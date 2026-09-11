@@ -1,0 +1,25 @@
+# Everything the running application does not need.
+.git
+.gitignore
+.venv
+venv
+**/__pycache__
+**/*.py[cod]
+*.egg-info
+.pytest_cache
+.mypy_cache
+.ruff_cache
+
+# Never let a real environment file reach an image layer.
+.env
+.env.*
+!.env.example
+
+# Local uploads and rendered pages.
+var/
+
+# Development-only.
+tests/
+Dockerfile
+.dockerignore
+docker-compose.yml
