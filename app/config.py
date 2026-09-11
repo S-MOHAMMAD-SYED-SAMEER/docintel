@@ -26,7 +26,6 @@ class Settings(BaseSettings):
     # Uploaded documents and rendered page images (milestone 3).
     storage_dir: Path = Path("./var/storage")
 
-    # Wired in milestone 2.
     database_url: str = "postgresql+psycopg://docintel:docintel@localhost:5432/docintel"
 
     # Wired in milestone 4.

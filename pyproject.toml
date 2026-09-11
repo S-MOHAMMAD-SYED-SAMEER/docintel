@@ -8,11 +8,13 @@ dependencies = [
     "uvicorn[standard]>=0.32",
     "pydantic>=2.9",
     "pydantic-settings>=2.6",
+    "sqlalchemy>=2.0",
+    "alembic>=1.14",
+    "psycopg[binary]>=3.2",
 ]
 
 # Dependencies are added as the milestone that needs them lands, so the
 # install stays honest about what the code actually imports.
-#   m2: sqlalchemy, alembic, psycopg[binary]
 #   m3: pypdfium2, python-multipart
 #   m4: anthropic
 #   m6: jinja2
