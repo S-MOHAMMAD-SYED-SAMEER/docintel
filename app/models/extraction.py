@@ -29,6 +29,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 
 if TYPE_CHECKING:
+    from app.models.correction import Correction
     from app.models.document import Document
 
 
@@ -99,11 +100,14 @@ class FieldValue(Base):
         index=True,
     )
     field_name: Mapped[str] = mapped_column(String(128))
-    # Null means the model did not find the field. Text, because a reviewer
-    # corrects what the document says, not a typed value.
+    # The *current* value: the model's answer until a human corrects it, and
+    # the human's from then on. What it held before each correction lives in
+    # `corrections`, so the original is never lost.
     value: Mapped[str | None] = mapped_column(Text, nullable=True)
-    # The final score: the model's confidence combined with the deterministic
-    # signals, per `app/confidence.py`.
+    # The final score, per `app/confidence.py`. It describes the value the
+    # model produced and is frozen at extraction time — a corrected value is
+    # human ground truth and is not scored, so read this together with
+    # `is_corrected` rather than as a judgement of the current value.
     confidence: Mapped[float] = mapped_column(Float)
     # What the model said about itself, kept verbatim. Never overwritten by
     # scoring — comparing the two is how you find a model that is confidently
@@ -120,6 +124,21 @@ class FieldValue(Base):
     )
 
     extraction: Mapped["Extraction"] = relationship(back_populates="field_values")
+    # Oldest first, so the chain reads as the field's history.
+    corrections: Mapped[list["Correction"]] = relationship(
+        back_populates="field_value",
+        cascade="all, delete-orphan",
+        order_by="Correction.corrected_at",
+    )
+
+    @property
+    def is_corrected(self) -> bool:
+        """Is `value` a human's answer rather than the model's?
+
+        Derived rather than stored: the corrections table is the single source
+        of truth, so the two can never drift apart.
+        """
+        return bool(self.corrections)
 
     def __repr__(self) -> str:
         return (

@@ -180,29 +180,6 @@ def test_a_missing_value_is_shown_as_not_found(
 # --- boundaries -----------------------------------------------------------
 
 
-def test_the_page_shows_no_correction_form(
-    api_client: TestClient, extracted_document
-) -> None:
-    """Corrections are milestone 7; this page is read-only."""
-    extracted_document(MANY_FLAGGED_PAYLOAD)
-
-    html = _html(api_client)
-
-    assert "<form" not in html
-    assert "<input" not in html
-
-
-def test_the_page_introduces_no_frontend_framework(
-    api_client: TestClient, extracted_document
-) -> None:
-    extracted_document(MANY_FLAGGED_PAYLOAD)
-
-    html = _html(api_client).lower()
-
-    assert "<script" not in html
-    assert "react" not in html
-
-
 def test_the_page_is_not_in_the_openapi_schema(api_client: TestClient) -> None:
     """It is a page, not part of the JSON API contract."""
     paths = api_client.get("/openapi.json").json()["paths"]
@@ -250,3 +227,143 @@ def test_reading_the_page_does_not_change_document_status(
     with Session(migrated_engine) as session:
         document = session.get(Document, text_layer_document.id)
         assert document.status is DocumentStatus.NEEDS_REVIEW
+
+
+# --- corrections from the page --------------------------------------------
+
+
+def _first_field_id(client: TestClient) -> str:
+    return client.get("/api/v1/review").json()["items"][0]["field_id"]
+
+
+def test_a_correction_form_appears_for_each_review_field(
+    api_client: TestClient, extracted_document
+) -> None:
+    extracted_document(MANY_FLAGGED_PAYLOAD)
+    queued = api_client.get("/api/v1/review").json()["items"]
+
+    html = _html(api_client)
+
+    assert html.count('<form class="correct"') == len(queued)
+    assert 'name="corrected_value"' in html
+    for item in queued:
+        assert f'action="/review/{item["field_id"]}"' in html
+
+
+def test_the_form_is_prefilled_with_the_current_value(
+    api_client: TestClient, extracted_document
+) -> None:
+    extracted_document(_payload_with(total="1500.00"))
+
+    html = _html(api_client)
+
+    assert 'value="1500.00"' in html
+
+
+def test_no_form_appears_when_the_queue_is_empty(
+    api_client: TestClient, extracted_document
+) -> None:
+    extracted_document(CONFIDENT_PAYLOAD)
+
+    assert "<form" not in _html(api_client)
+
+
+def test_submitting_the_form_records_the_correction(
+    api_client: TestClient, extracted_document, migrated_engine: Engine
+) -> None:
+    extracted_document(_payload_with(total="1500.00"))
+    field_id = _first_field_id(api_client)
+
+    response = api_client.post(
+        f"/review/{field_id}",
+        data={"corrected_value": "1210.00"},
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 303
+    assert response.headers["location"] == "/review"
+    with Session(migrated_engine) as session:
+        from app.models import Correction
+
+        assert session.query(Correction).count() == 1
+
+
+def test_an_empty_box_clears_the_value(
+    api_client: TestClient, extracted_document, migrated_engine: Engine
+) -> None:
+    """"The document does not state this" is a correction in its own right."""
+    extracted_document(MANY_FLAGGED_PAYLOAD)
+    field_id = _first_field_id(api_client)
+
+    api_client.post(f"/review/{field_id}", data={"corrected_value": "   "})
+
+    with Session(migrated_engine) as session:
+        from app.models import FieldValue
+
+        import uuid as _uuid
+
+        assert session.get(FieldValue, _uuid.UUID(field_id)).value is None
+
+
+def test_the_corrected_value_is_displayed_after_submitting(
+    api_client: TestClient, extracted_document
+) -> None:
+    extracted_document(_payload_with(total="1500.00"))
+    field_id = _first_field_id(api_client)
+    api_client.post(f"/review/{field_id}", data={"corrected_value": "1210.00"})
+
+    html = _html(api_client)
+
+    assert "Recently corrected" in html
+    assert "1210.00" in html
+    assert "These corrections are recorded." in html
+
+
+def test_the_corrected_field_leaves_the_queue_on_the_page(
+    api_client: TestClient, extracted_document
+) -> None:
+    extracted_document(_payload_with(total="1500.00"))
+    before = api_client.get("/api/v1/review").json()["total"]
+    api_client.post(f"/review/{_first_field_id(api_client)}", data={"corrected_value": "x"})
+
+    html = _html(api_client)
+
+    assert f"{before - 1} fields awaiting review" in html
+
+
+def test_the_reviewed_document_state_is_reflected(
+    api_client: TestClient, extracted_document
+) -> None:
+    extracted_document(MANY_FLAGGED_PAYLOAD)
+    while queue := api_client.get("/api/v1/review").json()["items"]:
+        api_client.post(
+            f"/review/{queue[0]['field_id']}", data={"corrected_value": "corrected"}
+        )
+
+    html = _html(api_client)
+
+    assert "Nothing to review." in html
+    assert "reviewed" in html
+
+
+def test_submitting_for_an_unknown_field_is_a_404(
+    api_client: TestClient, migrated_engine: Engine
+) -> None:
+    import uuid as _uuid
+
+    response = api_client.post(
+        f"/review/{_uuid.uuid4()}", data={"corrected_value": "x"}
+    )
+
+    assert response.status_code == 404
+
+
+def test_the_page_still_introduces_no_frontend_framework(
+    api_client: TestClient, extracted_document
+) -> None:
+    extracted_document(MANY_FLAGGED_PAYLOAD)
+
+    html = _html(api_client).lower()
+
+    assert "<script" not in html
+    assert "react" not in html

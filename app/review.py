@@ -82,7 +82,8 @@ def reason_for(field_value: FieldValue) -> ReviewReason:
 def _with_relations(statement):
     """Load the extraction and its document up front; the queue shows both."""
     return statement.options(
-        selectinload(FieldValue.extraction).selectinload(Extraction.document)
+        selectinload(FieldValue.extraction).selectinload(Extraction.document),
+        selectinload(FieldValue.corrections),
     )
 
 

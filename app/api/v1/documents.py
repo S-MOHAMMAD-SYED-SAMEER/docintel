@@ -16,12 +16,15 @@ from fastapi import (
     File,
     Form,
     HTTPException,
+    Query,
     UploadFile,
     status,
 )
+from fastapi.responses import JSONResponse, PlainTextResponse, Response
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from app import export as export_service
 from app import extraction, ingestion
 from app.config import Settings, get_settings
 from app.db.session import get_session
@@ -187,3 +190,64 @@ def extract_document(
         status=document.status,
         page_count=document.page_count,
     )
+
+
+@router.get(
+    "/documents/{document_id}/export",
+    summary="Export the document's current record",
+    description=(
+        "The record after review: a corrected field exports the human's value, "
+        "an uncorrected one the model's. Raw model responses are not included "
+        "— they stay in the extraction row for debugging and evals."
+    ),
+    responses={
+        200: {
+            "content": {"application/json": {}, "text/csv": {}},
+            "description": "The current record in the requested format.",
+        }
+    },
+)
+def export_document(
+    document_id: uuid.UUID,
+    session: Annotated[Session, Depends(get_session)],
+    format: Annotated[
+        str, Query(description="json or csv")
+    ] = export_service.JSON,
+) -> Response:
+    requested = format.strip().lower()
+    if requested not in export_service.SUPPORTED_FORMATS:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=(
+                f"Unsupported export format {format!r}. Supported: "
+                + ", ".join(export_service.SUPPORTED_FORMATS)
+                + "."
+            ),
+        )
+
+    document = export_service.get_document(session, document_id)
+    if document is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No document with id {document_id}.",
+        )
+
+    try:
+        record = export_service.build_record(session, document)
+    except export_service.ExportError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=str(exc)
+        ) from exc
+
+    if requested == export_service.CSV:
+        return PlainTextResponse(
+            export_service.to_csv(record),
+            media_type="text/csv; charset=utf-8",
+            headers={
+                "Content-Disposition": (
+                    f'attachment; filename="{document.id}.csv"'
+                )
+            },
+        )
+
+    return JSONResponse(record)

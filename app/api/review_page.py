@@ -5,16 +5,17 @@ JSON contract. It reads the same persisted rows the API does — the page never
 scores anything of its own.
 """
 
+import uuid
 from itertools import groupby
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Request
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request, status
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
-from app import review
+from app import corrections, review
 from app.api.v1.review import (
     DEFAULT_PAGE_SIZE,
     MAX_PAGE_SIZE,
@@ -67,5 +68,33 @@ def review_page(
             "confidence_threshold": settings.confidence_threshold,
             "items": items,
             "grouped": _grouped(items),
+            "recent": corrections.recent(session),
         },
     )
+
+
+@router.post("/review/{field_id}")
+def submit_correction_form(
+    field_id: uuid.UUID,
+    session: Annotated[Session, Depends(get_session)],
+    corrected_value: Annotated[str, Form()] = "",
+) -> RedirectResponse:
+    """The page's form target: form-encoded in, redirect back out.
+
+    Separate from the JSON endpoint so the API keeps a single content type,
+    and a POST-redirect-GET so a reload does not resubmit the correction. No
+    JavaScript is involved.
+    """
+    field_value = review.get_field(session, field_id)
+    if field_value is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No field value with id {field_id}.",
+        )
+
+    # An empty box means "the document does not state this", which is a
+    # correction in its own right.
+    value = corrected_value.strip() or None
+    corrections.apply_correction(session, field_value, value)
+
+    return RedirectResponse("/review", status_code=status.HTTP_303_SEE_OTHER)

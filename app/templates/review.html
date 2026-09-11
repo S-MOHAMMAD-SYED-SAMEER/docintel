@@ -20,6 +20,11 @@
     .muted { color: #666; }
     ul.checks { margin: 0; padding-left: 1.1rem; }
     .empty { padding: 1rem; background: #f2f2f2; }
+    form.correct { display: flex; gap: 0.3rem; }
+    form.correct input[type=text] { width: 12rem; font-family: inherit; }
+    .recent { margin-top: 2rem; }
+    .recent h2 { font-size: 1.05rem; }
+    .was { text-decoration: line-through; color: #777; }
   </style>
 </head>
 <body>
@@ -43,12 +48,13 @@
         <th>Page</th>
         <th>Validation</th>
         <th>Why it needs review</th>
+        <th>Correction</th>
       </tr>
     </thead>
     <tbody>
       {% for document_name, rows in grouped %}
       <tr class="doc-header">
-        <td colspan="7">
+        <td colspan="8">
           {{ document_name }}
           <span class="muted">
             &mdash; {{ rows[0].document.doc_type }},
@@ -85,11 +91,60 @@
             </ul>
           </td>
           <td>{{ item.review_reason }}</td>
+          <td>
+            <form class="correct" method="post"
+                  action="/review/{{ item.field_id }}">
+              <input type="text" name="corrected_value"
+                     value="{{ item.value if item.value is not none else '' }}"
+                     aria-label="Corrected value for {{ item.field_name }}">
+              <button type="submit">Save</button>
+            </form>
+          </td>
         </tr>
         {% endfor %}
       {% endfor %}
     </tbody>
   </table>
+  {% endif %}
+
+  {% if recent %}
+  <section class="recent">
+    <h2>Recently corrected</h2>
+    <p class="muted">
+      These corrections are recorded. The value below is what the record now
+      exports; the model's confidence is kept against its own answer.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Document</th>
+          <th>Field</th>
+          <th>Was</th>
+          <th>Now</th>
+          <th>Corrected at</th>
+          <th>Document status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for correction in recent %}
+        <tr>
+          <td>{{ correction.field_value.extraction.document.filename }}</td>
+          <td>{{ correction.field_value.field_name }}</td>
+          <td class="value was">
+            {% if correction.original_value is none %}&mdash;
+            {% else %}{{ correction.original_value }}{% endif %}
+          </td>
+          <td class="value">
+            {% if correction.corrected_value is none %}&mdash;
+            {% else %}{{ correction.corrected_value }}{% endif %}
+          </td>
+          <td>{{ correction.corrected_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+          <td>{{ correction.field_value.extraction.document.status.value }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
   {% endif %}
 </body>
 </html>

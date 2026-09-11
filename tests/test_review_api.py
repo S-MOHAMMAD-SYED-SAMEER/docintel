@@ -377,27 +377,30 @@ def test_the_queue_does_not_rescore_when_the_threshold_changes(
 # --- POST /api/v1/review/{field_id} ---------------------------------------
 
 
-def test_correction_endpoint_exists_but_stores_nothing(
+def test_correcting_a_field_takes_it_out_of_the_queue(
     api_client: TestClient, extracted_document, migrated_engine: Engine
 ) -> None:
     extracted_document(_payload_with(total="1500.00"))
     field_id = _by_name(_items(api_client))["total"]["field_id"]
 
-    response = api_client.post(f"/api/v1/review/{field_id}")
+    response = api_client.post(
+        f"/api/v1/review/{field_id}", json={"corrected_value": "1210.00"}
+    )
 
-    assert response.status_code == 501
-    assert "milestone 7" in response.json()["detail"]
-
+    assert response.status_code == 201
+    assert "total" not in _by_name(_items(api_client))
     with Session(migrated_engine) as session:
         stored = session.get(FieldValue, uuid.UUID(field_id))
-        assert stored.value == "1500.00"
-        assert stored.needs_review is True
+        assert stored.value == "1210.00"
+        assert stored.needs_review is False
 
 
 def test_correction_endpoint_404s_for_an_unknown_field(
     api_client: TestClient, migrated_engine: Engine
 ) -> None:
-    response = api_client.post(f"/api/v1/review/{uuid.uuid4()}")
+    response = api_client.post(
+        f"/api/v1/review/{uuid.uuid4()}", json={"corrected_value": "x"}
+    )
 
     assert response.status_code == 404
 
@@ -405,7 +408,9 @@ def test_correction_endpoint_404s_for_an_unknown_field(
 def test_correction_endpoint_rejects_a_malformed_field_id(
     api_client: TestClient, migrated_engine: Engine
 ) -> None:
-    response = api_client.post("/api/v1/review/not-a-uuid")
+    response = api_client.post(
+        "/api/v1/review/not-a-uuid", json={"corrected_value": "x"}
+    )
 
     assert response.status_code == 422
 

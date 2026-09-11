@@ -309,14 +309,90 @@ counts as a miss.
 document: no build step, no framework, no stylesheet beyond a few rules inline.
 It is read-only in this milestone.
 
-`POST /api/v1/review/{field_id}` exists because the README's API contract lists
-it, but storing corrections is milestone 7. It resolves the field (404 if
-unknown) and then returns **501** without writing anything; the request body is
-deliberately unspecified so milestone 7 can define it.
+`GET /review` also carries a one-line correction form per queued field and a
+"Recently corrected" table, so a reviewer can see their work was recorded. The
+form posts to `POST /review/{field_id}` (form-encoded, then a 303 back to the
+page, so a reload does not resubmit); the JSON API keeps its own content type.
 
-Document status is untouched by reading the queue: a document with any flagged
-field stays `needs_review`, one with none stays `extracted`, and `reviewed`
-waits for the correction workflow.
+### Correcting a field
+
+```bash
+curl -X POST localhost:8000/api/v1/review/<field_id> \
+     -H 'content-type: application/json' \
+     -d '{"corrected_value": "1210.00"}'
+```
+
+A correction is ground truth. The model is **not** called again, and the field
+is not rescored. What changes:
+
+| Column | After a correction |
+| --- | --- |
+| `field_values.value` | the corrected value — this is what the export reads |
+| `field_values.needs_review` | false; the field has been handled |
+| `corrections` | a new row: `original_value` (what it said a moment ago), `corrected_value`, `corrected_at` |
+
+What deliberately does not change: `model_confidence`, `confidence`,
+`validation`, and `extractions.raw_response`. All four describe the *model's*
+answer and stay true of it forever. Read them next to `FieldValue.is_corrected`
+— derived from the corrections table, so the two can never drift — which says
+whether the current value is still the one they describe.
+
+Correcting a field twice writes two rows whose values chain back to the model's
+original, so no revision is overwritten. An empty corrected value is a valid
+correction: it means the document does not state this field.
+
+Document status is untouched by *reading* the queue. A correction resolves it:
+the document stays `needs_review` while any field still is, and becomes
+`reviewed` once none is. A `failed` or still-processing document is never moved
+by a correction.
+
+### Exporting the record
+
+```bash
+curl localhost:8000/api/v1/documents/<id>/export             # json (default)
+curl localhost:8000/api/v1/documents/<id>/export?format=csv
+```
+
+Exactly two formats; anything else is a 422, an unknown document a 404, and a
+document with no completed extraction a 409. Raw model responses are never
+exported — they stay in `extractions.raw_response` for debugging and evals.
+
+**JSON.** Three top-level keys. `original_value` and `corrected_at` appear only
+on fields a human changed:
+
+```json
+{
+  "document":   {"id", "filename", "doc_type", "status", "page_count", "uploaded_at"},
+  "extraction": {"id", "model_name", "prompt_version", "extracted_at"},
+  "fields": {
+    "total": {
+      "value": "1210.00",
+      "corrected": true,
+      "source_page": 2,
+      "needs_review": false,
+      "confidence": 0.49,
+      "model_confidence": 0.98,
+      "original_value": "1500.00",
+      "corrected_at": "2026-09-11T07:16:52+00:00"
+    },
+    "line_items": {"value": [{"description": "...", "quantity": "10",
+                              "unit_price": "40.00", "amount": "400.00"}], "...": "..."}
+  }
+}
+```
+
+`line_items` comes back as a nested list, not a JSON string — which field is
+structured is read off the extractor's schema, not guessed from the stored text.
+
+**CSV.** One row per field, twelve columns:
+
+```
+document_id,filename,doc_type,document_status,field_name,value,corrected,
+original_value,confidence,model_confidence,source_page,needs_review
+```
+
+A null is an empty cell and `line_items` is written as compact JSON in its
+cell — a standard parseable representation rather than a Python `repr`.
 
 ### Cost
 
