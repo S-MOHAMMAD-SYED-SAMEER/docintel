@@ -16,11 +16,11 @@ dependencies = [
     # PNG on disk, and how uploaded images are normalised to the same format.
     "pillow>=11.0",
     "python-multipart>=0.0.20",
+    "anthropic>=1.5,<2",
 ]
 
 # Dependencies are added as the milestone that needs them lands, so the
 # install stays honest about what the code actually imports.
-#   m4: anthropic
 #   m6: jinja2
 
 [project.optional-dependencies]

@@ -22,11 +22,16 @@ from fastapi import (
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app import ingestion
+from app import extraction, ingestion
 from app.config import Settings, get_settings
 from app.db.session import get_session
+from app.extractors import (
+    UnknownDocumentType,
+    get_extractor,
+    registered_doc_types,
+)
 from app.media import SUPPORTED_MEDIA_TYPE_NAMES, UnsupportedMediaType
-from app.models import DocumentStatus
+from app.models import Document, DocumentStatus
 
 router = APIRouter(tags=["documents"])
 
@@ -122,3 +127,63 @@ async def upload_document(
     background_tasks.add_task(ingestion.render_pages_in_background, document.id)
 
     return DocumentResponse.model_validate(document)
+
+
+class ExtractionAcceptedResponse(BaseModel):
+    """What the caller gets back when an extraction has been queued."""
+
+    document_id: uuid.UUID
+    doc_type: str
+    status: DocumentStatus
+    page_count: int | None
+
+
+@router.post(
+    "/documents/{document_id}/extract",
+    response_model=ExtractionAcceptedResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Run extraction over a document's rendered pages",
+    description=(
+        "Sends the rendered pages to the extraction provider in the background. "
+        "Accepted document types: " + ", ".join(registered_doc_types()) + "."
+    ),
+)
+def extract_document(
+    document_id: uuid.UUID,
+    background_tasks: BackgroundTasks,
+    session: Annotated[Session, Depends(get_session)],
+) -> ExtractionAcceptedResponse:
+    document = session.get(Document, document_id)
+    if document is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No document with id {document_id}.",
+        )
+
+    # Checked here so an unknown type is a 422 rather than a background failure
+    # the caller never sees.
+    try:
+        get_extractor(document.doc_type)
+    except UnknownDocumentType as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(exc),
+        ) from exc
+
+    if document.page_count is None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                "Document has no rendered pages yet; wait for rendering to "
+                "finish before extracting."
+            ),
+        )
+
+    background_tasks.add_task(extraction.extract_document_in_background, document.id)
+
+    return ExtractionAcceptedResponse(
+        document_id=document.id,
+        doc_type=document.doc_type,
+        status=document.status,
+        page_count=document.page_count,
+    )

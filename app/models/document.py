@@ -3,11 +3,15 @@
 import enum
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, Enum, Integer, String, Text, Uuid, func, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.extraction import Extraction
 
 
 class DocumentStatus(enum.StrEnum):
@@ -56,6 +60,12 @@ class Document(Base):
     # Why a document ended up in FAILED. Set whenever status becomes FAILED and
     # cleared on a successful retry, so a failure is never silent.
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    extractions: Mapped[list["Extraction"]] = relationship(
+        back_populates="document",
+        cascade="all, delete-orphan",
+        order_by="Extraction.created_at",
+    )
 
     def __repr__(self) -> str:
         return f"<Document id={self.id} filename={self.filename!r} status={self.status}>"

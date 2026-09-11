@@ -33,9 +33,12 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg://docintel:docintel@localhost:5432/docintel"
 
-    # Wired in milestone 4.
+    # Extraction provider.
     anthropic_api_key: str = ""
-    extraction_model: str = "claude-sonnet-5"
+    extraction_model: str = "claude-opus-5"
+    # Ceiling for the extraction response. An invoice schema with line items is
+    # a few thousand tokens; the headroom is for long line-item tables.
+    extraction_max_tokens: int = Field(default=16000, gt=0)
 
     # Wired in milestone 5: any field scoring below this is routed to review.
     confidence_threshold: float = Field(default=0.85, ge=0.0, le=1.0)

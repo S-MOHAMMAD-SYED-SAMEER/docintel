@@ -175,6 +175,54 @@ been extracted yet, and `extracted` would be a lie. Milestone 4 moves it on.
 The `error` column is an addition to the README data model, so a failure is
 never silent (see "notes for the implementer").
 
+### Extracting a document
+
+```bash
+curl -X POST localhost:8000/api/v1/documents/<document_id>/extract
+```
+
+Returns 202; the extraction runs in the background against the document's
+rendered pages. 404 if the document is unknown, 409 if its pages are not
+rendered yet, 422 if no extractor is registered for its `doc_type`.
+
+The model call is reached only through `app/providers/` —
+`extract(images, schema, prompt) -> RawExtraction`. `app/providers/
+anthropic_vision.py` is the only module that imports the Anthropic SDK;
+swapping providers means adding a module there and changing `get_provider()`,
+and nothing above that boundary changes.
+
+What a document type contributes lives in `app/extractors/<type>.py`: its
+Pydantic schema, its prompt, and a `prompt_version`. Adding a type is a new
+module plus one registry entry — the pipeline never names a type.
+
+Every schema field is an `ExtractedField`, so a value always arrives with the
+model's own confidence and the page it came from. That confidence is stored
+exactly as reported and is **not** trusted on its own; milestone 5 combines it
+with deterministic checks to produce the score that routes a field to review,
+which is also what sets `field_values.needs_review`.
+
+Amounts travel as decimal strings and are parsed to `Decimal`. A JSON number
+would arrive as a float and `1234.56` would stop being exact, which milestone
+5's totals arithmetic cannot afford.
+
+Every attempt writes an `extractions` row, successful or not:
+
+| Outcome | Row | Document |
+| --- | --- | --- |
+| Parsed | `raw_response` + `parsed` + one `field_values` row per field | `extracted` |
+| Unparseable answer | `raw_response` + `error`, `parsed` null | `failed` |
+| Provider error or refusal | `error`, no field values | `failed` |
+
+`raw_response` is kept verbatim and never discarded — it is what you read when
+an extraction is wrong, and what future eval runs re-score.
+
+### Cost
+
+`input_tokens`, `output_tokens`, `latency_ms` and `cost_usd` are recorded per
+extraction. Cost is computed from a published price table in the Anthropic
+provider; a model missing from that table stores `cost_usd` as null rather
+than a guess.
+
 ### Migrations
 
 Alembic reads the database URL from `DOCINTEL_DATABASE_URL` via `app/config.py`
