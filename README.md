@@ -401,6 +401,62 @@ extraction. Cost is computed from a published price table in the Anthropic
 provider; a model missing from that table stores `cost_usd` as null rather
 than a guess.
 
+### Running an evaluation
+
+```bash
+python -m evals.run --dataset invoices_v1                    # real API, costs money
+python -m evals.run --dataset invoices_v1 --provider stub    # offline, harness only
+python -m evals.run --dataset invoices_v1 --limit 3 --json --no-persist
+```
+
+`--provider anthropic` is the default and is the only setting whose numbers
+mean anything. `--provider stub` answers every document identically without a
+network call; it exists to exercise the harness in CI and prints a banner
+saying its numbers are not a measurement of extraction quality.
+
+Every document goes through the real pipeline — store, render, extract,
+validate, score — so what is measured is the system, not a shortcut through it.
+Eval documents are written to the configured database and storage like any
+other upload; they are the evidence behind the numbers, so they are kept.
+
+The run exits non-zero if any document failed to extract. A failed document's
+labelled fields are counted as **wrong**, never skipped, and cannot be scored
+correct even where the label is null — the pipeline did not answer "absent", it
+did not answer at all.
+
+**Dataset.** `evals/datasets/invoices_v1/` holds 20 synthetic invoices and
+`labels.json`; see that directory's README. Labels are the values used to render
+each PDF, so they describe what the document says, independently of extraction.
+
+**Metric definitions.**
+
+| Metric | Definition |
+| --- | --- |
+| exact-match accuracy | per field: matching values / labelled occurrences of that field |
+| review rate | flagged fields / evaluated fields |
+| document review rate | documents with ≥1 flagged field / documents |
+| **false-confident rate** | wrong **and not flagged** / evaluated fields |
+| ...of unflagged fields | wrong and not flagged / not-flagged fields |
+| mean cost | sum of `extractions.cost_usd` / documents that reported a cost |
+| latency | `extractions.latency_ms`: the provider call alone, request sent to full response received. Excludes rendering, scoring and database writes. |
+| p50 / p95 | nearest-rank, so the figure is always a latency actually observed |
+
+The report prints all four outcomes — correct/flagged, correct/unflagged,
+wrong/flagged (caught), wrong/unflagged (false-confident) — so "wrong" is never
+confused with "wrong and nobody was told".
+
+**Normalisation** removes presentation only: money compares as decimals
+(`1,210.00` == `1210.0`), line items compare structurally row by row, and other
+values have whitespace collapsed. Case and punctuation are **not** normalised —
+`ACME` and `Acme`, `INV20261001` and `INV-2026-1001`, are different answers. An
+absent value matches only another absent value.
+
+Every run writes an `eval_runs` row: dataset, prompt version, model, document
+count, per-field accuracy, review rate, false-confident rate, mean cost, mean
+latency, and a `metrics` blob holding the percentiles, outcome counts and any
+failures. Bump `prompt_version` on every prompt change so the before/after
+number is always attached to it.
+
 ### Migrations
 
 Alembic reads the database URL from `DOCINTEL_DATABASE_URL` via `app/config.py`

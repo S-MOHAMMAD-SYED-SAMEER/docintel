@@ -1,0 +1,68 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 284 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+40 750 Td
+(Acme Supplies BV) Tj T*
+(12 Kade, 1011 AB Amsterdam) Tj T*
+(VAT NL123456789B01) Tj T*
+() Tj T*
+(INVOICE INV-2026-1011) Tj T*
+(Invoice date 2026-11-11) Tj T*
+(Due date 2026-11-25) Tj T*
+() Tj T*
+(Bill to: Beta Ltd) Tj T*
+(Purchase order: PO-4411) Tj T*
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 337 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+40 750 Td
+(Description                     Qty   Unit price     Amount) Tj T*
+(Courier delivery                  2        18.00        36.00) Tj T*
+(Laminated sign, A2                3        65.00       195.00) Tj T*
+() Tj T*
+(Subtotal   EUR 231.00) Tj T*
+(Tax        EUR 48.51) Tj T*
+(TOTAL      EUR 279.51) Tj T*
+ET
+endstream
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000189 00000 n 
+0000000315 00000 n 
+0000000650 00000 n 
+0000000776 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+1164
+%%EOF

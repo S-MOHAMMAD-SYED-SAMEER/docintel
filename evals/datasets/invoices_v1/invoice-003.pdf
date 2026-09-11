@@ -1,0 +1,67 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 263 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+40 750 Td
+(Kestrel Print & Sign) Tj T*
+(88 Mill Lane, Leeds LS1 5QR) Tj T*
+(VAT GB223344556) Tj T*
+() Tj T*
+(INVOICE INV-2026-1003) Tj T*
+(Invoice date 2026-03-03) Tj T*
+(Due date 2026-03-17) Tj T*
+() Tj T*
+(Bill to: Hollis & Dane LLP) Tj T*
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 338 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+40 750 Td
+(Description                     Qty   Unit price     Amount) Tj T*
+(Hex bolt M8 \(box of 100\)          3        12.50        37.50) Tj T*
+(Courier delivery                  4        18.00        72.00) Tj T*
+() Tj T*
+(Subtotal   GBP 109.50) Tj T*
+(Tax        GBP 0.00) Tj T*
+(TOTAL      GBP 109.50) Tj T*
+ET
+endstream
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000189 00000 n 
+0000000315 00000 n 
+0000000629 00000 n 
+0000000755 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+1144
+%%EOF
