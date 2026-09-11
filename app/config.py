@@ -35,7 +35,7 @@ class Settings(BaseSettings):
 
     # Extraction provider.
     anthropic_api_key: str = ""
-    extraction_model: str = "claude-opus-5"
+    extraction_model: str = "claude-sonnet-5"
     # Ceiling for the extraction response. An invoice schema with line items is
     # a few thousand tokens; the headroom is for long line-item tables.
     extraction_max_tokens: int = Field(default=16000, gt=0)
