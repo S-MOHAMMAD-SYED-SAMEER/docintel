@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Review queue &mdash; {{ app_name }}</title>
+  <style>
+    /* Plain and functional on purpose: the README rules out a design system. */
+    body { font-family: system-ui, sans-serif; margin: 2rem; color: #111; }
+    h1 { font-size: 1.4rem; margin-bottom: 0.2rem; }
+    .meta { color: #555; margin-bottom: 1.5rem; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+    th, td { border: 1px solid #ccc; padding: 0.4rem 0.55rem; text-align: left;
+             vertical-align: top; }
+    th { background: #f2f2f2; }
+    tr.doc-header td { background: #fafafa; font-weight: bold; }
+    .value { font-family: ui-monospace, monospace; max-width: 22rem;
+             overflow-wrap: anywhere; }
+    .fail { color: #a40000; }
+    .ok { color: #0a6100; }
+    .muted { color: #666; }
+    ul.checks { margin: 0; padding-left: 1.1rem; }
+    .empty { padding: 1rem; background: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h1>Review queue</h1>
+  <p class="meta">
+    {{ total }} field{{ '' if total == 1 else 's' }} awaiting review.
+    Scored against a threshold of {{ '%.2f'|format(confidence_threshold) }}.
+    {% if total > items|length %}Showing {{ items|length }}.{% endif %}
+  </p>
+
+  {% if not items %}
+    <p class="empty">Nothing to review.</p>
+  {% else %}
+  <table>
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th>Extracted value</th>
+        <th>Confidence</th>
+        <th>Model said</th>
+        <th>Page</th>
+        <th>Validation</th>
+        <th>Why it needs review</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for document_name, rows in grouped %}
+      <tr class="doc-header">
+        <td colspan="7">
+          {{ document_name }}
+          <span class="muted">
+            &mdash; {{ rows[0].document.doc_type }},
+            status {{ rows[0].document.status.value }},
+            {{ rows[0].document.page_count or '?' }} page(s),
+            extracted by {{ rows[0].model_name }} ({{ rows[0].prompt_version }})
+          </span>
+        </td>
+      </tr>
+        {% for item in rows %}
+        <tr>
+          <td>{{ item.field_name }}</td>
+          <td class="value">
+            {% if item.value is none %}<span class="muted">not found</span>
+            {% else %}{{ item.value }}{% endif %}
+          </td>
+          <td>{{ '%.3f'|format(item.confidence) }}</td>
+          <td>{{ '%.2f'|format(item.model_confidence) }}</td>
+          <td>{{ item.source_page if item.source_page is not none else '—' }}</td>
+          <td>
+            {% if item.failed_checks %}
+              <span class="fail">failed</span>
+              <ul class="checks">
+                {% for check in item.failed_checks %}<li>{{ check }}</li>{% endfor %}
+              </ul>
+            {% else %}
+              <span class="ok">no failed checks</span>
+            {% endif %}
+            <ul class="checks muted">
+              {% for signal in item.signals %}
+                <li>{{ signal.name }}: {{ '%.2f'|format(signal.score) }}
+                    (weight {{ '%.2f'|format(signal.weight) }})</li>
+              {% endfor %}
+            </ul>
+          </td>
+          <td>{{ item.review_reason }}</td>
+        </tr>
+        {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</body>
+</html>

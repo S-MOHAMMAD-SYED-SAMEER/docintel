@@ -279,6 +279,45 @@ whole document is searched rather than only the page the model named: a
 mis-numbered `source_page` is a separate problem and should not fail a value
 that is plainly in the document.
 
+### Reviewing flagged fields
+
+```bash
+curl localhost:8000/api/v1/review          # JSON queue
+open localhost:8000/review                 # the reviewer's page
+```
+
+`GET /api/v1/review` returns only field values whose persisted `needs_review`
+is true, least confident first, with a stable tie-break so the same queue pages
+the same way twice (`limit`, default 50, max 200; `offset`). Each entry carries
+the document (filename, type, status, page count), the field name and extracted
+value, `confidence` (the final score) alongside `model_confidence` (what the
+model claimed), `source_page`, the failed deterministic checks, the full signal
+breakdown, and a `review_reason` sentence. The response echoes the current
+`confidence_threshold`.
+
+**The queue never rescores.** `needs_review`, `confidence` and `validation` are
+written once, when the extraction runs. Changing the threshold afterwards does
+not silently re-sort the queue — the rows record the decision that was actually
+made, and a re-extraction is what changes them.
+
+A field whose text-layer signal is simply *absent* — a scan, a photo, or a value
+that cannot be looked for — reports `text_layer_miss: false` and says nothing
+about the text layer in its reason. Only a signal that ran and came back empty
+counts as a miss.
+
+`GET /review` renders the same rows as a plain Jinja2 table, grouped by
+document: no build step, no framework, no stylesheet beyond a few rules inline.
+It is read-only in this milestone.
+
+`POST /api/v1/review/{field_id}` exists because the README's API contract lists
+it, but storing corrections is milestone 7. It resolves the field (404 if
+unknown) and then returns **501** without writing anything; the request body is
+deliberately unspecified so milestone 7 can define it.
+
+Document status is untouched by reading the queue: a document with any flagged
+field stays `needs_review`, one with none stays `extracted`, and `reviewed`
+waits for the correction workflow.
+
 ### Cost
 
 `input_tokens`, `output_tokens`, `latency_ms` and `cost_usd` are recorded per

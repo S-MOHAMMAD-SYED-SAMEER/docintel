@@ -426,3 +426,28 @@ def text_layer_document(api_client: TestClient, migrated_engine: Engine):
         assert document.page_count == 2
         session.expunge(document)
     return document
+
+
+@pytest.fixture
+def extracted_document(text_layer_document, migrated_engine: Engine):
+    """A text-layer document that has been extracted and scored.
+
+    Returns a callable so a test can choose the payload the model "returned"
+    and therefore which fields end up in the review queue.
+    """
+    from sqlalchemy.orm import Session as OrmSession
+
+    from app import extraction as extraction_service
+    from app.models import Document
+
+    def _extract(payload: dict[str, object] | None = None):
+        with OrmSession(migrated_engine) as session:
+            document = session.get(Document, text_layer_document.id)
+            assert document is not None
+            extraction = extraction_service.extract_document(
+                session, document, FakeProvider(payload=payload)
+            )
+            session.expunge_all()
+            return extraction.id
+
+    return _extract
