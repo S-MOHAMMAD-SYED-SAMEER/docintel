@@ -11,11 +11,15 @@ dependencies = [
     "sqlalchemy>=2.0",
     "alembic>=1.14",
     "psycopg[binary]>=3.2",
+    "pypdfium2>=4.30",
+    # pypdfium2 renders to a raw bitmap; Pillow is how that bitmap becomes a
+    # PNG on disk, and how uploaded images are normalised to the same format.
+    "pillow>=11.0",
+    "python-multipart>=0.0.20",
 ]
 
 # Dependencies are added as the milestone that needs them lands, so the
 # install stays honest about what the code actually imports.
-#   m3: pypdfium2, python-multipart
 #   m4: anthropic
 #   m6: jinja2
 

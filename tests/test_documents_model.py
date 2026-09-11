@@ -18,6 +18,9 @@ README_COLUMNS = {
     "status",
     "uploaded_at",
 }
+# Beyond the README data model: why a document is in FAILED (milestone 3).
+EXTRA_COLUMNS = {"error"}
+ALL_COLUMNS = README_COLUMNS | EXTRA_COLUMNS
 README_STATUSES = [
     "uploaded",
     "processing",
@@ -34,12 +37,14 @@ def test_migration_creates_the_documents_table(migrated_engine: Engine) -> None:
 
 def test_columns_match_the_readme_data_model(migrated_engine: Engine) -> None:
     columns = inspect(migrated_engine).get_columns("documents")
-    assert {column["name"] for column in columns} == README_COLUMNS
+    assert {column["name"] for column in columns} == ALL_COLUMNS
 
     by_name = {column["name"]: column for column in columns}
     assert by_name["id"]["type"].python_type is uuid.UUID
-    # Only page_count is unknown at upload time; everything else is required.
+    # page_count is unknown until pages are rendered and error is only set on
+    # failure; every column the README names is otherwise required.
     assert by_name["page_count"]["nullable"] is True
+    assert by_name["error"]["nullable"] is True
     assert not any(
         by_name[name]["nullable"] for name in README_COLUMNS - {"page_count"}
     )

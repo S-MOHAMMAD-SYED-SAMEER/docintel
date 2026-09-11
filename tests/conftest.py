@@ -1,8 +1,12 @@
+import io
 import os
 from collections.abc import Iterator
+from pathlib import Path
 
+import pypdfium2 as pdfium
 import pytest
 import sqlalchemy
+from PIL import Image
 from alembic.config import Config as AlembicConfig
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine
@@ -99,3 +103,56 @@ def migrated_engine(
 def session(migrated_engine: Engine) -> Iterator[Session]:
     with Session(migrated_engine) as db_session:
         yield db_session
+
+
+@pytest.fixture
+def storage_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[Path]:
+    """Point storage at a throwaway directory for the duration of a test."""
+    root = tmp_path / "storage"
+    monkeypatch.setenv("DOCINTEL_STORAGE_DIR", str(root))
+    get_settings.cache_clear()
+    try:
+        yield root
+    finally:
+        get_settings.cache_clear()
+
+
+@pytest.fixture
+def api_client(
+    migrated_engine: Engine, storage_dir: Path, monkeypatch: pytest.MonkeyPatch
+) -> Iterator[TestClient]:
+    """A client backed by the migrated test database and temporary storage."""
+    monkeypatch.setenv("DOCINTEL_ENVIRONMENT", "test")
+    get_settings.cache_clear()
+    reset_engine()
+    try:
+        yield TestClient(create_app())
+    finally:
+        get_settings.cache_clear()
+        reset_engine()
+
+
+def build_pdf(pages: int = 3) -> bytes:
+    """A real, minimal PDF — rendering is the thing under test, so no stubs."""
+    pdf = pdfium.PdfDocument.new()
+    for _ in range(pages):
+        pdf.new_page(200, 260)
+    buffer = io.BytesIO()
+    pdf.save(buffer)
+    return buffer.getvalue()
+
+
+def build_png(size: tuple[int, int] = (120, 80)) -> bytes:
+    buffer = io.BytesIO()
+    Image.new("RGBA", size, (200, 30, 30, 255)).save(buffer, format="PNG")
+    return buffer.getvalue()
+
+
+@pytest.fixture
+def pdf_bytes() -> bytes:
+    return build_pdf()
+
+
+@pytest.fixture
+def png_bytes() -> bytes:
+    return build_png()

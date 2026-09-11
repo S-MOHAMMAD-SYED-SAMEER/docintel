@@ -4,7 +4,7 @@ import enum
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, Integer, String, Uuid, func, text
+from sqlalchemy import DateTime, Enum, Integer, String, Text, Uuid, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -53,6 +53,9 @@ class Document(Base):
         DateTime(timezone=True),
         server_default=func.now(),
     )
+    # Why a document ended up in FAILED. Set whenever status becomes FAILED and
+    # cleared on a successful retry, so a failure is never silent.
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     def __repr__(self) -> str:
         return f"<Document id={self.id} filename={self.filename!r} status={self.status}>"

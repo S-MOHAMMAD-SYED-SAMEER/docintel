@@ -137,6 +137,44 @@ curl localhost:8000/api/v1/health
 pytest
 ```
 
+### Uploading a document
+
+```bash
+curl -F file=@invoice.pdf -F doc_type=invoice localhost:8000/api/v1/documents
+```
+
+Accepts PDF, PNG, JPEG, TIFF and WEBP. The declared content type is treated as
+a claim and verified against the file's own leading bytes, so a text file named
+`invoice.pdf` is rejected (415) rather than failing later in the renderer.
+
+The response returns immediately with the document id and `status: uploaded`;
+pages are rendered in a `BackgroundTasks` job (the README non-goals rule out a
+worker queue). Storage layout, under `DOCINTEL_STORAGE_DIR`:
+
+```
+documents/<document_id>/source.pdf
+documents/<document_id>/pages/page-0001.png
+```
+
+`Document.storage_path` holds the path *relative* to the storage root, so the
+root can move without rewriting rows. The stored filename comes from the
+detected type, never from the client, so an upload named `../../etc/passwd`
+cannot escape the root; the original name is kept in the `filename` column.
+
+Status through this leg of the pipeline:
+
+| Status | Meaning |
+| --- | --- |
+| `uploaded` | bytes are on disk, nothing rendered yet |
+| `processing` | pages are rendering, or are rendered and waiting on the extractor |
+| `failed` | rendering gave up; `error` holds the reason and the source is kept |
+
+A successfully rendered document stays `processing` on purpose — nothing has
+been extracted yet, and `extracted` would be a lie. Milestone 4 moves it on.
+
+The `error` column is an addition to the README data model, so a failure is
+never silent (see "notes for the implementer").
+
 ### Migrations
 
 Alembic reads the database URL from `DOCINTEL_DATABASE_URL` via `app/config.py`

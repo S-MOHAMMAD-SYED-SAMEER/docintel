@@ -23,8 +23,13 @@ class Settings(BaseSettings):
     environment: str = "local"
     debug: bool = False
 
-    # Uploaded documents and rendered page images (milestone 3).
+    # Root for uploaded documents and their rendered page images.
     storage_dir: Path = Path("./var/storage")
+    # Uploads larger than this are rejected with 413 before anything is written.
+    max_upload_bytes: int = Field(default=25 * 1024 * 1024, gt=0)
+    # Render resolution for PDF pages. Higher is sharper but costs more to send
+    # to a vision model later.
+    render_dpi: int = Field(default=200, ge=72, le=600)
 
     database_url: str = "postgresql+psycopg://docintel:docintel@localhost:5432/docintel"
 
