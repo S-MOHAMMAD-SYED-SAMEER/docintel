@@ -49,7 +49,8 @@ def test_extract_persists_an_extraction(
 
         document = session.get(Document, rendered_document.id)
         assert document is not None
-        assert document.status is DocumentStatus.EXTRACTED
+        # Scored on the way in; the fixture has fields below the threshold.
+        assert document.status is DocumentStatus.NEEDS_REVIEW
 
     assert len(provider_in_use.calls) == 1
 

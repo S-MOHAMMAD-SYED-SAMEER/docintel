@@ -164,6 +164,66 @@ def build_pdf(pages: int = 3) -> bytes:
     return buffer.getvalue()
 
 
+def build_pdf_with_text(pages: list[str]) -> bytes:
+    """A valid PDF whose pages carry a real, extractable text layer.
+
+    `build_pdf` produces blank pages — useful for rendering, useless for the
+    text-layer signal — so this writes the PDF by hand with Helvetica text
+    objects rather than stubbing the extractor.
+    """
+
+    def escape(text: str) -> str:
+        return text.replace("\\", r"\\").replace("(", r"\(").replace(")", r"\)")
+
+    page_count = len(pages)
+    page_ids = [4 + 2 * index for index in range(page_count)]
+    content_ids = [5 + 2 * index for index in range(page_count)]
+
+    objects: dict[int, bytes] = {
+        1: b"<< /Type /Catalog /Pages 2 0 R >>",
+        2: (
+            "<< /Type /Pages /Kids ["
+            + " ".join(f"{pid} 0 R" for pid in page_ids)
+            + f"] /Count {page_count} >>"
+        ).encode(),
+        3: b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+    }
+
+    for index, text in enumerate(pages):
+        body = ["BT", "/F1 11 Tf", "14 TL", "40 740 Td"]
+        body += [f"({escape(line)}) Tj T*" for line in (text.splitlines() or [""])]
+        body.append("ET")
+        stream = "\n".join(body).encode()
+        objects[content_ids[index]] = (
+            b"<< /Length "
+            + str(len(stream)).encode()
+            + b" >>\nstream\n"
+            + stream
+            + b"\nendstream"
+        )
+        objects[page_ids[index]] = (
+            "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] "
+            "/Resources << /Font << /F1 3 0 R >> >> "
+            f"/Contents {content_ids[index]} 0 R >>"
+        ).encode()
+
+    out = bytearray(b"%PDF-1.4\n")
+    offsets: dict[int, int] = {}
+    for number in sorted(objects):
+        offsets[number] = len(out)
+        out += f"{number} 0 obj\n".encode() + objects[number] + b"\nendobj\n"
+
+    xref_at = len(out)
+    highest = max(objects)
+    out += f"xref\n0 {highest + 1}\n".encode() + b"0000000000 65535 f \n"
+    for number in range(1, highest + 1):
+        out += f"{offsets[number]:010d} 00000 n \n".encode()
+    out += (
+        f"trailer\n<< /Size {highest + 1} /Root 1 0 R >>\nstartxref\n{xref_at}\n"
+    ).encode() + b"%%EOF\n"
+    return bytes(out)
+
+
 def build_png(size: tuple[int, int] = (120, 80)) -> bytes:
     buffer = io.BytesIO()
     Image.new("RGBA", size, (200, 30, 30, 255)).save(buffer, format="PNG")
@@ -318,6 +378,43 @@ def rendered_document(api_client: TestClient, migrated_engine: Engine):
     response = api_client.post(
         "/api/v1/documents",
         files={"file": ("acme-invoice.pdf", build_pdf(pages=2), "application/pdf")},
+        data={"doc_type": "invoice"},
+    )
+    assert response.status_code == 201
+    document_id = uuid.UUID(response.json()["id"])
+
+    with OrmSession(migrated_engine) as session:
+        document = session.get(Document, document_id)
+        assert document is not None
+        assert document.page_count == 2
+        session.expunge(document)
+    return document
+
+
+@pytest.fixture
+def text_layer_document(api_client: TestClient, migrated_engine: Engine):
+    """An uploaded, rendered document whose source carries a real text layer."""
+    from sqlalchemy.orm import Session as OrmSession
+
+    from app.models import Document
+
+    # Carries every scalar value in VALID_INVOICE_PAYLOAD, so a correct
+    # extraction is corroborated by the text layer and a wrong one is not.
+    source = build_pdf_with_text(
+        [
+            "Acme Supplies BV, 12 Kade, Amsterdam\n"
+            "VAT NL123456789B01\n"
+            "Invoice INV-2026-0042\n"
+            "Issued 2026-01-05   Due 2026-02-04\n"
+            "Bill to: Beta Ltd     Your order PO-88",
+            "Widget, blue   10 x 40.00 = 400.00\n"
+            "Widget, red    15 x 40.00 = 600.00\n"
+            "Subtotal 1,000.00   Tax 210.00   Total EUR 1,210.00",
+        ]
+    )
+    response = api_client.post(
+        "/api/v1/documents",
+        files={"file": ("acme-invoice.pdf", source, "application/pdf")},
         data={"doc_type": "invoice"},
     )
     assert response.status_code == 201

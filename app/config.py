@@ -40,8 +40,18 @@ class Settings(BaseSettings):
     # a few thousand tokens; the headroom is for long line-item tables.
     extraction_max_tokens: int = Field(default=16000, gt=0)
 
-    # Wired in milestone 5: any field scoring below this is routed to review.
+    # A field whose final score falls below this is routed to human review.
     confidence_threshold: float = Field(default=0.85, ge=0.0, le=1.0)
+
+    # Weights for the four confidence signals. They need not sum to 1: only
+    # the signals that apply to a field are used, and their weights are
+    # renormalised over that subset. The defaults give the model's own opinion
+    # less than half the say, so the deterministic signals together outweigh it
+    # whenever they apply.
+    confidence_weight_model: float = Field(default=0.40, ge=0.0)
+    confidence_weight_schema: float = Field(default=0.20, ge=0.0)
+    confidence_weight_arithmetic: float = Field(default=0.20, ge=0.0)
+    confidence_weight_text_layer: float = Field(default=0.20, ge=0.0)
 
 
 @lru_cache

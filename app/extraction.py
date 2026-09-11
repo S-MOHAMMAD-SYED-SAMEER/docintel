@@ -3,31 +3,39 @@
 Sits beside `app.ingestion` and follows the same shape — the route handler does
 HTTP, this module owns the order of operations and the status transitions.
 
-    PROCESSING  pages rendered, extraction running
-    EXTRACTED   the model answered and the answer parsed into the schema
-    FAILED      the provider or the parse gave up; `error` says why
+    PROCESSING    pages rendered, extraction running
+    EXTRACTED     the answer parsed and every field cleared the threshold
+    NEEDS_REVIEW  at least one field is uncertain or failed a check
+    FAILED        the provider or the parse gave up; `error` says why
 
-Nothing here decides whether a field needs review. Confidence is stored exactly
-as the model reported it; combining it with deterministic checks, and the
-threshold that routes a field to the queue, are milestone 5.
+The order of operations, once the model has answered:
+
+    raw extraction -> schema validation -> deterministic validation
+        -> page-text checks -> final field confidence -> needs_review
+        -> persistence
 """
 
 import json
 import logging
 import mimetypes
 import uuid
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 
 from pydantic import BaseModel, ValidationError
 from sqlalchemy.orm import Session
 
-from app import storage
+from app import media as media_types
+from app import rendering, storage
+from app.confidence import FieldScore, score_extraction
 from app.config import get_settings
 from app.db.session import get_sessionmaker
 from app.extractors import UnknownDocumentType, get_extractor
 from app.extractors.base import ExtractedField, Extractor
+from app.media import UnsupportedMediaType
 from app.models import Document, DocumentStatus, Extraction, FieldValue
 from app.providers import ExtractionProvider, PageImage, ProviderError, get_provider
+from app.validation import get_validator
+from app.validation.text_layer import TextLayer
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +65,28 @@ def load_page_images(document: Document) -> list[PageImage]:
     if not images:
         raise ExtractionError(f"Document {document.id} has no page images.")
     return images
+
+
+def load_text_layer(document: Document) -> TextLayer:
+    """The document's own embedded text, if it has any.
+
+    A scan, a photo or an image upload has no text layer. That is recorded as
+    an empty `TextLayer`, which scoring treats as "this signal does not apply"
+    — never as evidence that a field is wrong.
+    """
+    source = storage.resolve(document.storage_path)
+    if not source.is_file():
+        logger.warning("source file missing for document %s", document.id)
+        return TextLayer()
+
+    try:
+        with source.open("rb") as handle:
+            media = media_types.detect(handle.read(media_types.SNIFF_BYTES))
+    except (UnsupportedMediaType, OSError) as exc:
+        logger.warning("cannot read source of document %s: %s", document.id, exc)
+        return TextLayer()
+
+    return TextLayer.from_pages(rendering.extract_text_layer(source, media))
 
 
 def extract_document(
@@ -110,21 +140,38 @@ def extract_document(
         logger.warning("could not parse extraction for %s: %s", document.id, exc)
         return extraction
 
-    extraction.parsed = parsed.model_dump(mode="json")
-    extraction.field_values = list(build_field_values(parsed))
+    # Deterministic checks, then the text layer, then the score. Anything the
+    # maths can settle is settled in Python rather than taken on trust.
+    report = get_validator(document.doc_type)(parsed)
+    text_layer = load_text_layer(document)
+    value_texts = {
+        field_name: _as_text(getattr(parsed, field_name).value)
+        for field_name in type(parsed).model_fields
+    }
+    scores = score_extraction(parsed, report, text_layer, value_texts)
 
-    document.status = DocumentStatus.EXTRACTED
+    extraction.parsed = parsed.model_dump(mode="json")
+    extraction.field_values = list(build_field_values(parsed, scores))
+
+    flagged = [score for score in scores.values() if score.needs_review]
+    document.status = (
+        DocumentStatus.NEEDS_REVIEW if flagged else DocumentStatus.EXTRACTED
+    )
     document.error = None
     session.add(extraction)
     session.commit()
     session.refresh(extraction)
 
     logger.info(
-        "extracted document %s with %s (%s): %d field(s), %s USD",
+        "extracted document %s with %s (%s): %d field(s), %d needing review, "
+        "%d check(s) failed, text layer %s, %s USD",
         document.id,
         raw.model_name,
         extractor.prompt_version,
         len(extraction.field_values),
+        len(flagged),
+        len(report.failures()),
+        "present" if text_layer.exists else "absent",
         raw.cost_usd,
     )
     return extraction
@@ -146,13 +193,17 @@ def parse_response(content: str, schema: type[BaseModel]) -> BaseModel:
         ) from exc
 
 
-def build_field_values(parsed: BaseModel) -> Iterator[FieldValue]:
+def build_field_values(
+    parsed: BaseModel, scores: Mapping[str, FieldScore]
+) -> Iterator[FieldValue]:
     """One row per top-level field of the schema.
 
-    Every field of an extraction schema is an `ExtractedField`, so each one
-    carries its own confidence and source page. A structured value (the
-    line-item table) is stored as JSON text — `field_values.value` is text
-    because a reviewer corrects what the document says.
+    `confidence` holds the final combined score and `model_confidence` holds
+    what the model said about itself — the second is never overwritten by the
+    first, because the gap between them is how a confidently wrong model gets
+    caught. A structured value (the line-item table) is stored as JSON text;
+    `field_values.value` is text because a reviewer corrects what the document
+    says.
     """
     for field_name in type(parsed).model_fields:
         field = getattr(parsed, field_name)
@@ -162,10 +213,14 @@ def build_field_values(parsed: BaseModel) -> Iterator[FieldValue]:
                 "extraction schemas must report confidence per field."
             )
 
+        score = scores[field_name]
         yield FieldValue(
             field_name=field_name,
             value=_as_text(field.value),
-            confidence=field.confidence,
+            confidence=score.confidence,
+            model_confidence=score.model_confidence,
+            needs_review=score.needs_review,
+            validation=score.as_dict(),
             source_page=field.source_page,
         )
 

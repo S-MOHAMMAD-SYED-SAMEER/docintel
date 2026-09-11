@@ -196,10 +196,9 @@ Pydantic schema, its prompt, and a `prompt_version`. Adding a type is a new
 module plus one registry entry — the pipeline never names a type.
 
 Every schema field is an `ExtractedField`, so a value always arrives with the
-model's own confidence and the page it came from. That confidence is stored
-exactly as reported and is **not** trusted on its own; milestone 5 combines it
-with deterministic checks to produce the score that routes a field to review,
-which is also what sets `field_values.needs_review`.
+model's own confidence and the page it came from. That confidence is kept
+verbatim in `field_values.model_confidence` and is **not** trusted on its own —
+see "Validation and confidence" below.
 
 Amounts travel as decimal strings and are parsed to `Decimal`. A JSON number
 would arrive as a float and `1234.56` would stop being exact, which milestone
@@ -215,6 +214,70 @@ Every attempt writes an `extractions` row, successful or not:
 
 `raw_response` is kept verbatim and never discarded — it is what you read when
 an extraction is wrong, and what future eval runs re-score.
+
+### Validation and confidence
+
+Deterministic checks live in `app/validation/`, one module per document type,
+resolved by `doc_type` the same way extractors are. Nothing is asked of the
+model that Python can settle:
+
+| Check | Kind | Fields |
+| --- | --- | --- |
+| `<field>.not_blank` | schema | invoice_number, vendor_name, currency |
+| `invoice_date.is_a_date`, `due_date.is_a_date` | schema | that date |
+| `dates.due_on_or_after_invoice` | schema | invoice_date, due_date |
+| `currency.iso_4217` | schema | currency |
+| `totals.subtotal_plus_tax_equals_total` | arithmetic | subtotal, tax, total |
+| `line_items.sum_to_subtotal` | arithmetic | line_items, subtotal |
+| `line_items.row_quantity_times_price` | arithmetic | line_items |
+
+Every check is `passed`, `failed`, or **`skipped`** — the third is the important
+one. An invoice that states no subtotal has not got its arithmetic wrong, so
+the check is skipped and that signal simply does not apply to those fields.
+
+The final score combines the README's four signals:
+
+```
+confidence = Σ(weight_i × score_i) / Σ(weight_i)   over applicable signals only
+```
+
+| Signal | Default weight | Score | Applies when |
+| --- | --- | --- | --- |
+| model | 0.40 | the model's own number | always |
+| schema | 0.20 | 1 passed / 0 failed | a schema check ran for the field |
+| arithmetic | 0.20 | 1 passed / 0 failed | an arithmetic check ran for the field |
+| text_layer | 0.20 | 1 found / 0 not found | the document has a text layer and the value is a scalar |
+
+Weights need not sum to 1 — inapplicable signals drop out and the rest are
+renormalised, so a field is never marked down for a check that could not run.
+The defaults give the model under half the say, so the deterministic signals
+together outweigh it wherever they apply. All five values are configurable
+(`DOCINTEL_CONFIDENCE_THRESHOLD`, `DOCINTEL_CONFIDENCE_WEIGHT_*`); none is
+hard-coded in the scoring logic.
+
+`needs_review` is set when **the score is below the threshold (default 0.85),
+or any deterministic check for that field failed**. The second clause matters:
+a failed check means the value is known to be wrong, and no weighting should
+let a confident model hide that. A missing string in the text layer is *not* a
+blocking failure — text layers are reformatted and imperfect, so it lowers the
+score but never forces review on its own.
+
+`field_values` therefore carries three numbers: `model_confidence` (verbatim,
+never overwritten), `confidence` (the final score), and `validation` (the
+signal-by-signal breakdown, so a flagged field can say why). The gap between
+the first two is how a confidently wrong model gets caught.
+
+A document with any flagged field lands in `needs_review`; otherwise
+`extracted`.
+
+**Page text layer.** `rendering.extract_text_layer` reads the text already
+embedded in the source PDF. A scan, a photo, or an image upload has none, and
+that returns an empty text layer — meaning "this signal does not apply", never
+"the value is wrong". Matching ignores case, spacing, currency symbols and
+thousands separators, so `1,210.00` on the page corroborates `1210.00`. The
+whole document is searched rather than only the page the model named: a
+mis-numbered `source_page` is a separate problem and should not fail a value
+that is plainly in the document.
 
 ### Cost
 

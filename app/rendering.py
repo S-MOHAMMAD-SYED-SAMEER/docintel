@@ -76,6 +76,35 @@ def _render_pdf(source: Path, pages: Path) -> list[Path]:
         pdf.close()
 
 
+def extract_text_layer(source: Path, media: MediaType) -> list[str]:
+    """The text already embedded in the document, one entry per page.
+
+    A born-digital PDF carries its text; a scan or a photographed invoice does
+    not. Returning an empty list says "this document has no text layer", which
+    is different from "the text layer says nothing about this field" — the
+    caller must not read one as the other.
+    """
+    if not media.is_pdf or not source.is_file():
+        return []
+
+    try:
+        pdf = pdfium.PdfDocument(source)
+    except pdfium.PdfiumError as exc:
+        logger.warning("could not open %s for text extraction: %s", source, exc)
+        return []
+
+    try:
+        pages = [pdf[index].get_textpage().get_text_range() for index in range(len(pdf))]
+    except pdfium.PdfiumError as exc:
+        logger.warning("could not read the text layer of %s: %s", source, exc)
+        return []
+    finally:
+        pdf.close()
+
+    # All-blank pages mean an image-only PDF, which has no text layer at all.
+    return pages if any(page.strip() for page in pages) else []
+
+
 def _render_image(source: Path, pages: Path) -> Path:
     """Normalise a single uploaded image to the same PNG page format."""
     try:

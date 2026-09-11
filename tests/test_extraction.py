@@ -133,14 +133,16 @@ def test_parsed_result_is_stored_as_json(
     assert parsed["total"]["value"] == "1210.00"
 
 
-def test_document_becomes_extracted(
+def test_document_needing_review_says_so(
     rendered_document: Document, migrated_engine: Engine, fake_provider: FakeProvider
 ) -> None:
+    """The fixture PDF has no text layer, so weakly-reported fields stay unsure."""
     extraction_id = _run(migrated_engine, rendered_document, fake_provider)
 
     loaded = _load(migrated_engine, extraction_id)
-    assert loaded["document_status"] is DocumentStatus.EXTRACTED
+    assert loaded["document_status"] is DocumentStatus.NEEDS_REVIEW
     assert loaded["document_error"] is None
+    assert any(field.needs_review for field in loaded["fields"].values())
 
 
 # --- field values ---------------------------------------------------------
@@ -167,15 +169,16 @@ def test_field_values_store_the_extracted_text(
     assert fields["currency"].value == "EUR"
 
 
-def test_model_reported_confidence_is_stored_as_given(
+def test_model_reported_confidence_is_preserved_verbatim(
     rendered_document: Document, migrated_engine: Engine, fake_provider: FakeProvider
 ) -> None:
+    """Scoring writes `confidence`; it must never overwrite what the model said."""
     extraction_id = _run(migrated_engine, rendered_document, fake_provider)
 
     fields = _load(migrated_engine, extraction_id)["fields"]
-    assert fields["total"].confidence == pytest.approx(0.98)
-    assert fields["vendor_address"].confidence == pytest.approx(0.71)
-    assert fields["purchase_order_number"].confidence == pytest.approx(0.2)
+    assert fields["total"].model_confidence == pytest.approx(0.98)
+    assert fields["vendor_address"].model_confidence == pytest.approx(0.71)
+    assert fields["purchase_order_number"].model_confidence == pytest.approx(0.2)
 
 
 def test_source_page_is_stored(
@@ -198,14 +201,16 @@ def test_absent_value_is_stored_as_null(
     assert fields["purchase_order_number"].value is None
 
 
-def test_needs_review_defaults_to_false(
+def test_needs_review_follows_the_score(
     rendered_document: Document, migrated_engine: Engine, fake_provider: FakeProvider
 ) -> None:
-    """Routing to review is milestone 5; nothing sets this yet."""
     extraction_id = _run(migrated_engine, rendered_document, fake_provider)
 
     fields = _load(migrated_engine, extraction_id)["fields"]
-    assert not any(field.needs_review for field in fields.values())
+    # 0.98 model confidence plus passing arithmetic clears 0.85 comfortably.
+    assert fields["total"].needs_review is False
+    # 0.20, with no deterministic signal to rescue it.
+    assert fields["purchase_order_number"].needs_review is True
 
 
 def test_line_items_are_stored_as_json_text(
@@ -216,7 +221,7 @@ def test_line_items_are_stored_as_json_text(
     fields = _load(migrated_engine, extraction_id)["fields"]
     rows = json.loads(fields["line_items"].value)
     assert [row["description"] for row in rows] == ["Widget, blue", "Widget, red"]
-    assert fields["line_items"].confidence == pytest.approx(0.85)
+    assert fields["line_items"].model_confidence == pytest.approx(0.85)
 
 
 def test_field_values_cascade_when_the_extraction_goes(
@@ -240,7 +245,7 @@ def test_build_field_values_rejects_a_schema_without_confidence() -> None:
         total: str
 
     with pytest.raises(ExtractionError, match="ExtractedField"):
-        list(build_field_values(Bare(total="10")))
+        list(build_field_values(Bare(total="10"), {}))
 
 
 # --- failures -------------------------------------------------------------

@@ -102,11 +102,19 @@ class FieldValue(Base):
     # Null means the model did not find the field. Text, because a reviewer
     # corrects what the document says, not a typed value.
     value: Mapped[str | None] = mapped_column(Text, nullable=True)
-    # The model's own confidence, stored as reported. Milestone 5 combines it
-    # with deterministic checks to produce the score that routes to review.
+    # The final score: the model's confidence combined with the deterministic
+    # signals, per `app/confidence.py`.
     confidence: Mapped[float] = mapped_column(Float)
+    # What the model said about itself, kept verbatim. Never overwritten by
+    # scoring — comparing the two is how you find a model that is confidently
+    # wrong, which is the metric the README cares about most.
+    model_confidence: Mapped[float] = mapped_column(Float)
+    # Why the field scored what it did: the signals, their weights, and any
+    # deterministic check that failed. Null for rows written before scoring.
+    validation: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     source_page: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    # Set by the scoring step in milestone 5; nothing writes True yet.
+    # Set by scoring: below the configured threshold, or a deterministic check
+    # failed. See `app/confidence.py`.
     needs_review: Mapped[bool] = mapped_column(
         Boolean, default=False, server_default=text("false")
     )
