@@ -25,22 +25,20 @@ STUB_WARNING = (
     "not extraction quality. Use --provider anthropic for a real evaluation."
 )
 
-# A fixed, plausible answer. It is not derived from any label.
-STUB_ANSWER: dict[str, Any] = {
-    "invoice_number": {"value": "INV-0000-0000", "confidence": 0.5, "source_page": 1},
-    "invoice_date": {"value": "2026-01-01", "confidence": 0.5, "source_page": 1},
-    "due_date": {"value": "2026-01-15", "confidence": 0.5, "source_page": 1},
-    "vendor_name": {"value": "Unknown Vendor", "confidence": 0.5, "source_page": 1},
-    "vendor_address": {"value": None, "confidence": 0.1, "source_page": None},
-    "vendor_tax_id": {"value": None, "confidence": 0.1, "source_page": None},
-    "customer_name": {"value": None, "confidence": 0.1, "source_page": None},
-    "purchase_order_number": {"value": None, "confidence": 0.1, "source_page": None},
-    "currency": {"value": "EUR", "confidence": 0.5, "source_page": 1},
-    "subtotal": {"value": "100.00", "confidence": 0.5, "source_page": 2},
-    "tax": {"value": "21.00", "confidence": 0.5, "source_page": 2},
-    "total": {"value": "121.00", "confidence": 0.5, "source_page": 2},
-    "line_items": {"value": [], "confidence": 0.3, "source_page": 2},
-}
+# What the stub says about any one field: nothing, with low confidence.
+STUB_FIELD: dict[str, Any] = {"value": None, "confidence": 0.1, "source_page": None}
+
+
+def stub_answer(schema: type[BaseModel]) -> dict[str, Any]:
+    """An empty but schema-valid answer for whatever type it is handed.
+
+    Derived from the schema, never from the labels, and it invents no value —
+    so it is document-type agnostic and its accuracy is genuinely near zero.
+    """
+    return {
+        field_name: dict(STUB_FIELD)
+        for field_name in getattr(schema, "model_fields", {})
+    }
 
 
 class StubProvider:
@@ -49,7 +47,7 @@ class StubProvider:
     model_name = STUB_MODEL_NAME
 
     def __init__(self, answer: dict[str, Any] | None = None) -> None:
-        self._content = json.dumps(answer if answer is not None else STUB_ANSWER)
+        self._answer = answer
 
     def extract(
         self,
@@ -57,12 +55,15 @@ class StubProvider:
         schema: type[BaseModel],
         prompt: str,
     ) -> RawExtraction:
+        content = json.dumps(
+            self._answer if self._answer is not None else stub_answer(schema)
+        )
         return RawExtraction(
-            content=self._content,
+            content=content,
             raw_response={
                 "id": "stub",
                 "model": self.model_name,
-                "content": [{"type": "text", "text": self._content}],
+                "content": [{"type": "text", "text": content}],
                 "stop_reason": "end_turn",
                 "usage": {"input_tokens": None, "output_tokens": None},
             },

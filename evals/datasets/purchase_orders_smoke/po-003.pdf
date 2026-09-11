@@ -1,0 +1,66 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 215 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+40 750 Td
+(Tallow Works) Tj T*
+() Tj T*
+(PURCHASE ORDER PO-2026-2003) Tj T*
+(Order date 2026-04-06) Tj T*
+(Requested delivery 2026-04-20) Tj T*
+() Tj T*
+(Supplier: Bluegrass Hardware Inc) Tj T*
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 408 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+40 750 Td
+(Description                     Qty   Unit price     Amount) Tj T*
+(Packing crate, large             12        27.25       327.00) Tj T*
+(Courier delivery                  2        18.00        36.00) Tj T*
+(Laminated sign, A2                3        65.00       195.00) Tj T*
+() Tj T*
+(Subtotal   USD 558.00) Tj T*
+(Tax        USD 46.04) Tj T*
+(ORDER TOTAL USD 604.04) Tj T*
+ET
+endstream
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000189 00000 n 
+0000000315 00000 n 
+0000000581 00000 n 
+0000000707 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+1166
+%%EOF

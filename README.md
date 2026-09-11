@@ -191,9 +191,32 @@ anthropic_vision.py` is the only module that imports the Anthropic SDK;
 swapping providers means adding a module there and changing `get_provider()`,
 and nothing above that boundary changes.
 
-What a document type contributes lives in `app/extractors/<type>.py`: its
-Pydantic schema, its prompt, and a `prompt_version`. Adding a type is a new
-module plus one registry entry — the pipeline never names a type.
+### Document types
+
+Two are supported: **invoice** and **purchase order** (`doc_type=invoice` /
+`doc_type=purchase_order` on upload).
+
+They share one pipeline. Upload, rendering, extraction, confidence scoring, the
+review queue, corrections and export contain no branch on document type at all
+— a test asserts that. What differs between types is resolved through two
+registries keyed by `doc_type`:
+
+| Registry | Provides |
+| --- | --- |
+| `app/extractors/<type>.py` | the Pydantic schema, the prompt, and a `prompt_version` |
+| `app/validation/<type>.py` | the deterministic rules for that type |
+
+Adding a type is a new module in each, plus one registry entry — never a change
+to the pipeline. The arithmetic and format rules the two types share (row
+`quantity x unit_price`, rows summing to a subtotal, `subtotal + tax = total`,
+ISO 4217 currency, date parsing and ordering) live once in
+`app/validation/common.py` and are composed by both; each type's own module
+holds only what is specific to it — which identifiers must not be blank, and
+which of its dates must not precede which.
+
+Purchase-order support is new and unmeasured: the fixture under
+`evals/datasets/purchase_orders_smoke/` is three synthetic documents that prove
+the type flows end to end, not a benchmark. No accuracy claim is made for it.
 
 Every schema field is an `ExtractedField`, so a value always arrives with the
 model's own confidence and the page it came from. That confidence is kept

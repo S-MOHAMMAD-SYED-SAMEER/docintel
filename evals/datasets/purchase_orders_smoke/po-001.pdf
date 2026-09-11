@@ -1,0 +1,65 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 205 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+40 750 Td
+(Beta Ltd) Tj T*
+() Tj T*
+(PURCHASE ORDER PO-2026-2001) Tj T*
+(Order date 2026-02-03) Tj T*
+(Requested delivery 2026-02-17) Tj T*
+() Tj T*
+(Supplier: Acme Supplies BV) Tj T*
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 339 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+40 750 Td
+(Description                     Qty   Unit price     Amount) Tj T*
+(Widget, blue                     10        40.00       400.00) Tj T*
+(Widget, red                       5        40.00       200.00) Tj T*
+() Tj T*
+(Subtotal   EUR 600.00) Tj T*
+(Tax        EUR 126.00) Tj T*
+(ORDER TOTAL EUR 726.00) Tj T*
+ET
+endstream
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000189 00000 n 
+0000000315 00000 n 
+0000000571 00000 n 
+0000000697 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+1087
+%%EOF

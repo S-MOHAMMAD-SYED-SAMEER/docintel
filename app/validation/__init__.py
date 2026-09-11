@@ -15,11 +15,13 @@ from app.validation.base import (
     ValidationReport,
 )
 from app.validation.invoice import validate_invoice
+from app.validation.purchase_order import validate_purchase_order
 
 Validator = Callable[[Any], ValidationReport]
 
 _VALIDATORS: dict[str, Validator] = {
     "invoice": validate_invoice,
+    "purchase_order": validate_purchase_order,
 }
 
 
@@ -45,4 +47,5 @@ __all__ = [
     "get_validator",
     "no_checks",
     "validate_invoice",
+    "validate_purchase_order",
 ]

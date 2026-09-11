@@ -4,12 +4,17 @@ A new document type is a new module plus one entry here. The pipeline resolves
 an extractor by `doc_type` and never names a type itself.
 """
 
-from app.extractors.base import ExtractedField, Extractor, UnknownDocumentType
+from app.extractors.base import ExtractedField, Extractor, Money, UnknownDocumentType
 from app.extractors.invoice import Invoice, InvoiceExtractor, InvoiceLineItem
+from app.extractors.purchase_order import (
+    PurchaseOrder,
+    PurchaseOrderExtractor,
+    PurchaseOrderLineItem,
+)
 
 _EXTRACTORS: dict[str, Extractor] = {
     extractor.doc_type: extractor
-    for extractor in (InvoiceExtractor(),)
+    for extractor in (InvoiceExtractor(), PurchaseOrderExtractor())
 }
 
 
@@ -33,6 +38,10 @@ __all__ = [
     "Invoice",
     "InvoiceExtractor",
     "InvoiceLineItem",
+    "Money",
+    "PurchaseOrder",
+    "PurchaseOrderExtractor",
+    "PurchaseOrderLineItem",
     "UnknownDocumentType",
     "get_extractor",
     "registered_doc_types",

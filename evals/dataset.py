@@ -11,6 +11,9 @@ from typing import Any
 
 DATASETS_DIR = Path(__file__).resolve().parent / "datasets"
 LABELS_FILENAME = "labels.json"
+# A dataset declares the document type it exercises. Datasets written before
+# the field existed are invoices, so that is the fallback.
+DEFAULT_DOC_TYPE = "invoice"
 
 
 class DatasetError(Exception):
@@ -33,6 +36,8 @@ class Dataset:
     synthetic: bool
     description: str
     documents: tuple[LabelledDocument, ...]
+    # Which extractor, validator and prompt this dataset exercises.
+    doc_type: str = DEFAULT_DOC_TYPE
 
     def __len__(self) -> int:
         return len(self.documents)
@@ -104,6 +109,7 @@ def load(name: str, datasets_dir: Path | None = None) -> Dataset:
         synthetic=bool(payload.get("synthetic", False)),
         description=str(payload.get("description", "")),
         documents=documents,
+        doc_type=str(payload.get("doc_type", DEFAULT_DOC_TYPE)),
     )
 
 

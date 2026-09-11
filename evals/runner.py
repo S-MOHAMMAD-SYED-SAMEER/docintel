@@ -22,19 +22,21 @@ from evals.metrics import DocumentObservation, FieldObservation, Report, summari
 
 logger = logging.getLogger(__name__)
 
-DOC_TYPE = "invoice"
-
 
 def evaluate(
     session: Session,
     dataset: Dataset,
     provider: ExtractionProvider,
     *,
-    doc_type: str = DOC_TYPE,
+    doc_type: str | None = None,
 ) -> Report:
-    """Run every document and fold the results into one report."""
+    """Run every document and fold the results into one report.
+
+    The document type comes from the dataset, so the runner never names one.
+    """
+    resolved = doc_type or dataset.doc_type
     observations = [
-        evaluate_document(session, labelled, provider, doc_type=doc_type)
+        evaluate_document(session, labelled, provider, doc_type=resolved)
         for labelled in dataset.documents
     ]
     return summarise(dataset.name, observations)
@@ -45,7 +47,7 @@ def evaluate_document(
     labelled: LabelledDocument,
     provider: ExtractionProvider,
     *,
-    doc_type: str = DOC_TYPE,
+    doc_type: str,
 ) -> DocumentObservation:
     """Push one labelled document through the pipeline and compare.
 

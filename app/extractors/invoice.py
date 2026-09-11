@@ -5,29 +5,12 @@ registering it — no pipeline change. See `app/extractors/__init__.py`.
 """
 
 from datetime import date
-from decimal import Decimal
-from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, WithJsonSchema
+from pydantic import BaseModel, ConfigDict
 
-from app.extractors.base import ExtractedField
+from app.extractors.base import ExtractedField, Money
 
 PROMPT_VERSION = "invoice/v1"
-
-# Amounts travel as decimal strings. Pydantic parses a string into Decimal
-# happily, and asking for a string keeps the model away from float rounding —
-# a JSON number would arrive as a float and 1234.56 would stop being exact.
-# The default Decimal schema is a regex with a lookahead, which schema
-# validators cannot be relied on to support, so the shape is stated directly.
-Money = Annotated[
-    Decimal,
-    WithJsonSchema(
-        {
-            "type": "string",
-            "description": 'Decimal amount as a plain string, e.g. "1234.56".',
-        }
-    ),
-]
 
 
 class InvoiceLineItem(BaseModel):
