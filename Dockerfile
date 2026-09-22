@@ -22,6 +22,10 @@ COPY alembic.ini ./
 # The evaluation harness and its committed dataset, so `python -m evals.run`
 # is reproducible inside the image as well as outside it.
 COPY evals ./evals
+# The deterministic demo entrypoint and its committed fixture data, for the
+# same reason: demo/fixtures/invoice_answers.json must be on disk, and only
+# a raw copy (not the installed package) guarantees that. See docs/DEMO.md.
+COPY demo ./demo
 
 RUN pip install . && rm -rf build docintel.egg-info
 

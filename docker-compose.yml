@@ -1,7 +1,6 @@
-# Local, reproducible stack: PostgreSQL plus the application.
+# Local, reproducible stack: PostgreSQL, the migration, then the application.
 #
-#   docker compose up --build          # start both
-#   docker compose run --rm app alembic upgrade head
+#   docker compose up --build          # database, migrate once, then serve
 #   curl localhost:8000/health
 #
 # Development convenience only. The credentials below are local defaults;
@@ -21,7 +20,13 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
 
-  app:
+  # Migrations run once, as their own step, and the application waits for
+  # them to finish. Deliberately not run from application startup: replicas
+  # would race the same DDL, and a failed migration would take a running
+  # service down with it. Uses the same image and the same Alembic
+  # configuration the "Local" run instructions do — no second migration
+  # mechanism.
+  migrate:
     build:
       context: .
       args:
@@ -31,12 +36,50 @@ services:
         condition: service_healthy
     environment:
       DOCINTEL_DATABASE_URL: postgresql+psycopg://docintel:docintel@db:5432/docintel
+    command: ["alembic", "upgrade", "head"]
+    restart: "no"
+
+  app:
+    build:
+      context: .
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:-python:3.13-slim}
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DOCINTEL_DATABASE_URL: postgresql+psycopg://docintel:docintel@db:5432/docintel
       # Leave unset to fall back to the SDK's own ANTHROPIC_API_KEY lookup.
       DOCINTEL_ANTHROPIC_API_KEY: ${DOCINTEL_ANTHROPIC_API_KEY:-}
     ports:
       - "8000:8000"
     volumes:
       - storage:/var/lib/docintel/storage
+
+  # Same image as `app`, with the extraction provider swapped for the
+  # deterministic, credential-free demo (see demo/app.py, docs/DEMO.md). No
+  # Anthropic key: the demo provider never calls out. Uses `python -m
+  # uvicorn` rather than the bare `uvicorn` the image's own CMD runs, so the
+  # working directory's raw `demo/` copy (with its fixture JSON) resolves --
+  # the same reason `python -m evals.run` is used instead of a console
+  # script for the evaluation harness.
+  demo:
+    build:
+      context: .
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:-python:3.13-slim}
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DOCINTEL_DATABASE_URL: postgresql+psycopg://docintel:docintel@db:5432/docintel
+    command: ["python", "-m", "uvicorn", "demo.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8001:8000"
 
 volumes:
   db-data:

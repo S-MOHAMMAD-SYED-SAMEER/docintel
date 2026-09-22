@@ -90,6 +90,22 @@ The only difference from the normal "Running it" instructions in the main
 [README](../README.md#running-it) is the module passed to `uvicorn`:
 `demo.app:app` instead of `app.main:app`.
 
+### Docker
+
+`docker-compose.yml` has a dedicated `demo` service — the same image as
+`app`, built from the same `Dockerfile`, with its command overridden to
+serve `demo.app:app` instead. It depends on `db` and `migrate` exactly the
+way `app` does, so it comes up only once the database is healthy and
+migrations have run; no second migration mechanism, no Anthropic key.
+
+```bash
+docker compose up --build db migrate demo
+curl localhost:8001/health
+```
+
+The demo is published on host port `8001` (`app`, when also running, keeps
+`8000`), so both can run side by side without a port conflict.
+
 ## 7. The complete demo workflow
 
 Same nine steps as the main README's demo walkthrough, using one of the
