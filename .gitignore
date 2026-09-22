@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Local data (uploads, rendered pages, eval report artifacts)
+var/
