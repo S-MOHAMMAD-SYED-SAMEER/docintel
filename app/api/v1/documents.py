@@ -35,6 +35,7 @@ from app.extractors import (
 )
 from app.media import SUPPORTED_MEDIA_TYPE_NAMES, UnsupportedMediaType
 from app.models import Document, DocumentStatus
+from app.providers import ExtractionProvider, get_provider
 
 router = APIRouter(tags=["documents"])
 
@@ -155,6 +156,12 @@ def extract_document(
     document_id: uuid.UUID,
     background_tasks: BackgroundTasks,
     session: Annotated[Session, Depends(get_session)],
+    # `Depends(get_provider)` rather than calling `get_provider()` directly:
+    # resolves to the exact same cached Anthropic provider for every normal
+    # request (no behaviour change), but lets a *different* FastAPI app
+    # instance override it via `app.dependency_overrides[get_provider]` --
+    # the same seam `demo/app.py` uses, and nowhere else does.
+    provider: Annotated[ExtractionProvider, Depends(get_provider)],
 ) -> ExtractionAcceptedResponse:
     document = session.get(Document, document_id)
     if document is None:
@@ -182,7 +189,9 @@ def extract_document(
             ),
         )
 
-    background_tasks.add_task(extraction.extract_document_in_background, document.id)
+    background_tasks.add_task(
+        extraction.extract_document_in_background, document.id, provider=provider
+    )
 
     return ExtractionAcceptedResponse(
         document_id=document.id,

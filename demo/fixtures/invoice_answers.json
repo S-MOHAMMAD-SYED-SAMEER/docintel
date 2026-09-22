@@ -1,0 +1,89 @@
+{
+  "_comment": "Demo Mode fixture answers -- see docs/DEMO.md. Every 'value' below is copied verbatim from evals/datasets/invoices_v1/labels.json, the authoritative ground truth used to render these PDFs, so it is known-correct rather than model-inferred. Every 'confidence' is hand-authored for deterministic demonstration -- it is NOT a real Anthropic model's self-reported confidence, and must never be presented as one. content_sha256 is the SHA-256 of this document's rendered page PNGs (page order, DOCINTEL_RENDER_DPI=200), not of the uploaded PDF file itself -- that is what ExtractionProvider.extract() actually receives.",
+  "invoice-001": {
+    "content_sha256": "c5b9cb3bb67799daea142c7f6d4a55b0e9906e1810e1b2aea2e67b7df39d2255",
+    "doc_type": "invoice",
+    "schema_name": "Invoice",
+    "source_pdf": "evals/datasets/invoices_v1/invoice-001.pdf",
+    "answer": {
+      "invoice_number": {"value": "INV-2026-1001", "confidence": 0.97, "source_page": 1},
+      "invoice_date": {"value": "2026-01-01", "confidence": 0.98, "source_page": 1},
+      "due_date": {"value": "2026-01-15", "confidence": 0.98, "source_page": 1},
+      "vendor_name": {"value": "Acme Supplies BV", "confidence": 0.98, "source_page": 1},
+      "vendor_address": {"value": "12 Kade, 1011 AB Amsterdam", "confidence": 0.95, "source_page": 1},
+      "vendor_tax_id": {"value": "NL123456789B01", "confidence": 0.96, "source_page": 1},
+      "customer_name": {"value": "Beta Ltd", "confidence": 0.97, "source_page": 1},
+      "purchase_order_number": {"value": "PO-4401", "confidence": 0.96, "source_page": 1},
+      "currency": {"value": "EUR", "confidence": 0.99, "source_page": 2},
+      "subtotal": {"value": "120.00", "confidence": 0.97, "source_page": 2},
+      "tax": {"value": "25.20", "confidence": 0.97, "source_page": 2},
+      "total": {"value": "145.20", "confidence": 0.98, "source_page": 2},
+      "line_items": {
+        "value": [
+          {"description": "Widget, blue", "quantity": "1", "unit_price": "40.00", "amount": "40.00"},
+          {"description": "Widget, red", "quantity": "2", "unit_price": "40.00", "amount": "80.00"}
+        ],
+        "confidence": 0.96,
+        "source_page": 2
+      }
+    }
+  },
+  "invoice-003": {
+    "content_sha256": "c34dd46afe9bed890ba1d38084547a938cd2e95e532b1b87c5dbb4534b303d44",
+    "doc_type": "invoice",
+    "schema_name": "Invoice",
+    "source_pdf": "evals/datasets/invoices_v1/invoice-003.pdf",
+    "notes": "purchase_order_number is deliberately given confidence 0.55 (below DOCINTEL_CONFIDENCE_THRESHOLD, default 0.85) so this field genuinely routes to the review queue through the real scoring logic -- chosen to demonstrate that path honestly, not fabricated to force it. The value itself (null / not present) is correct per labels.json.",
+    "answer": {
+      "invoice_number": {"value": "INV-2026-1003", "confidence": 0.97, "source_page": 1},
+      "invoice_date": {"value": "2026-03-03", "confidence": 0.98, "source_page": 1},
+      "due_date": {"value": "2026-03-17", "confidence": 0.98, "source_page": 1},
+      "vendor_name": {"value": "Kestrel Print & Sign", "confidence": 0.97, "source_page": 1},
+      "vendor_address": {"value": "88 Mill Lane, Leeds LS1 5QR", "confidence": 0.95, "source_page": 1},
+      "vendor_tax_id": {"value": "GB223344556", "confidence": 0.96, "source_page": 1},
+      "customer_name": {"value": "Hollis & Dane LLP", "confidence": 0.96, "source_page": 1},
+      "purchase_order_number": {"value": null, "confidence": 0.55, "source_page": null},
+      "currency": {"value": "GBP", "confidence": 0.99, "source_page": 2},
+      "subtotal": {"value": "109.50", "confidence": 0.97, "source_page": 2},
+      "tax": {"value": "0.00", "confidence": 0.95, "source_page": 2},
+      "total": {"value": "109.50", "confidence": 0.98, "source_page": 2},
+      "line_items": {
+        "value": [
+          {"description": "Hex bolt M8 (box of 100)", "quantity": "3", "unit_price": "12.50", "amount": "37.50"},
+          {"description": "Courier delivery", "quantity": "4", "unit_price": "18.00", "amount": "72.00"}
+        ],
+        "confidence": 0.96,
+        "source_page": 2
+      }
+    }
+  },
+  "invoice-004": {
+    "content_sha256": "2a829c73f0642e30c6750b13ed865a5ed0157a0372f124a5c6f26bbe392d6f31",
+    "doc_type": "invoice",
+    "schema_name": "Invoice",
+    "source_pdf": "evals/datasets/invoices_v1/invoice-004.pdf",
+    "answer": {
+      "invoice_number": {"value": "INV-2026-1004", "confidence": 0.97, "source_page": 1},
+      "invoice_date": {"value": "2026-04-04", "confidence": 0.98, "source_page": 1},
+      "due_date": {"value": "2026-04-18", "confidence": 0.98, "source_page": 1},
+      "vendor_name": {"value": "Bluegrass Hardware Inc", "confidence": 0.97, "source_page": 1},
+      "vendor_address": {"value": "900 Sycamore St, Austin TX 78701", "confidence": 0.95, "source_page": 1},
+      "vendor_tax_id": {"value": "US45-6789012", "confidence": 0.96, "source_page": 1},
+      "customer_name": {"value": "Riverbend Cafe", "confidence": 0.97, "source_page": 1},
+      "purchase_order_number": {"value": "PO-4404", "confidence": 0.96, "source_page": 1},
+      "currency": {"value": "USD", "confidence": 0.99, "source_page": 2},
+      "subtotal": {"value": "967.00", "confidence": 0.97, "source_page": 2},
+      "tax": {"value": "79.78", "confidence": 0.97, "source_page": 2},
+      "total": {"value": "1046.78", "confidence": 0.98, "source_page": 2},
+      "line_items": {
+        "value": [
+          {"description": "Courier delivery", "quantity": "4", "unit_price": "18.00", "amount": "72.00"},
+          {"description": "Laminated sign, A2", "quantity": "5", "unit_price": "65.00", "amount": "325.00"},
+          {"description": "Consulting, hourly", "quantity": "6", "unit_price": "95.00", "amount": "570.00"}
+        ],
+        "confidence": 0.96,
+        "source_page": 2
+      }
+    }
+  }
+}

@@ -26,7 +26,7 @@ from app.extractors import (
 )
 from app.extractors.purchase_order import PROMPT_VERSION
 from app.models import Correction, Document, DocumentStatus, Extraction, FieldValue
-from app.providers import ProviderError, RawExtraction
+from app.providers import ProviderError, RawExtraction, get_provider
 from app.validation import CheckStatus, get_validator
 from app.validation.purchase_order import validate_purchase_order
 from evals import dataset as dataset_module
@@ -346,10 +346,15 @@ def test_the_upload_endpoint_accepts_the_new_doc_type(po_document: Document) -> 
 
 
 def test_the_extract_endpoint_accepts_a_purchase_order(
-    api_client: TestClient, po_document: Document, monkeypatch
+    api_client: TestClient, po_document: Document
 ) -> None:
+    # Overrides the FastAPI dependency the `/extract` route resolves its
+    # provider through (`Depends(get_provider)`), the same seam
+    # `demo/app.py` overrides for Demo Mode -- not a monkeypatch of
+    # `app.extraction`'s own module-level reference, which the route no
+    # longer calls directly.
     provider = RecordingProvider()
-    monkeypatch.setattr(extraction_service, "get_provider", lambda: provider)
+    api_client.app.dependency_overrides[get_provider] = lambda: provider
 
     response = api_client.post(f"/api/v1/documents/{po_document.id}/extract")
 

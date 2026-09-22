@@ -273,8 +273,18 @@ def _record_provider_failure(
     return extraction
 
 
-def extract_document_in_background(document_id: uuid.UUID) -> None:
-    """Entry point for `BackgroundTasks`; owns its own session."""
+def extract_document_in_background(
+    document_id: uuid.UUID,
+    provider: ExtractionProvider | None = None,
+) -> None:
+    """Entry point for `BackgroundTasks`; owns its own session.
+
+    `provider` is optional and defaults to `None`, exactly like
+    `extract_document`'s own parameter, which this passes straight through.
+    A caller that does not supply one keeps resolving the real, configured
+    provider through `get_provider()` inside `extract_document` -- nothing
+    here changes that default.
+    """
     with get_sessionmaker()() as session:
         document = session.get(Document, document_id)
         if document is None:
@@ -282,7 +292,7 @@ def extract_document_in_background(document_id: uuid.UUID) -> None:
             return
 
         try:
-            extract_document(session, document)
+            extract_document(session, document, provider=provider)
         except (ExtractionError, UnknownDocumentType) as exc:
             logger.warning("extraction not attempted for %s: %s", document_id, exc)
             session.rollback()

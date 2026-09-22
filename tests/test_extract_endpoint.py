@@ -7,17 +7,24 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
-from app import extraction as extraction_service
 from app.models import Document, DocumentStatus, Extraction
+from app.providers import get_provider
 
 from .conftest import FakeProvider
 
 
 @pytest.fixture
-def provider_in_use(monkeypatch: pytest.MonkeyPatch) -> FakeProvider:
-    """Replace the configured provider so no request ever leaves the process."""
+def provider_in_use(api_client: TestClient) -> FakeProvider:
+    """Replace the configured provider so no request ever leaves the process.
+
+    Overrides the FastAPI dependency the `/extract` route resolves its
+    provider through (`Depends(get_provider)`), the same seam
+    `demo/app.py` overrides for Demo Mode -- not a monkeypatch of
+    `app.extraction`'s own module-level reference, which the route no
+    longer calls directly.
+    """
     provider = FakeProvider()
-    monkeypatch.setattr(extraction_service, "get_provider", lambda: provider)
+    api_client.app.dependency_overrides[get_provider] = lambda: provider
     return provider
 
 

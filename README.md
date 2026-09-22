@@ -158,9 +158,13 @@ the type flows end to end, not a benchmark.
 
 ```bash
 docker compose up --build
-docker compose run --rm app alembic upgrade head
 curl localhost:8000/health
 ```
+
+Migrations run automatically as their own step — `docker-compose.yml`'s
+`migrate` service waits for PostgreSQL to report healthy, runs
+`alembic upgrade head`, and the app only starts once that succeeds. No
+separate manual migration command is needed with this path.
 
 `docker-compose.yml` is a local convenience stack (PostgreSQL + the app) with
 development credentials. For anything else, build the image and supply real
@@ -178,8 +182,10 @@ docker run -p 8000:8000 \
 The image runs as a non-root user, carries a `HEALTHCHECK` against `/health`,
 and needs only `DOCINTEL_DATABASE_URL` to start. Uploaded files and rendered
 pages live under `DOCINTEL_STORAGE_DIR` (default `/var/lib/docintel/storage`) —
-mount a volume there to keep them. Migrations are not run automatically; run
-`alembic upgrade head` as a separate step.
+mount a volume there to keep them. Run this way — a bare image without
+Compose — migrations are not run automatically; run `alembic upgrade head`
+as a separate step, the same way `docker-compose.yml`'s own `migrate`
+service does it.
 
 Behind a mirror or an internal registry, override the base image:
 
@@ -210,6 +216,14 @@ uvicorn app.main:app --reload
 curl localhost:8000/api/v1/health
 pytest
 ```
+
+### Demo Mode (no Anthropic key required)
+
+Want to see the full pipeline without an Anthropic API key? Run
+`uvicorn demo.app:app --reload` instead of `app.main:app` — the real
+application, with extraction served by a deterministic, credential-free
+provider against a small set of committed sample invoices. See
+[docs/DEMO.md](docs/DEMO.md) for the full walkthrough.
 
 ---
 
