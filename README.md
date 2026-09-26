@@ -4,10 +4,11 @@ Extract structured data from business documents (invoices, purchase orders)
 into a validated schema, score confidence per field, and route anything
 uncertain to a human review queue.
 
-**Status:** feature-complete through milestone 10. 478 tests collected, 477
-passing — the one failure is a known, environment-specific test-capture
-artifact, not a correctness defect (see [Testing](#testing)). No real-model
-benchmark has been run — see [Evaluation](#evaluation).
+**Status:** feature-complete through milestone 10, plus a hardened
+public demo. 513 tests collected, 513 passing (see
+[Testing](#testing) for what that number covers and the one
+previously-reported, environment-dependent flake this run did not hit).
+No real-model benchmark has been run — see [Evaluation](#evaluation).
 
 ---
 
@@ -75,7 +76,7 @@ asking a language model whether it added up correctly.
 | **Reproducible evaluation** | A committed, deterministic, labelled dataset and a CLI that measures accuracy, review rate, false-confident rate, cost and latency. |
 | **Cost and latency tracking** | Recorded per extraction from provider usage; never invented when the provider reports none. |
 | **PostgreSQL + Alembic** | Six migrations, each verified to upgrade, downgrade and re-upgrade on a fresh database. |
-| **Test coverage** | 478 tests across 28 files, including a hard guard that no test can reach the real API. |
+| **Test coverage** | 513 tests across 31 files, including a hard guard that no test can reach the real API. |
 
 ---
 
@@ -222,7 +223,17 @@ pytest
 Want to see the full pipeline without an Anthropic API key? Run
 `uvicorn demo.app:app --reload` instead of `app.main:app` — the real
 application, with extraction served by a deterministic, credential-free
-provider against a small set of committed sample invoices. See
+provider against three committed sample invoices, seeded through the real
+pipeline (`python -m demo.seed`) since uploading a new document is
+disabled here. Hardened for public exposure: uploads and corrections both
+refuse with 403, and extraction is rate-limited (off by default; see
+[docs/DEMO.md](docs/DEMO.md)) — the one part of this project built to be
+put on the public internet, unlike everything else described in
+[Security and reliability](#security-and-reliability).
+
+`docker compose up --build` now also builds and starts the `seed` and
+`demo` services alongside `db`/`migrate`/`app` — the demo is reachable at
+`localhost:8001` once `seed` completes. See
 [docs/DEMO.md](docs/DEMO.md) for the full walkthrough.
 
 ---
@@ -638,30 +649,42 @@ What is actually implemented:
   suite additionally patches the Anthropic client so no test can make a real
   request — verified by a test that asserts the guard fires.
 - **The container runs as a non-root user** with a health check.
+- **The public demo (only) has mutation protection and a rate limiter.**
+  See [Demo Mode](docs/DEMO.md) for the full description. Neither applies
+  to Live Mode: both are dependency overrides scoped to `demo.app`'s own
+  FastAPI instance, and the rate limiter is also off by default even
+  there, behind `DOCINTEL_DEMO_RATE_LIMIT_ENABLED`.
 
-What is **not** implemented, by design (see non-goals): authentication,
-authorisation, multi-tenancy, rate limiting, at-rest encryption, audit logging
-of readers, and CSRF protection on the review form. DocIntel is built as a
-single-user local tool. **Do not expose it to an untrusted network as-is.**
+What is **not** implemented for Live Mode, by design (see non-goals):
+authentication, authorisation, multi-tenancy, rate limiting, at-rest
+encryption, audit logging of readers, and CSRF protection on the review
+form. DocIntel is built as a single-user local tool. **Do not expose Live
+Mode to an untrusted network as-is.** The demo (`demo.app`) is the one
+exception built specifically to be exposed publicly — see
+[Demo Mode](docs/DEMO.md) for what it does and does not protect against.
 
 ---
 
 ## Testing
 
 ```bash
-pytest                     # 478 tests
+pytest                     # 513 tests
 pytest -q tests/test_purchase_order.py
 ```
 
-With PostgreSQL running: 478 tests collected, 477 pass, 1 fails. The one
-failure, `tests/test_eval_cli.py::test_json_output_is_machine_readable`, is a
+With PostgreSQL running: 513 tests collected, 513 pass. A previous count
+(478 collected, 477 pass) reported one failure,
+`tests/test_eval_cli.py::test_json_output_is_machine_readable`, as a
 known, environment-specific artifact — SQLAlchemy log output occasionally
-interleaves with the CLI's captured JSON stdout in some environments — not a
-defect in the application. It has been reproduced independently of this
-checkout and is not hidden here.
+interleaves with the CLI's captured JSON stdout in some environments — not
+a defect in the application. That specific failure did not reproduce in
+the environment this count was most recently verified in; it is recorded
+here rather than silently dropped, since nothing has changed about the
+underlying mechanism that could cause it, only the environment happened
+not to trigger it this time.
 
 Tests that need PostgreSQL are skipped when no server answers, so `pytest`
-runs without a database at 260 pass, 218 skip (478 collected either way).
+runs without a database at 278 pass, 235 skip (513 collected either way).
 Database tests migrate a dedicated test database to head and tear it down on
 every run.
 

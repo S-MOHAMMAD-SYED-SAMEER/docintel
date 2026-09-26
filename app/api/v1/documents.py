@@ -26,6 +26,8 @@ from sqlalchemy.orm import Session
 
 from app import export as export_service
 from app import extraction, ingestion
+from app.api.demo_guard import require_mutation_allowed
+from app.api.rate_limit import rate_limit_demo_extraction
 from app.config import Settings, get_settings
 from app.db.session import get_session
 from app.extractors import (
@@ -98,6 +100,7 @@ def _normalise_doc_type(doc_type: str) -> str:
         "and its pages are rendered in the background; poll the document to see "
         "page_count appear."
     ),
+    dependencies=[Depends(require_mutation_allowed)],
 )
 async def upload_document(
     background_tasks: BackgroundTasks,
@@ -151,6 +154,7 @@ class ExtractionAcceptedResponse(BaseModel):
         "Sends the rendered pages to the extraction provider in the background. "
         "Accepted document types: " + ", ".join(registered_doc_types()) + "."
     ),
+    dependencies=[Depends(rate_limit_demo_extraction)],
 )
 def extract_document(
     document_id: uuid.UUID,

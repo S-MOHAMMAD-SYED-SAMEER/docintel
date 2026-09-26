@@ -16,6 +16,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from app import corrections, review
+from app.api.demo_guard import require_mutation_allowed
 from app.api.v1.review import (
     DEFAULT_PAGE_SIZE,
     MAX_PAGE_SIZE,
@@ -73,7 +74,7 @@ def review_page(
     )
 
 
-@router.post("/review/{field_id}")
+@router.post("/review/{field_id}", dependencies=[Depends(require_mutation_allowed)])
 def submit_correction_form(
     field_id: uuid.UUID,
     session: Annotated[Session, Depends(get_session)],

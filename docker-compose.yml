@@ -58,6 +58,30 @@ services:
     volumes:
       - storage:/var/lib/docintel/storage
 
+  # Seeds the demo's three recognised sample invoices (see demo/seed.py,
+  # docs/DEMO.md §5) through the real upload/render pipeline, before the
+  # demo app is reachable. Required because the demo's mutation guard
+  # (app/api/demo_guard.py) refuses every upload -- without this step the
+  # demo would have nothing to show. Idempotent, so re-running this stack
+  # against the same volume never duplicates the seeded documents. Does
+  # not run for `app` (Live Mode): only `demo` depends on it.
+  seed:
+    build:
+      context: .
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:-python:3.13-slim}
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DOCINTEL_DATABASE_URL: postgresql+psycopg://docintel:docintel@db:5432/docintel
+    command: ["python", "-m", "demo.seed"]
+    volumes:
+      - storage:/var/lib/docintel/storage
+    restart: "no"
+
   # Same image as `app`, with the extraction provider swapped for the
   # deterministic, credential-free demo (see demo/app.py, docs/DEMO.md). No
   # Anthropic key: the demo provider never calls out. Uses `python -m
@@ -73,13 +97,21 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      migrate:
+      seed:
         condition: service_completed_successfully
     environment:
       DOCINTEL_DATABASE_URL: postgresql+psycopg://docintel:docintel@db:5432/docintel
+      # Off by default (app/config.py) -- this deployment opts in so a
+      # public visitor cannot call POST /api/v1/documents/{id}/extract in
+      # an unbounded loop. In-process only; see app/api/rate_limit.py's
+      # own docstring for why no Redis or other external service is
+      # needed for this one-container deployment.
+      DOCINTEL_DEMO_RATE_LIMIT_ENABLED: "true"
     command: ["python", "-m", "uvicorn", "demo.app:app", "--host", "0.0.0.0", "--port", "8000"]
     ports:
       - "8001:8000"
+    volumes:
+      - storage:/var/lib/docintel/storage
 
 volumes:
   db-data:

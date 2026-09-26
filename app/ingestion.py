@@ -32,14 +32,27 @@ logger = logging.getLogger(__name__)
 
 
 def store_upload(
-    session: Session, *, filename: str | None, doc_type: str, data: bytes
+    session: Session,
+    *,
+    filename: str | None,
+    doc_type: str,
+    data: bytes,
+    document_id: uuid.UUID | None = None,
 ) -> Document:
     """Validate the bytes, write them to disk, and create the document row.
 
     Raises `UnsupportedMediaType` before anything is written.
+
+    `document_id` is normally left unset, so a fresh id is generated the
+    way it always has been -- every existing caller is unaffected. Demo
+    seeding (`demo/seed.py`) is the one caller that passes a fixed,
+    deterministic id, so a re-run can check whether that exact row already
+    exists before calling this function at all, the same idempotency
+    contract a real upload never needs.
     """
     media = media_types.detect(data)
-    document_id = uuid.uuid4()
+    if document_id is None:
+        document_id = uuid.uuid4()
 
     stored = storage.save_source(document_id, data, media)
     document = Document(

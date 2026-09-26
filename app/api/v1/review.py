@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app import corrections, review
+from app.api.demo_guard import require_mutation_allowed
 from app.config import Settings, get_settings
 from app.db.session import get_session
 from app.models import DocumentStatus, FieldValue
@@ -169,6 +170,7 @@ class CorrectionResponse(BaseModel):
         "validation are left untouched — they describe the answer that was "
         "superseded. The model is not called again."
     ),
+    dependencies=[Depends(require_mutation_allowed)],
 )
 def submit_correction(
     field_id: uuid.UUID,

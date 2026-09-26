@@ -53,6 +53,20 @@ class Settings(BaseSettings):
     confidence_weight_arithmetic: float = Field(default=0.20, ge=0.0)
     confidence_weight_text_layer: float = Field(default=0.20, ge=0.0)
 
+    # --- Demo rate limiting ---
+    # Off by default, so normal/Live Mode behaviour is unchanged unless an
+    # operator deliberately opts in for a public demo deployment. When
+    # true, `POST /api/v1/documents/{id}/extract` (see
+    # `app/api/rate_limit.py`) refuses a request over
+    # `demo_rate_limit_per_minute` from the same client IP with a 429,
+    # rather than letting an automated loop trigger extraction without
+    # limit. In-process only -- no Redis, no database table.
+    demo_rate_limit_enabled: bool = False
+    # Conservative default for a single-replica portfolio demo: generous
+    # enough for a visitor trying the three seeded invoices a few times
+    # over, tight enough to stop a scripted loop quickly.
+    demo_rate_limit_per_minute: int = Field(default=10, gt=0)
+
 
 @lru_cache
 def get_settings() -> Settings:
