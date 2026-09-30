@@ -45,22 +45,43 @@ already tracked in the repository.
 
 ## 4. How fixture matching works
 
-`ExtractionProvider.extract()` only ever receives the document's **rendered
-page images** (`PageImage` objects — one PNG per page, produced by
-`app/rendering.py`), never the originally-uploaded file's own bytes. So
-`DemoExtractionProvider` computes the SHA-256 of the concatenated rendered
-page PNGs (in page order) and looks that hash up in a small committed table,
-`demo/fixtures/invoice_answers.json`.
+Fixture identity is the SHA-256 of the **originally-uploaded source PDF's
+own bytes** — never a rendered page image. `app.ingestion.store_upload`
+computes this hash from the exact uploaded bytes already in memory, before
+any rendering happens, and persists it as `Document.source_sha256`. This is
+the same column and the same computation for every document, Demo Mode or
+not; Demo Mode is simply the one place that hash is looked up against
+something.
+
+When a request reaches `POST /api/v1/documents/{id}/extract` on the demo
+app, a demo-specific FastAPI dependency (`demo/app.py::
+_demo_provider_for_request`) resolves the `Document` row for that
+`document_id`, reads its `source_sha256`, and looks that value up in a
+small committed table, `demo/fixtures/invoice_answers.json`. This happens
+*before* `DemoExtractionProvider.extract()` is ever called — the provider
+instance handed to the pipeline is already bound to whichever fixture, if
+any, matched.
 
 - **Known hash** → the committed fixture answer is returned, run through
   the real schema, validation, scoring, and persistence pipeline.
-- **Unknown hash** → a `ProviderError` is raised, exactly like any other
-  extraction failure. There is no approximate matching, no silent empty
-  answer, and no fallback to a real model.
+- **Unknown hash** (including a document with no `source_sha256` at all)
+  → a `ProviderError` is raised, exactly like any other extraction
+  failure. There is no approximate matching, no silent empty answer, and
+  no fallback to a real model.
 
-Because matching is by content, re-uploading the same sample PDF — even
-under a different filename — is recognised. A different document, even a
-visually similar one, is not.
+Because matching is by the source file's own content — never a filename,
+never the document id, and never anything derived from rendering —
+re-uploading the same sample PDF under a different filename is still
+recognised, while a different document, even a visually similar one, is
+not. Rendering (`app/rendering.py`, PDFium plus Pillow) still runs exactly
+as it does in Live Mode, and `extract()` still receives real rendered
+`PageImage`s to do its actual work — rendering is simply no longer part of
+*identity*. That is deliberate: a rendered page's exact bytes depend on
+the rasterizer and PNG encoder that produced them, which are not
+guaranteed byte-identical across operating systems or library versions,
+while the uploaded source bytes are identical everywhere. See
+`demo/generate_fixture_identity.py` for how the committed fixture hashes
+in §5 are produced and kept in sync with the source PDFs.
 
 ## 5. Which invoices are supported
 

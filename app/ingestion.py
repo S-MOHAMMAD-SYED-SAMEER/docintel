@@ -16,6 +16,7 @@ EXTRACTED: nothing has been extracted yet, and saying otherwise would be a lie
 the review queue would later have to untangle.
 """
 
+import hashlib
 import logging
 import uuid
 from pathlib import Path
@@ -54,11 +55,18 @@ def store_upload(
     if document_id is None:
         document_id = uuid.uuid4()
 
+    # From the exact validated upload bytes already in hand -- no second read,
+    # no transcoding. Computed only once `detect()` has confirmed this is a
+    # real, supported document, so an empty/unsupported upload never gets a
+    # hash or a row at all.
+    source_sha256 = hashlib.sha256(data).hexdigest()
+
     stored = storage.save_source(document_id, data, media)
     document = Document(
         id=document_id,
         filename=storage.safe_filename(filename),
         storage_path=stored.relative_path,
+        source_sha256=source_sha256,
         doc_type=doc_type,
         status=DocumentStatus.UPLOADED,
     )

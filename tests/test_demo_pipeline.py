@@ -55,8 +55,13 @@ def test_demo_provider_produces_a_real_extraction_and_field_values(
     with Session(migrated_engine) as session:
         attached = session.get(Document, document.id)
         assert attached is not None
+        # The document's own persisted source_sha256 (computed at upload
+        # time, before rendering) is what resolves the fixture -- proving
+        # the full round trip, not just the provider in isolation.
+        assert attached.source_sha256 is not None
+        provider = DemoExtractionProvider.for_source_sha256(attached.source_sha256)
         result = extraction_service.extract_document(
-            session, attached, provider=DemoExtractionProvider()
+            session, attached, provider=provider
         )
         extraction_id = result.id
 
@@ -106,8 +111,10 @@ def test_demo_provider_routes_a_low_confidence_field_to_review_through_real_scor
     with Session(migrated_engine) as session:
         attached = session.get(Document, document.id)
         assert attached is not None
+        assert attached.source_sha256 is not None
+        provider = DemoExtractionProvider.for_source_sha256(attached.source_sha256)
         result = extraction_service.extract_document(
-            session, attached, provider=DemoExtractionProvider()
+            session, attached, provider=provider
         )
         extraction_id = result.id
 

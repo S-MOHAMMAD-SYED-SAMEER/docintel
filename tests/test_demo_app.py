@@ -6,7 +6,11 @@ that this override is scoped to the demo app instance only: the normal
 `app.main.create_app()` FastAPI app is completely unaffected.
 """
 
+import uuid
+
 from fastapi.testclient import TestClient
+from sqlalchemy import Engine
+from sqlalchemy.orm import Session
 
 from app.main import create_app
 from app.providers import get_provider
@@ -22,11 +26,21 @@ def test_the_demo_app_exposes_exactly_the_production_routes() -> None:
     assert "/demo/extract" not in demo_paths
 
 
-def test_the_demo_app_overrides_only_the_provider_dependency() -> None:
+def test_the_demo_app_overrides_only_the_provider_dependency(
+    migrated_engine: Engine,
+) -> None:
+    """The override resolves to a `DemoExtractionProvider` for any
+    document_id -- including one that does not exist, which must resolve
+    to "no fixture matched" rather than raise here (the same way a real
+    request's later `.extract()` call is where an unrecognised document
+    actually fails, not dependency resolution)."""
     demo_app = create_demo_app()
 
     assert get_provider in demo_app.dependency_overrides
-    resolved = demo_app.dependency_overrides[get_provider]()
+    with Session(migrated_engine) as session:
+        resolved = demo_app.dependency_overrides[get_provider](
+            document_id=uuid.uuid4(), session=session
+        )
     assert isinstance(resolved, DemoExtractionProvider)
 
 

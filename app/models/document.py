@@ -45,6 +45,14 @@ class Document(Base):
     )
     filename: Mapped[str] = mapped_column(String(512))
     storage_path: Mapped[str] = mapped_column(String(1024))
+    # Lowercase hex SHA-256 of the original uploaded bytes, computed before any
+    # rendering. A stable, platform-independent content identity -- unlike a
+    # rendered page image, the uploaded bytes are identical on every OS and
+    # every rendering-library version, so this is what Demo Mode matches a
+    # known sample document by (see demo/providers.py). Nullable because rows
+    # written before this column existed have none; every row written by the
+    # current ingestion path always gets one.
+    source_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
     doc_type: Mapped[str] = mapped_column(String(64))
     # Unknown until the pages are rendered (milestone 3).
     page_count: Mapped[int | None] = mapped_column(Integer, nullable=True)

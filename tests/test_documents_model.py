@@ -18,9 +18,13 @@ README_COLUMNS = {
     "status",
     "uploaded_at",
 }
-# Beyond the README data model: why a document is in FAILED (milestone 3).
-EXTRA_COLUMNS = {"error"}
+# Beyond the README data model: why a document is in FAILED (milestone 3),
+# and the uploaded source's own content identity (milestone 5 portability
+# work) -- nullable because rows written before that column existed have
+# none; every row the current ingestion path writes always gets one.
+EXTRA_COLUMNS = {"error", "source_sha256"}
 ALL_COLUMNS = README_COLUMNS | EXTRA_COLUMNS
+NULLABLE_COLUMNS = {"page_count", "error", "source_sha256"}
 README_STATUSES = [
     "uploaded",
     "processing",
@@ -41,10 +45,11 @@ def test_columns_match_the_readme_data_model(migrated_engine: Engine) -> None:
 
     by_name = {column["name"]: column for column in columns}
     assert by_name["id"]["type"].python_type is uuid.UUID
-    # page_count is unknown until pages are rendered and error is only set on
-    # failure; every column the README names is otherwise required.
-    assert by_name["page_count"]["nullable"] is True
-    assert by_name["error"]["nullable"] is True
+    # page_count is unknown until pages are rendered, error is only set on
+    # failure, and source_sha256 is nullable only for rows predating that
+    # column; every column the README names is otherwise required.
+    for name in NULLABLE_COLUMNS:
+        assert by_name[name]["nullable"] is True
     assert not any(
         by_name[name]["nullable"] for name in README_COLUMNS - {"page_count"}
     )

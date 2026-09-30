@@ -64,7 +64,7 @@ def save_source(document_id: uuid.UUID, data: bytes, media: MediaType) -> Stored
     absolute.write_bytes(data)
 
     relative = absolute.relative_to(storage_root())
-    return StoredSource(relative_path=str(relative), absolute_path=absolute)
+    return StoredSource(relative_path=relative.as_posix(), absolute_path=absolute)
 
 
 def prepare_pages_dir(document_id: uuid.UUID) -> Path:

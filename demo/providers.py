@@ -6,20 +6,21 @@ Implements `app.providers.base.ExtractionProvider` exactly -- same
 (schema parsing, deterministic validation, confidence scoring, persistence,
 review, correction, export) runs completely unaware this is not Anthropic.
 
-Matching is by content, never by trust: the SHA-256 of the rendered page
-images (what `extract()` actually receives -- there is no access to the
-originally uploaded file's own bytes at this seam) is looked up against a
-small, committed table of known sample invoices. An unrecognised hash is a
-`ProviderError`, exactly like any other extraction failure; there is no
-approximate match and no silent empty answer.
+Identity -- which known sample document this is -- is decided *before*
+`extract()` is ever called, by `for_source_sha256()`, keyed on
+`Document.source_sha256`: the SHA-256 of the originally uploaded PDF bytes,
+computed once at ingestion, before any rendering. This is deliberately not a
+hash of the rendered page images `extract()` receives -- a rendered image's
+bytes depend on the rasterizer and PNG encoder that produced them, which are
+not guaranteed byte-identical across operating systems or library versions;
+the uploaded source bytes are. See `demo/generate_fixture_identity.py` for
+how the committed fixture hashes are produced.
 
 Never imports `anthropic`. Never imports a model-loading library. Never
 performs network I/O.
 """
 
-import hashlib
 import json
-from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
@@ -65,15 +66,15 @@ def _load_fixtures(path: Path = FIXTURES_PATH) -> dict[str, dict[str, Any]]:
             continue
         if (
             not isinstance(entry, dict)
-            or not isinstance(entry.get("content_sha256"), str)
-            or not entry["content_sha256"]
+            or not isinstance(entry.get("source_sha256"), str)
+            or not entry["source_sha256"]
             or not isinstance(entry.get("schema_name"), str)
             or not entry["schema_name"]
             or not isinstance(entry.get("answer"), dict)
         ):
             raise DemoFixtureError(
                 f"Demo fixture {fixture_id!r} in {path} is malformed: each "
-                "entry needs a non-empty 'content_sha256', a non-empty "
+                "entry needs a non-empty 'source_sha256', a non-empty "
                 "'schema_name', and an 'answer' object."
             )
         fixtures[fixture_id] = entry
@@ -84,41 +85,26 @@ def _load_fixtures(path: Path = FIXTURES_PATH) -> dict[str, dict[str, Any]]:
     return fixtures
 
 
-def _index_by_hash(
+def _index_by_source_hash(
     fixtures: dict[str, dict[str, Any]],
 ) -> dict[str, tuple[str, dict[str, Any]]]:
     by_hash: dict[str, tuple[str, dict[str, Any]]] = {}
     for fixture_id, entry in fixtures.items():
-        content_hash = entry["content_sha256"]
-        if content_hash in by_hash:
+        source_hash = entry["source_sha256"]
+        if source_hash in by_hash:
             raise DemoFixtureError(
-                f"Demo fixtures {by_hash[content_hash][0]!r} and "
-                f"{fixture_id!r} both declare content_sha256 {content_hash!r} "
+                f"Demo fixtures {by_hash[source_hash][0]!r} and "
+                f"{fixture_id!r} both declare source_sha256 {source_hash!r} "
                 "-- each known sample document must hash uniquely."
             )
-        by_hash[content_hash] = (fixture_id, entry)
+        by_hash[source_hash] = (fixture_id, entry)
     return by_hash
 
 
 # Loaded and validated once, at import time -- a broken fixture file fails
 # clearly before any request can reach it.
 _FIXTURES = _load_fixtures()
-_BY_HASH = _index_by_hash(_FIXTURES)
-
-
-def hash_pages(images: Sequence[PageImage]) -> str:
-    """SHA-256 over the rendered page images, in page order.
-
-    This is what `extract()` actually receives -- rendering happens before
-    the provider is ever called, and there is no path back to the originally
-    uploaded file's bytes from here. Rendering is deterministic for a given
-    document and a given `DOCINTEL_RENDER_DPI`, so the same sample PDF always
-    produces the same hash.
-    """
-    digest = hashlib.sha256()
-    for image in sorted(images, key=lambda page: page.page_number):
-        digest.update(image.data)
-    return digest.hexdigest()
+_BY_SOURCE_HASH = _index_by_source_hash(_FIXTURES)
 
 
 class DemoExtractionProvider:
@@ -130,22 +116,51 @@ class DemoExtractionProvider:
     `confidence` is hand-authored for deterministic demonstration and is
     explicitly NOT a real Anthropic model's self-reported confidence. See
     docs/DEMO.md.
+
+    Bound to a specific fixture match (or the lack of one) at construction
+    time, via `for_source_sha256()` -- not re-derived from `extract()`'s own
+    `images` argument, which is exactly the platform-dependent value this
+    design avoids keying identity on.
     """
 
     model_name = MODEL_NAME
 
+    def __init__(
+        self, fixture_id: str | None, entry: dict[str, Any] | None
+    ) -> None:
+        self._fixture_id = fixture_id
+        self._entry = entry
+
+    @classmethod
+    def for_source_sha256(
+        cls, source_sha256: str | None
+    ) -> "DemoExtractionProvider":
+        """The provider instance for a document with this source identity.
+
+        `source_sha256` is `None` for a document with no computed hash (for
+        example, a row written before this column existed) -- treated
+        exactly the same as an unrecognised hash, never as a wildcard
+        match. Matching a fixture is deferred to construction time, not
+        done here eagerly as an error: whether this resolves to a known
+        fixture or not, the failure (if any) surfaces from `extract()`
+        later, at the same point it always has.
+        """
+        match = _BY_SOURCE_HASH.get(source_sha256) if source_sha256 else None
+        if match is None:
+            return cls(None, None)
+        fixture_id, entry = match
+        return cls(fixture_id, entry)
+
     def extract(
         self,
-        images: Sequence[PageImage],
+        images: list[PageImage],
         schema: type[BaseModel],
         prompt: str,
     ) -> RawExtraction:
         if not images:
             raise ProviderError("Cannot extract from a document with no pages.")
 
-        content_hash = hash_pages(images)
-        match = _BY_HASH.get(content_hash)
-        if match is None:
+        if self._entry is None:
             raise ProviderError(
                 "Demo Mode does not recognise this document. It only "
                 "answers for its own committed sample invoices "
@@ -154,7 +169,7 @@ class DemoExtractionProvider:
                 "upload one of the demo's known samples instead."
             )
 
-        fixture_id, entry = match
+        fixture_id, entry = self._fixture_id, self._entry
         if schema.__name__ != entry["schema_name"]:
             raise ProviderError(
                 f"Demo fixture {fixture_id!r} was authored for "
@@ -193,4 +208,4 @@ class DemoExtractionProvider:
         )
 
 
-__all__ = ["DemoExtractionProvider", "DemoFixtureError", "MODEL_NAME", "hash_pages"]
+__all__ = ["DemoExtractionProvider", "DemoFixtureError", "MODEL_NAME"]
