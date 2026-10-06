@@ -5,7 +5,7 @@ into a validated schema, score confidence per field, and route anything
 uncertain to a human review queue.
 
 **Status:** feature-complete through milestone 10, plus a hardened
-public demo. 513 tests collected, 513 passing (see
+public demo. 521 tests collected, 521 passing (see
 [Testing](#testing) for what that number covers and the one
 previously-reported, environment-dependent flake this run did not hit).
 No real-model benchmark has been run — see [Evaluation](#evaluation).
@@ -76,7 +76,7 @@ asking a language model whether it added up correctly.
 | **Reproducible evaluation** | A committed, deterministic, labelled dataset and a CLI that measures accuracy, review rate, false-confident rate, cost and latency. |
 | **Cost and latency tracking** | Recorded per extraction from provider usage; never invented when the provider reports none. |
 | **PostgreSQL + Alembic** | Six migrations, each verified to upgrade, downgrade and re-upgrade on a fresh database. |
-| **Test coverage** | 513 tests across 31 files, including a hard guard that no test can reach the real API. |
+| **Test coverage** | 521 tests across 32 files, including a hard guard that no test can reach the real API. |
 
 ---
 
@@ -668,11 +668,11 @@ exception built specifically to be exposed publicly — see
 ## Testing
 
 ```bash
-pytest                     # 513 tests
+pytest                     # 521 tests
 pytest -q tests/test_purchase_order.py
 ```
 
-With PostgreSQL running: 513 tests collected, 513 pass. A previous count
+With PostgreSQL running: 521 tests collected, 521 pass. A previous count
 (478 collected, 477 pass) reported one failure,
 `tests/test_eval_cli.py::test_json_output_is_machine_readable`, as a
 known, environment-specific artifact — SQLAlchemy log output occasionally
@@ -684,7 +684,7 @@ underlying mechanism that could cause it, only the environment happened
 not to trigger it this time.
 
 Tests that need PostgreSQL are skipped when no server answers, so `pytest`
-runs without a database at 278 pass, 235 skip (513 collected either way).
+runs without a database at 279 pass, 242 skip (521 collected either way).
 Database tests migrate a dedicated test database to head and tear it down on
 every run.
 
