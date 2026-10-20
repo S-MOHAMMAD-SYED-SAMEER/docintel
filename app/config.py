@@ -4,6 +4,7 @@ All settings come from the environment (or a local `.env`), never from
 module-level constants scattered through the code. See `.env.example`.
 """
 
+from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
 
@@ -35,10 +36,25 @@ class Settings(BaseSettings):
 
     # Extraction provider.
     anthropic_api_key: str = ""
-    extraction_model: str = "claude-sonnet-5"
+    extraction_model: str = "claude-haiku-4-5"
     # Ceiling for the extraction response. An invoice schema with line items is
     # a few thousand tokens; the headroom is for long line-item tables.
     extraction_max_tokens: int = Field(default=16000, gt=0)
+    # How the Anthropic adapter treats a slow or failing service. Stated here, never left to the SDK's
+    # defaults (a 10-minute read timeout inside a background task, two silent retries).
+    # A request is cut off after this many seconds:
+    extraction_timeout_seconds: float = Field(default=120.0, gt=0)
+    # A transient failure (a timeout, a connection error, 408, 409, 429 or a 5xx) is retried this many more
+    # times by the SDK, which waits what the service asks (Retry-After) or backs off. 0 turns retries off,
+    # which is what a counted evaluation run uses. 401, 403 and other 4xx are never retried.
+    extraction_max_retries: int = Field(default=2, ge=0, le=5)
+    # A document with more pages than this is refused before any model call, and so is one whose rendered
+    # pages together exceed the byte limit (the API takes about 100 images and 32 MB a request).
+    max_pages: int = Field(default=20, ge=1, le=100)
+    max_image_bytes_total: int = Field(default=20 * 1024 * 1024, gt=0)
+    # USD per million tokens as `{"<model id>": [input, output]}`, to add or override entries of the table
+    # in `app/providers/pricing.py`. A model with no entry has no cost recorded (None), never a guess.
+    pricing_usd_per_mtok: dict[str, tuple[Decimal, Decimal]] = Field(default_factory=dict)
 
     # A field whose final score falls below this is routed to human review.
     confidence_threshold: float = Field(default=0.85, ge=0.0, le=1.0)

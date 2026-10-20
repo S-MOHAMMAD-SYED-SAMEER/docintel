@@ -1,7 +1,7 @@
 """Page rendering: a stored document becomes one PNG per page.
 
 Every document type ends up in the same shape — `pages/page-NNNN.png` — so the
-extractor that arrives in milestone 4 never has to care whether the upload was
+extractor never has to care whether the upload was
 a PDF or a photo.
 """
 

@@ -1,6 +1,6 @@
 """The review queue API.
 
-Read-only in this milestone. Everything the reviewer sees was decided and
+Everything the reviewer sees was decided and
 persisted when the extraction ran, so the queue and the database can never
 disagree about whether a field needs review.
 """

@@ -8,9 +8,9 @@ via structured outputs, and returns the response verbatim alongside its cost.
 import base64
 import json
 import logging
+import re
 import time
 from collections.abc import Sequence
-from decimal import Decimal
 from typing import Any
 
 import anthropic
@@ -19,39 +19,41 @@ from pydantic import BaseModel
 from app.config import get_settings
 from app.providers.base import (
     PageImage,
+    ProviderAuthError,
+    ProviderBadRequest,
+    ProviderConnectionError,
     ProviderError,
+    ProviderQuotaExhausted,
+    ProviderRateLimited,
     ProviderRefusal,
+    ProviderTimeout,
+    ProviderUnavailable,
     RawExtraction,
 )
+from app.providers.pricing import estimate_cost_usd
 
 logger = logging.getLogger(__name__)
 
-# USD per million tokens, from Anthropic's published pricing. A model missing
-# from this table yields cost_usd = None rather than a guessed number.
-PRICING_USD_PER_MTOK: dict[str, tuple[Decimal, Decimal]] = {
-    "claude-opus-5": (Decimal("5.00"), Decimal("25.00")),
-    "claude-opus-4-8": (Decimal("5.00"), Decimal("25.00")),
-    "claude-sonnet-5": (Decimal("2.00"), Decimal("10.00")),
-    "claude-haiku-4-5": (Decimal("1.00"), Decimal("5.00")),
-}
-
-TOKENS_PER_MTOK = Decimal(1_000_000)
-
-
-def estimate_cost_usd(
-    model: str, input_tokens: int | None, output_tokens: int | None
-) -> Decimal | None:
-    """Cost of one call, or None when the model's pricing is unknown."""
-    pricing = PRICING_USD_PER_MTOK.get(model)
-    if pricing is None or input_tokens is None or output_tokens is None:
-        return None
-
-    input_rate, output_rate = pricing
-    cost = (
-        Decimal(input_tokens) * input_rate + Decimal(output_tokens) * output_rate
-    ) / TOKENS_PER_MTOK
-    # Six decimal places: a single page costs fractions of a cent.
-    return cost.quantize(Decimal("0.000001"))
+#: Keywords the structured-outputs endpoint does not accept (numeric and string constraints, and defaults),
+#: removed from the schema before it is sent. The limits they express are enforced afterwards, in Python:
+#: Pydantic's own validation (`ge`/`le` on the confidence and the page number) runs on every answer in
+#: `app.extraction.parse_response`, so a confidence of 1.4 or a page 0 still fails the extraction.
+UNSUPPORTED_SCHEMA_KEYWORDS = frozenset(
+    {
+        "minimum",
+        "maximum",
+        "exclusiveMinimum",
+        "exclusiveMaximum",
+        "multipleOf",
+        "minLength",
+        "maxLength",
+        "pattern",
+        "minItems",
+        "maxItems",
+        "uniqueItems",
+        "default",
+    }
+)
 
 
 def json_schema_for(schema: type[BaseModel]) -> dict[str, Any]:
@@ -59,12 +61,31 @@ def json_schema_for(schema: type[BaseModel]) -> dict[str, Any]:
 
     Structured outputs expects every object to be closed and to list all of its
     properties as required. Pydantic leaves fields with defaults out of
-    `required`, so they are added back — a nullable field is still answered,
-    just with null.
+    `required`, so they are added back: a nullable field is still answered,
+    just with null. Keywords the endpoint rejects (`UNSUPPORTED_SCHEMA_KEYWORDS`) are dropped; the
+    constraint they stated is still checked on the way back in.
     """
     document = schema.model_json_schema()
     _close_objects(document)
+    _strip_unsupported(document)
     return document
+
+
+def _strip_unsupported(node: Any) -> None:
+    if isinstance(node, dict):
+        for keyword in UNSUPPORTED_SCHEMA_KEYWORDS & set(node):
+            del node[keyword]
+        for key, value in node.items():
+            if key == "properties" and isinstance(value, dict):
+                # The keys here are property NAMES (a field could be called "default"); only the schemas
+                # under them are walked.
+                for sub in value.values():
+                    _strip_unsupported(sub)
+            else:
+                _strip_unsupported(value)
+    elif isinstance(node, list):
+        for item in node:
+            _strip_unsupported(item)
 
 
 def _close_objects(node: Any) -> None:
@@ -79,6 +100,39 @@ def _close_objects(node: Any) -> None:
             _close_objects(item)
 
 
+def classify_api_error(exc: anthropic.APIError) -> ProviderError:
+    """Turn the SDK's error into the provider error that says what to do about it.
+
+    The message never contains the request or a key; it names the failure and, where the service gave
+    one, its own description.
+    """
+    if isinstance(exc, anthropic.APITimeoutError):
+        return ProviderTimeout(f"Anthropic did not answer in time: {exc}")
+    if isinstance(exc, anthropic.APIConnectionError):
+        return ProviderConnectionError(f"Anthropic could not be reached: {exc}")
+    status = getattr(exc, "status_code", None)
+    detail = getattr(exc, "message", None) or str(exc)
+    text = f"Anthropic request failed (HTTP {status}): {detail}"
+    if status in (401, 403):
+        return ProviderAuthError(text)
+    if status == 400 and re.search(r"credit balance|billing|insufficient (credit|funds)", detail, re.I):
+        return ProviderQuotaExhausted(text)
+    if status == 429:
+        retry_after: float | None = None
+        headers = getattr(getattr(exc, "response", None), "headers", None)
+        if headers is not None:
+            try:
+                retry_after = float(headers.get("retry-after"))
+            except (TypeError, ValueError):
+                retry_after = None
+        return ProviderRateLimited(text, retry_after=retry_after)
+    if status is not None and status >= 500:
+        return ProviderUnavailable(text)
+    if status is not None and 400 <= status < 500:
+        return ProviderBadRequest(text)
+    return ProviderError(text)
+
+
 class AnthropicExtractionProvider:
     """Calls Claude with the rendered pages and the extractor's schema."""
 
@@ -91,8 +145,11 @@ class AnthropicExtractionProvider:
         settings = get_settings()
         self._model = model or settings.extraction_model
         self._max_tokens = max_tokens or settings.extraction_max_tokens
+        # The timeout and the retry count are stated, not inherited from the SDK's defaults.
         self._client = client or anthropic.Anthropic(
-            api_key=settings.anthropic_api_key or None
+            api_key=settings.anthropic_api_key or None,
+            timeout=settings.extraction_timeout_seconds,
+            max_retries=settings.extraction_max_retries,
         )
 
     @property
@@ -122,7 +179,15 @@ class AnthropicExtractionProvider:
                 },
             )
         except anthropic.APIError as exc:
-            raise ProviderError(f"Anthropic request failed: {exc}") from exc
+            raise classify_api_error(exc) from exc
+        except TypeError as exc:
+            # The SDK raises a bare TypeError when no credential can be found ("Could not resolve
+            # authentication method"). That is a configuration problem, not a bug in the request.
+            if "authentication" in str(exc).lower():
+                raise ProviderAuthError(
+                    "No Anthropic credential is configured: set DOCINTEL_ANTHROPIC_API_KEY (or ANTHROPIC_API_KEY)."
+                ) from exc
+            raise
         latency_ms = int((time.perf_counter() - started) * 1000)
 
         return self._to_raw_extraction(response, latency_ms)

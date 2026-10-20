@@ -54,7 +54,7 @@ class Document(Base):
     # current ingestion path always gets one.
     source_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
     doc_type: Mapped[str] = mapped_column(String(64))
-    # Unknown until the pages are rendered (milestone 3).
+    # Unknown until the pages are rendered.
     page_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     status: Mapped[DocumentStatus] = mapped_column(
         document_status_enum,

@@ -25,6 +25,13 @@
     .recent { margin-top: 2rem; }
     .recent h2 { font-size: 1.05rem; }
     .was { text-decoration: line-through; color: #777; }
+    .page-thumb img { display: block; width: 11rem; border: 1px solid #bbb; background: #fff; }
+    .page-thumb figcaption { font-size: 0.8rem; color: #555; margin-top: 0.15rem; }
+    .page-thumb { margin: 0; }
+    .failed { margin: 0 0 1.5rem; padding: 0.8rem 1rem; background: #fff4f4; border: 1px solid #e3b4b4; }
+    .failed h2 { font-size: 1.05rem; margin: 0 0 0.4rem; }
+    .failed ul { margin: 0; padding-left: 1.1rem; }
+    .failed .reason { font-family: ui-monospace, monospace; font-size: 0.85rem; overflow-wrap: anywhere; }
   </style>
 </head>
 <body>
@@ -34,6 +41,22 @@
     Scored against a threshold of {{ '%.2f'|format(confidence_threshold) }}.
     {% if total > items|length %}Showing {{ items|length }}.{% endif %}
   </p>
+
+  {% if failed_documents %}
+  <section class="failed" aria-label="Documents that failed">
+    <h2>{{ failed_documents|length }} document{{ '' if failed_documents|length == 1 else 's' }} failed and need{{ 's' if failed_documents|length == 1 else '' }} attention</h2>
+    <p class="muted">No fields were produced for these, so they are not in the queue below. The reason is what the system stored; <code>GET /api/v1/documents/&lt;id&gt;</code> returns the same.</p>
+    <ul>
+      {% for failed in failed_documents %}
+      <li>
+        <strong>{{ failed.filename }}</strong>
+        <span class="muted">({{ failed.doc_type }}, uploaded {{ failed.uploaded_at.strftime('%Y-%m-%d %H:%M') }}, id {{ failed.id }})</span><br>
+        <span class="reason">{{ failed.error or 'no reason was stored' }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
 
   {% if not items %}
     <p class="empty">Nothing to review.</p>
@@ -46,6 +69,7 @@
         <th>Confidence</th>
         <th>Model said</th>
         <th>Page</th>
+        <th>Source page</th>
         <th>Validation</th>
         <th>Why it needs review</th>
         <th>Correction</th>
@@ -54,7 +78,7 @@
     <tbody>
       {% for document_name, rows in grouped %}
       <tr class="doc-header">
-        <td colspan="8">
+        <td colspan="9">
           {{ document_name }}
           <span class="muted">
             &mdash; {{ rows[0].document.doc_type }},
@@ -74,6 +98,22 @@
           <td>{{ '%.3f'|format(item.confidence) }}</td>
           <td>{{ '%.2f'|format(item.model_confidence) }}</td>
           <td>{{ item.source_page if item.source_page is not none else '—' }}</td>
+          <td>
+            {% if item.document.page_count %}
+              {% set shown = item.source_page if item.source_page is not none and item.source_page <= item.document.page_count else 1 %}
+              <figure class="page-thumb">
+                <a href="/api/v1/documents/{{ item.document.id }}/pages/{{ shown }}" target="_blank" rel="noopener">
+                  <img src="/api/v1/documents/{{ item.document.id }}/pages/{{ shown }}" loading="lazy"
+                       alt="Page {{ shown }} of {{ item.document.filename }}">
+                </a>
+                <figcaption>
+                  {% if item.source_page is not none and item.source_page <= item.document.page_count %}page {{ shown }}, where the model read it
+                  {% else %}page 1 (the model gave no page){% endif %}
+                  &middot; <a href="/api/v1/documents/{{ item.document.id }}/source">source file</a>
+                </figcaption>
+              </figure>
+            {% else %}<span class="muted">no page image</span>{% endif %}
+          </td>
           <td>
             {% if item.failed_checks %}
               <span class="fail">failed</span>

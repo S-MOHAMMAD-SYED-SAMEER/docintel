@@ -5,9 +5,10 @@ into a validated schema, score confidence per field, and route anything
 uncertain to a human review queue.
 
 **Status:** feature-complete through milestone 10, plus a hardened
-public demo. 521 tests collected, 521 passing (see
+public demo. 604 tests collected, 604 passing (see
 [Testing](#testing) for what that number covers and the one
 previously-reported, environment-dependent flake this run did not hit).
+CI runs the suite on Linux (with PostgreSQL) and Windows, builds the Docker image and runs the demo stack.
 No real-model benchmark has been run — see [Evaluation](#evaluation).
 
 ---
@@ -75,8 +76,8 @@ asking a language model whether it added up correctly.
 | **Document-type registries** | Invoice and purchase order share one pipeline with zero branching on document type — asserted by a test. |
 | **Reproducible evaluation** | A committed, deterministic, labelled dataset and a CLI that measures accuracy, review rate, false-confident rate, cost and latency. |
 | **Cost and latency tracking** | Recorded per extraction from provider usage; never invented when the provider reports none. |
-| **PostgreSQL + Alembic** | Six migrations, each verified to upgrade, downgrade and re-upgrade on a fresh database. |
-| **Test coverage** | 521 tests across 32 files, including a hard guard that no test can reach the real API. |
+| **PostgreSQL + Alembic** | Seven migrations, each verified to upgrade, downgrade and re-upgrade on a fresh database. |
+| **Test coverage** | 604 tests across 34 files, including a hard guard that no test can reach the real API. |
 
 ---
 
@@ -292,7 +293,10 @@ curl 'localhost:8000/api/v1/documents/<document_id>/export?format=csv'
 | Method | Path | Purpose |
 | --- | --- | --- |
 | `POST` | `/api/v1/documents` | Upload a PDF or image (`file`, `doc_type`). 201. |
-| `POST` | `/api/v1/documents/{id}/extract` | Run extraction in the background. 202. |
+| `POST` | `/api/v1/documents/{id}/extract` | Run extraction in the background. 202; 409 if one is already running for this document. |
+| `GET` | `/api/v1/documents/{id}` | The document's status, page count, running flag and, if it failed, why (`error`); plus its latest extraction attempt (model, prompt version, tokens, cost, latency, error). Never the raw response. |
+| `GET` | `/api/v1/documents/{id}/pages/{n}` | A rendered page, as a PNG. |
+| `GET` | `/api/v1/documents/{id}/source` | The file as it was uploaded. |
 | `GET` | `/api/v1/documents/{id}/export?format=json\|csv` | The current record. |
 | `GET` | `/api/v1/review` | Fields awaiting review (`limit`, `offset`). |
 | `POST` | `/api/v1/review/{field_id}` | Submit a correction. 201. |
@@ -301,8 +305,8 @@ curl 'localhost:8000/api/v1/documents/<document_id>/export?format=csv'
 | `GET` | `/review` | The server-rendered review page (HTML). |
 | `POST` | `/review/{field_id}` | The page's form target; redirects back. |
 
-Interactive docs at `/docs`. There is deliberately **no** `GET /api/v1/documents/{id}`
-— use the export endpoint to read a document's record.
+Interactive docs at `/docs`. `GET /api/v1/documents/{id}` is the status endpoint (poll it after an
+upload and after `/extract`); the export endpoint reads a document's *record* once it has one.
 
 ---
 
@@ -342,13 +346,40 @@ The model call is reached only through `app/providers/` —
 `app/providers/anthropic_vision.py` is the only module that imports the
 Anthropic SDK.
 
-Every attempt writes an `extractions` row, successful or not:
+Every attempt writes an `extractions` row, successful or not, and whatever stopped it:
 
 | Outcome | Row | Document |
 | --- | --- | --- |
 | Parsed | `raw_response` + `parsed` + one `field_values` row per field | `extracted` or `needs_review` |
 | Unparseable answer | `raw_response` + `error`, `parsed` null | `failed` |
 | Provider error or refusal | `error`, no field values | `failed` |
+| Refused before any model call (too many pages, too many bytes, no rendered pages) | `error` ("Nothing was sent to the model") | `failed` |
+| Anything unexpected | `error` ("Unexpected extraction failure: ...") | `failed` |
+
+**What the adapter does when the service fails.** The timeout (`DOCINTEL_EXTRACTION_TIMEOUT_SECONDS`, default 120 s)
+and the retry count (`DOCINTEL_EXTRACTION_MAX_RETRIES`, default 2, set 0 to turn retries off) are stated, not left to the
+SDK's defaults. The SDK retries only transient failures (timeouts, connection errors, 408, 409, 429, 5xx), waiting what
+the service asks. What remains is classified, and the class is in the stored error:
+
+| Failure | Class | Retried by the SDK |
+| --- | --- | --- |
+| No credential, 401, 403 | `ProviderAuthError` | no |
+| No credit left (a 400 about the credit balance) | `ProviderQuotaExhausted` | no |
+| 429 | `ProviderRateLimited` (carries `retry_after`) | yes, then this |
+| 500, 503, 529 | `ProviderUnavailable` | yes, then this |
+| Timeout / cannot connect | `ProviderTimeout` / `ProviderConnectionError` | yes, then this |
+| 400, 404, 413, 422 | `ProviderBadRequest` (a bug or a wrong model ID) | no |
+| Declined by the model | `ProviderRefusal` | no |
+
+A document with more than `DOCINTEL_MAX_PAGES` pages (default 20), or whose rendered pages exceed
+`DOCINTEL_MAX_IMAGE_BYTES_TOTAL` (default 20 MiB), is refused before any model call. Only one extraction per document
+runs at a time (a second `POST .../extract` gets 409).
+
+**The schema sent to the API** is the extractor's Pydantic schema with every keyword the structured-outputs endpoint
+does not accept (`minimum`, `maximum`, `default` and the other numeric and string constraints) removed. Those limits
+are still enforced on the way back in: Pydantic validates every answer, so a confidence of 1.4 or a page 0 fails the
+extraction. Whether the live endpoint accepts the remaining schema has not been checked yet: the first real request
+will be that check.
 
 `raw_response` is kept verbatim and never discarded — it is what you read when
 an extraction is wrong, and what future eval runs re-score.
@@ -416,6 +447,11 @@ the first two is how a confidently wrong model gets caught.
 is true, least confident first. **The queue never rescores** — `needs_review`,
 `confidence` and `validation` are written once, when the extraction runs, so
 the queue and the database cannot disagree.
+
+The review page (`/review`) shows, beside each field, the rendered **source page** it was read from (page 1, and
+said so, when the model gave no page), a link to the full image and a link to the uploaded file, so the reviewer can
+check the value against the document. Documents that failed (no fields, so not in the queue) are listed at the top
+with the stored reason.
 
 A correction is ground truth. The model is **not** called again, and the field
 is not rescored:
@@ -517,15 +553,22 @@ of the numbers above should be quoted until one does.
 ### Running an evaluation
 
 ```bash
-# Offline. Verifies the harness. Costs nothing. Not a quality measurement.
-python -m evals.run --dataset invoices_v1 --provider stub
+# Offline (the default). Verifies the harness. Costs nothing. Not a quality measurement.
+python -m evals.run --dataset invoices_v1
 
-# REAL API CALLS — 20 documents, billed to your Anthropic account.
-python -m evals.run --dataset invoices_v1 --provider anthropic
+# REAL API CALLS — 20 documents, billed to your Anthropic account. Both caps are required.
+DOCINTEL_EXTRACTION_MAX_RETRIES=0 \
+  python -m evals.run --dataset invoices_v1 --provider anthropic --request-cap 80 --max-cost-usd 2.00
 ```
 
-`--provider anthropic` is the default precisely because a real evaluation
-should be a deliberate act, not something that happens by accident.
+The stub is the default, and a real run is a deliberate act: it will not start without `--request-cap` and
+`--max-cost-usd`, with adapter retries off (`DOCINTEL_EXTRACTION_MAX_RETRIES=0`, because a retry inside the SDK is a
+request the ledger cannot see), and for a model whose price is known. The caps are for the **whole piece of work**:
+they live in a ledger file (`var/eval_ledger.json`, or `--ledger`), a request is counted **before** it is sent, and
+the request that would pass either cap is never sent. The **first** failure that means "stop" (no or bad
+credential, no credit, 429, 5xx or 529, a timeout, a connection error, a rejected request) ends the run at once with
+exit code 3: nothing is retried, no `eval_runs` row is written (a partial run is not a result), and the report says
+how many requests and dollars were used.
 
 Useful flags: `--limit N` (first N documents), `--no-persist` (skip the
 `eval_runs` row), `--json` (machine-readable report).
@@ -585,7 +628,11 @@ Environment-only, prefix `DOCINTEL_`. See `.env.example`; never commit a real
 | --- | --- | --- |
 | `DOCINTEL_DATABASE_URL` | local dev URL | **Override in production.** The default carries a development credential and points at localhost. |
 | `DOCINTEL_ANTHROPIC_API_KEY` | empty | Empty falls back to the SDK's own `ANTHROPIC_API_KEY` / profile lookup. |
-| `DOCINTEL_EXTRACTION_MODEL` | `claude-sonnet-5` | |
+| `DOCINTEL_EXTRACTION_MODEL` | `claude-haiku-4-5` | The model ID sent to the API. Not yet verified against the live API. |
+| `DOCINTEL_EXTRACTION_TIMEOUT_SECONDS` | `120` | A request is cut off after this long. |
+| `DOCINTEL_EXTRACTION_MAX_RETRIES` | `2` | SDK retries of transient failures; `0` = never (required for a counted evaluation run). |
+| `DOCINTEL_MAX_PAGES` / `DOCINTEL_MAX_IMAGE_BYTES_TOTAL` | `20` / 20 MiB | A document over either is refused before any model call. |
+| `DOCINTEL_PRICING_USD_PER_MTOK` | `{}` | JSON `{"<model id>": [input, output]}` to add or correct a price (the built-in table, with its source and date, is in `app/providers/pricing.py`). A model with no price has no cost recorded. |
 | `DOCINTEL_EXTRACTION_MAX_TOKENS` | `16000` | Ceiling for one extraction response. |
 | `DOCINTEL_STORAGE_DIR` | `./var/storage` | `/var/lib/docintel/storage` in the image. |
 | `DOCINTEL_MAX_UPLOAD_BYTES` | 25 MiB | Larger uploads are rejected with 413. |
@@ -635,8 +682,9 @@ What is actually implemented:
 - **Uploads are size-capped** (`DOCINTEL_MAX_UPLOAD_BYTES`, default 25 MiB),
   enforced while reading rather than after buffering.
 - **Failures fail loudly with a stored reason.** A provider error, a refusal,
-  or an unparseable answer marks the document `failed` and records why. Nothing
-  silently returns empty fields.
+  an unparseable answer, a size guard or an unexpected error marks the document `failed`, writes an
+  `extractions` row with why, shows it on the review page and returns it from `GET /api/v1/documents/{id}`.
+  Nothing silently returns empty fields.
 - **Deterministic checks run outside the model.** Arithmetic, date validity and
   currency codes are verified in Python; the prompt explicitly instructs the
   model *not* to compute totals.
@@ -655,6 +703,18 @@ What is actually implemented:
   FastAPI instance, and the rate limiter is also off by default even
   there, behind `DOCINTEL_DEMO_RATE_LIMIT_ENABLED`.
 
+**Prompt injection, and what it can and cannot do here.** A hostile document can contain text that tells the model
+what to report. The model sees only the page images, has no tools and is forced into the schema, so the worst it can
+do is report a wrong value with a high confidence. A value that contradicts the rest of the document (a total that
+is not subtotal plus tax) fails a deterministic check and goes to a person whatever confidence it carries (there is
+a test). **A wrong value that is consistent with the rest of the document is not caught by these checks**, and the
+text-layer check corroborates it too, because the injected text is on the page. There is no injection evaluation
+yet.
+
+**Data handling.** Uploaded files and their rendered pages are stored unencrypted under `DOCINTEL_STORAGE_DIR`, with
+no retention policy; the pages are sent to the Anthropic API for extraction. Do not upload documents you may not send
+to a third party.
+
 What is **not** implemented for Live Mode, by design (see non-goals):
 authentication, authorisation, multi-tenancy, rate limiting, at-rest
 encryption, audit logging of readers, and CSRF protection on the review
@@ -668,11 +728,11 @@ exception built specifically to be exposed publicly — see
 ## Testing
 
 ```bash
-pytest                     # 521 tests
+pytest                     # 604 tests
 pytest -q tests/test_purchase_order.py
 ```
 
-With PostgreSQL running: 521 tests collected, 521 pass. A previous count
+With PostgreSQL running: 604 tests collected, 604 pass. A previous count
 (478 collected, 477 pass) reported one failure,
 `tests/test_eval_cli.py::test_json_output_is_machine_readable`, as a
 known, environment-specific artifact — SQLAlchemy log output occasionally
@@ -684,7 +744,7 @@ underlying mechanism that could cause it, only the environment happened
 not to trigger it this time.
 
 Tests that need PostgreSQL are skipped when no server answers, so `pytest`
-runs without a database at 279 pass, 242 skip (521 collected either way).
+runs without a database at 339 pass, 265 skip (604 collected either way).
 Database tests migrate a dedicated test database to head and tear it down on
 every run.
 

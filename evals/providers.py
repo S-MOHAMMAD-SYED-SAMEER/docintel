@@ -22,7 +22,7 @@ PROVIDER_CHOICES = (ANTHROPIC, STUB)
 STUB_MODEL_NAME = "stub-provider"
 STUB_WARNING = (
     "Ran against the stub provider: these numbers measure the harness, "
-    "not extraction quality. Use --provider anthropic for a real evaluation."
+    "not extraction quality. Use --provider anthropic (with a request cap and a cost cap) for a real evaluation."
 )
 
 # What the stub says about any one field: nothing, with low confidence.

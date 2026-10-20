@@ -68,3 +68,47 @@ class ProviderError(Exception):
 
 class ProviderRefusal(ProviderError):
     """The model declined to answer."""
+
+
+class ProviderAuthError(ProviderError):
+    """No credential, or one the service rejected (401, 403). Retrying cannot help."""
+
+
+class ProviderQuotaExhausted(ProviderAuthError):
+    """The account has no credit or quota left. Retrying cannot help until it is topped up."""
+
+
+class ProviderRateLimited(ProviderError):
+    """The service said to slow down (429). `retry_after` is how long it asked, in seconds, when it said."""
+
+    def __init__(self, message: str, *, retry_after: float | None = None) -> None:
+        super().__init__(message)
+        self.retry_after = retry_after
+
+
+class ProviderUnavailable(ProviderError):
+    """The service is overloaded or failing (500, 503, 529) and the retries did not clear it."""
+
+
+class ProviderTimeout(ProviderError):
+    """The service did not answer within the configured time, even after the retries."""
+
+
+class ProviderConnectionError(ProviderError):
+    """The service could not be reached."""
+
+
+class ProviderBadRequest(ProviderError):
+    """The service rejected the request itself (400, 404, 413, 422): a bug or a wrong model ID, not a blip."""
+
+
+#: Failures after which a counted run must stop at once instead of going on to the next document: the next
+#: request would fail the same way, and an overloaded or rate-limited service should be left alone.
+STOP_RULE_ERRORS: tuple[type[ProviderError], ...] = (
+    ProviderAuthError,
+    ProviderRateLimited,
+    ProviderUnavailable,
+    ProviderTimeout,
+    ProviderConnectionError,
+    ProviderBadRequest,
+)

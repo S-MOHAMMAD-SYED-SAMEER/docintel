@@ -31,7 +31,7 @@ class Invoice(BaseModel):
     the model's confidence and the page it came from. Nothing here is validated
     for arithmetic consistency — totals arithmetic, date parsing and currency
     checks are deterministic work that belongs in `app/validation/`
-    (milestone 5), not in the schema and not in the prompt.
+    (`app/validation/`), not in the schema and not in the prompt.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -50,13 +50,13 @@ class Invoice(BaseModel):
     purchase_order_number: ExtractedField[str]
 
     # Money. Decimal, never float — these are amounts, not measurements, and
-    # milestone 5 has to add them up exactly.
+    # the validators have to add them up exactly.
     currency: ExtractedField[str]
     subtotal: ExtractedField[Money]
     tax: ExtractedField[Money]
     total: ExtractedField[Money]
 
-    # Kept so milestone 5 can check that the rows sum to the subtotal.
+    # Kept so the validators can check that the rows sum to the subtotal.
     line_items: ExtractedField[list[InvoiceLineItem]]
 
 

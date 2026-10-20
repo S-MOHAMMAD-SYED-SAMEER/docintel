@@ -18,6 +18,7 @@ The order of operations, once the model has answered:
 import json
 import logging
 import mimetypes
+import threading
 import uuid
 from collections.abc import Iterator, Mapping
 
@@ -44,6 +45,81 @@ DEFAULT_PAGE_MEDIA_TYPE = "image/png"
 
 class ExtractionError(Exception):
     """Extraction could not be attempted or completed."""
+
+
+# One extraction per document at a time. A second click while the first is running would start a second
+# paid model call on the same pages. The set lives in this process, which is the only process the
+# application runs in (background work is FastAPI's `BackgroundTasks`, not a worker pool).
+_RUNNING: set[uuid.UUID] = set()
+_RUNNING_LOCK = threading.Lock()
+
+
+def begin_extraction(document_id: uuid.UUID) -> bool:
+    """Claim the document for an extraction. False when one is already running."""
+    with _RUNNING_LOCK:
+        if document_id in _RUNNING:
+            return False
+        _RUNNING.add(document_id)
+        return True
+
+
+def end_extraction(document_id: uuid.UUID) -> None:
+    with _RUNNING_LOCK:
+        _RUNNING.discard(document_id)
+
+
+def is_extracting(document_id: uuid.UUID) -> bool:
+    with _RUNNING_LOCK:
+        return document_id in _RUNNING
+
+
+def check_request_size(images: list[PageImage]) -> None:
+    """Refuse, before any model call, a document too big to send: too many pages or too many bytes.
+
+    The limits are `DOCINTEL_MAX_PAGES` and `DOCINTEL_MAX_IMAGE_BYTES_TOTAL`. A refused document is a
+    failed one with this reason stored; nothing is sent and nothing is billed.
+    """
+    settings = get_settings()
+    if len(images) > settings.max_pages:
+        raise ExtractionError(
+            f"The document has {len(images)} pages; the limit is {settings.max_pages} "
+            "(DOCINTEL_MAX_PAGES). Nothing was sent to the model."
+        )
+    total = sum(len(image.data) for image in images)
+    if total > settings.max_image_bytes_total:
+        raise ExtractionError(
+            f"The document's rendered pages total {total} bytes; the limit is "
+            f"{settings.max_image_bytes_total} (DOCINTEL_MAX_IMAGE_BYTES_TOTAL). "
+            "Nothing was sent to the model."
+        )
+
+
+def record_failed_attempt(
+    session: Session,
+    document: Document,
+    message: str,
+    *,
+    model_name: str | None = None,
+    prompt_version: str | None = None,
+) -> Extraction:
+    """Store a failed attempt: an `extractions` row with the reason, and the document marked `failed`.
+
+    Every extraction attempt leaves a row, whatever stopped it (the provider, the parse, a size guard, an
+    unexpected error), so the history of what was tried, and why it did not work, is in one place.
+    """
+    extraction = Extraction(
+        document_id=document.id,
+        model_name=model_name or get_settings().extraction_model,
+        prompt_version=prompt_version or "unknown",
+        raw_response={"error": message},
+        error=message,
+    )
+    document.status = DocumentStatus.FAILED
+    document.error = message
+    session.add(extraction)
+    session.commit()
+    session.refresh(extraction)
+    return extraction
 
 
 def load_page_images(document: Document) -> list[PageImage]:
@@ -102,6 +178,7 @@ def extract_document(
     """
     extractor = get_extractor(document.doc_type)
     images = load_page_images(document)
+    check_request_size(images)
     # Resolved only once the call is definitely happening, so a document that
     # cannot be extracted never builds a provider (or its API client).
     provider = provider or get_provider()
@@ -284,24 +361,28 @@ def extract_document_in_background(
     A caller that does not supply one keeps resolving the real, configured
     provider through `get_provider()` inside `extract_document` -- nothing
     here changes that default.
-    """
-    with get_sessionmaker()() as session:
-        document = session.get(Document, document_id)
-        if document is None:
-            logger.error("document %s vanished before extraction", document_id)
-            return
 
-        try:
-            extract_document(session, document, provider=provider)
-        except (ExtractionError, UnknownDocumentType) as exc:
-            logger.warning("extraction not attempted for %s: %s", document_id, exc)
-            session.rollback()
-            document.status = DocumentStatus.FAILED
-            document.error = str(exc)
-            session.commit()
-        except Exception as exc:  # noqa: BLE001 - last line of defence
-            logger.exception("unexpected extraction failure for %s", document_id)
-            session.rollback()
-            document.status = DocumentStatus.FAILED
-            document.error = f"Unexpected extraction failure: {exc}"
-            session.commit()
+    Whatever goes wrong, the attempt leaves an `extractions` row with the reason and the document is
+    marked `failed`; the claim on the document (`begin_extraction`) is always released.
+    """
+    try:
+        with get_sessionmaker()() as session:
+            document = session.get(Document, document_id)
+            if document is None:
+                logger.error("document %s vanished before extraction", document_id)
+                return
+
+            try:
+                extract_document(session, document, provider=provider)
+            except (ExtractionError, UnknownDocumentType) as exc:
+                logger.warning("extraction not attempted for %s: %s", document_id, exc)
+                session.rollback()
+                record_failed_attempt(session, document, str(exc))
+            except Exception as exc:  # noqa: BLE001 - last line of defence
+                logger.exception("unexpected extraction failure for %s", document_id)
+                session.rollback()
+                record_failed_attempt(
+                    session, document, f"Unexpected extraction failure: {type(exc).__name__}: {exc}"
+                )
+    finally:
+        end_extraction(document_id)

@@ -8,10 +8,18 @@ from functools import lru_cache
 
 from app.providers.anthropic_vision import AnthropicExtractionProvider
 from app.providers.base import (
+    STOP_RULE_ERRORS,
     ExtractionProvider,
     PageImage,
+    ProviderAuthError,
+    ProviderBadRequest,
+    ProviderConnectionError,
     ProviderError,
+    ProviderQuotaExhausted,
+    ProviderRateLimited,
     ProviderRefusal,
+    ProviderTimeout,
+    ProviderUnavailable,
     RawExtraction,
 )
 
@@ -31,9 +39,17 @@ __all__ = [
     "AnthropicExtractionProvider",
     "ExtractionProvider",
     "PageImage",
+    "ProviderAuthError",
+    "ProviderBadRequest",
+    "ProviderConnectionError",
     "ProviderError",
+    "ProviderQuotaExhausted",
+    "ProviderRateLimited",
     "ProviderRefusal",
+    "ProviderTimeout",
+    "ProviderUnavailable",
     "RawExtraction",
+    "STOP_RULE_ERRORS",
     "get_provider",
     "reset_provider",
 ]
