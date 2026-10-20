@@ -189,6 +189,9 @@ def get_document(
 ) -> DocumentDetail:
     document = _get_document_or_404(session, document_id)
     attempts = list(document.extractions)
+    # Read the status after the attempts: an extraction commits together with the document's new status, so
+    # reading the document first could pair a new attempt with the old status.
+    session.refresh(document)
     latest = attempts[-1] if attempts else None
     return DocumentDetail(
         id=document.id,

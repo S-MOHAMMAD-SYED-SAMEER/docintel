@@ -668,3 +668,25 @@ def test_a_confident_total_that_breaks_the_arithmetic_is_routed_to_review_whatev
     assert total["model_confidence"] == 1.0
     assert total["needs_review"] is True
     assert "totals.subtotal_plus_tax_equals_total" in total["failed_checks"]
+
+
+def test_the_export_pairs_an_extraction_with_the_status_committed_with_it(
+    rendered_document: Document, migrated_engine: Engine
+) -> None:
+    """A reader that loaded the document before an extraction committed must not export the old status.
+
+    The first CI run of the Docker stack caught `status: processing` beside a finished extraction: the
+    document and its extraction are read by separate queries, and the extraction landed between them.
+    """
+    from app import export as export_service
+
+    with Session(migrated_engine) as reader:
+        stale = reader.get(Document, rendered_document.id)
+        assert stale.status is DocumentStatus.PROCESSING
+        with Session(migrated_engine) as writer:
+            document = writer.get(Document, rendered_document.id)
+            extraction_service.extract_document(writer, document, FakeProvider())
+
+        record = export_service.build_record(reader, stale)
+
+    assert record["document"]["status"] == "needs_review"
