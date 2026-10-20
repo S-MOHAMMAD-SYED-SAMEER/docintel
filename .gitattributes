@@ -1,0 +1,10 @@
+# Binary files must never be line-ending converted. The demo recognises a sample invoice by the SHA-256 of
+# its source PDF bytes, so a checkout that rewrote LF to CRLF (Git for Windows with core.autocrlf=true does this to
+# files it mistakes for text) made the demo recognise nothing on any other platform.
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.tif binary
+*.tiff binary
+*.webp binary
