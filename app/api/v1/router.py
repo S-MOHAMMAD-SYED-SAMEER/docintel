@@ -1,4 +1,4 @@
-"""Router for /api/v1. Feature routers are mounted here as milestones land."""
+"""Router for /api/v1. Feature routers are mounted here."""
 
 from fastapi import APIRouter
 

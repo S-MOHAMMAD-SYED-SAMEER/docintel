@@ -810,7 +810,12 @@ def test_the_stub_provider_adapts_to_the_purchase_order_schema(
 
 
 def test_the_invoice_schema_is_unchanged() -> None:
-    """The Money type moved to a shared module; the schema must not have."""
+    """The Money type moved to a shared module; the schema must not have.
+
+    This pins the schema as SENT to the API. It was last changed on purpose when the keywords the
+    structured-outputs endpoint rejects (`minimum`, `maximum`, `default`) were removed from it; the limits
+    themselves are still enforced by Pydantic on the way back in (`tests/test_hardening.py`).
+    """
     import hashlib
 
     from app.providers.anthropic_vision import json_schema_for
@@ -818,7 +823,7 @@ def test_the_invoice_schema_is_unchanged() -> None:
     rendered = json.dumps(json_schema_for(Invoice), sort_keys=True)
 
     assert hashlib.sha256(rendered.encode()).hexdigest() == (
-        "b9b1fbad64014893d2d2b5c43f74a6b0edd67d5816c8ad4b14cf90b6882e364d"
+        "5bdf55e3be2ffd45fd55e122e332e1739d11924aad270f35020325f27bae7a59"
     )
 
 
@@ -848,10 +853,10 @@ def test_the_two_document_types_do_not_share_a_prompt_version() -> None:
     )
 
 
-def test_the_default_model_is_unchanged() -> None:
+def test_the_default_model_is_haiku_4_5() -> None:
     from app.config import Settings
 
-    assert Settings(_env_file=None).extraction_model == "claude-sonnet-5"
+    assert Settings(_env_file=None).extraction_model == "claude-haiku-4-5"
 
 
 def test_the_core_pipeline_does_not_name_a_document_type() -> None:

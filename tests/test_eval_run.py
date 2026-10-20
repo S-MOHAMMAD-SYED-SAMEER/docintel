@@ -362,10 +362,10 @@ def test_build_rejects_an_unknown_provider() -> None:
         providers.build("magic")
 
 
-def test_anthropic_is_the_default_cli_provider() -> None:
-    """A real evaluation costs money, and that has to be the explicit default."""
+def test_the_stub_is_the_default_cli_provider() -> None:
+    """A real evaluation costs money, so it has to be asked for: the default is the offline stub."""
     from evals.run import build_parser
 
     args = build_parser().parse_args(["--dataset", "invoices_v1"])
 
-    assert args.provider == providers.ANTHROPIC
+    assert args.provider == providers.STUB

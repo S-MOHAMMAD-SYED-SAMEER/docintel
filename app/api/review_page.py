@@ -70,6 +70,7 @@ def review_page(
             "items": items,
             "grouped": _grouped(items),
             "recent": corrections.recent(session),
+            "failed_documents": review.failed_documents(session),
         },
     )
 

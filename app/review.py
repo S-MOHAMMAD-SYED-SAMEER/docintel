@@ -1,4 +1,4 @@
-"""The human review queue: reading what milestone 5 decided.
+"""The human review queue: reading what the scorer decided.
 
 Nothing here scores anything. `needs_review`, `confidence`, `model_confidence`
 and the `validation` breakdown are all written once, by `app.confidence`, when
@@ -62,7 +62,7 @@ def failed_checks(field_value: FieldValue) -> tuple[str, ...]:
 def text_layer_missed(field_value: FieldValue) -> bool:
     """Did a text-layer check run for this field and come back empty?
 
-    False when the signal is absent — that is milestone 5 correctly leaving it
+    False when the signal is absent — that is the scorer correctly leaving it
     out (no text layer, or a value that cannot be looked for), not a miss.
     """
     return any(
@@ -124,3 +124,21 @@ def get_field(session: Session, field_id: uuid.UUID) -> FieldValue | None:
 
 def document_of(field_value: FieldValue) -> Document:
     return field_value.extraction.document
+
+
+def failed_documents(session: Session, *, limit: int = 50) -> list[Document]:
+    """Documents whose last attempt failed, newest first, with the reason in `error`.
+
+    The review queue lists fields awaiting a person; a document that never produced any fields would
+    otherwise be invisible on the page, so a reviewer could not tell it from one that was never uploaded.
+    """
+    from app.models import DocumentStatus
+
+    return list(
+        session.scalars(
+            select(Document)
+            .where(Document.status == DocumentStatus.FAILED)
+            .order_by(Document.uploaded_at.desc())
+            .limit(limit)
+        )
+    )

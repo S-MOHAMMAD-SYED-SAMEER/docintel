@@ -251,7 +251,7 @@ def test_sdk_errors_are_wrapped_as_provider_errors() -> None:
     error = anthropic.APIConnectionError(request=None)  # type: ignore[arg-type]
     provider, _ = _provider(error=error)
 
-    with pytest.raises(ProviderError, match="Anthropic request failed"):
+    with pytest.raises(ProviderError, match="Anthropic could not be reached"):
         provider.extract(PAGES, Invoice, "prompt")
 
 

@@ -17,6 +17,7 @@ from app import extraction as extraction_service
 from app import ingestion
 from app.models import Document, Extraction, FieldValue
 from app.providers import ExtractionProvider
+from evals.budget import RunStopped
 from evals.dataset import Dataset, LabelledDocument
 from evals.metrics import DocumentObservation, FieldObservation, Report, summarise
 
@@ -35,10 +36,14 @@ def evaluate(
     The document type comes from the dataset, so the runner never names one.
     """
     resolved = doc_type or dataset.doc_type
-    observations = [
-        evaluate_document(session, labelled, provider, doc_type=resolved)
-        for labelled in dataset.documents
-    ]
+    observations = []
+    for labelled in dataset.documents:
+        observations.append(evaluate_document(session, labelled, provider, doc_type=resolved))
+        # A budgeted provider says so when something means "stop" (a credential or quota error, a rate
+        # limit, an overloaded service, a spent cap). The run ends there: a partial run is not a result.
+        halt_reason = getattr(provider, "halt_reason", None)
+        if halt_reason is not None:
+            raise RunStopped(halt_reason, len(observations), len(dataset.documents))
     return summarise(dataset.name, observations)
 
 

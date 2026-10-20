@@ -4,11 +4,11 @@ The route handler does HTTP; this module owns the order of operations and the
 status transitions, so the same flow can be driven from a test or a script
 without going through FastAPI.
 
-Status, in this milestone:
+Status, as far as this module moves a document:
 
     UPLOADED   bytes are on disk, nothing rendered yet
     PROCESSING pages are being rendered, and — once they are — the document is
-               waiting on the extractor, which arrives in milestone 4
+               waiting on the extractor (`app/extraction.py`)
     FAILED     rendering gave up; `error` says why and the source file is kept
 
 A rendered document deliberately stays PROCESSING rather than moving to

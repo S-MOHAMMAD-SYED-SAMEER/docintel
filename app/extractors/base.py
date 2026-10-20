@@ -30,7 +30,7 @@ class ExtractedField[T](BaseModel):
     """One field the model was asked to find, with what it thinks of its answer.
 
     `confidence` is the model's *self-reported* confidence and nothing more. It
-    is stored as given and deliberately not trusted on its own — milestone 5
+    is stored as given and deliberately not trusted on its own — `app/confidence.py`
     combines it with deterministic checks to produce the score that actually
     routes a field to review.
     """

@@ -116,6 +116,11 @@ def build_record(session: Session, document: Document) -> dict[str, Any]:
         raise ExportError(
             f"Document {document.id} has no completed extraction to export."
         )
+    # The document and its extraction are read by separate queries. An extraction commits together with
+    # the document's new status, so if one landed between the two reads the record would pair the new
+    # extraction with the old status ("processing"). Reading the document again, after the extraction,
+    # makes the pair consistent (found by the first CI run of the Docker stack).
+    session.refresh(document)
 
     try:
         structured = structured_field_names(get_extractor(document.doc_type).schema)
