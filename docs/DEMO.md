@@ -83,6 +83,11 @@ while the uploaded source bytes are identical everywhere. See
 `demo/generate_fixture_identity.py` for how the committed fixture hashes
 in §5 are produced and kept in sync with the source PDFs.
 
+**Why the PDFs are marked binary.** `.gitattributes` declares `*.pdf binary`. Without it, Git for Windows
+with `core.autocrlf=true` rewrote LF to CRLF in these files on checkout, the fixture hashes were once computed from
+such a checkout, and the demo recognised nothing on Linux or in Docker (found by the first CI run).
+`tests/test_fixture_bytes.py` fails if a checkout ever changes the bytes again.
+
 ## 5. Which invoices are supported
 
 | Fixture | Source PDF | Notes |
