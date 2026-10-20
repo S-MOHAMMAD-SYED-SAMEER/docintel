@@ -7,15 +7,14 @@ are talking to.
 
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import engine_from_config, pool
-
-from app.config import get_settings
-from app.db.base import Base
 
 # Importing the models package registers every table on Base.metadata, which
 # is what autogenerate compares the live database against.
 import app.models  # noqa: F401
+from alembic import context
+from app.config import get_settings
+from app.db.base import Base
 
 config = context.config
 

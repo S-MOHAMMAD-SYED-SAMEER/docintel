@@ -1,7 +1,7 @@
 {
   "_comment": "Demo Mode fixture answers -- see docs/DEMO.md. Every value below is copied verbatim from evals/datasets/invoices_v1/labels.json, the authoritative ground truth used to render these PDFs, so it is known-correct rather than model-inferred. Every confidence is hand-authored for deterministic demonstration -- it is NOT a real Anthropic models self-reported confidence, and must never be presented as one. source_sha256 is the SHA-256 of the committed source_pdf files own bytes, computed before any rendering -- stable on every OS, architecture and rendering-library version, unlike a rendered page image. Regenerate with: python -m demo.generate_fixture_identity.",
   "invoice-001": {
-    "source_sha256": "f5c0d4c0bf6b6d1f9e81c629f742f31024571493dae00b3e6d62b811fe466e5f",
+    "source_sha256": "9e393ccf0cddf2dd9feaf0987d8587ad1b553d7399acb928106b28f014083710",
     "doc_type": "invoice",
     "schema_name": "Invoice",
     "source_pdf": "evals/datasets/invoices_v1/invoice-001.pdf",
@@ -87,7 +87,7 @@
     }
   },
   "invoice-003": {
-    "source_sha256": "906cd828a1b769d10895b809252b10c2f625237ae48c7f34e441def6ab06639c",
+    "source_sha256": "5d079a820ec4423e5495a58795985b0120c964256185c8f34576698ec3c45d97",
     "doc_type": "invoice",
     "schema_name": "Invoice",
     "source_pdf": "evals/datasets/invoices_v1/invoice-003.pdf",
@@ -174,7 +174,7 @@
     }
   },
   "invoice-004": {
-    "source_sha256": "2b5684f42ae591c45758812efbe47eed0c30307d84244c7600a7935f0986f123",
+    "source_sha256": "884de141ae61882d2de0752a689079d1ef46a40820c93e4088d318a83ff4679d",
     "doc_type": "invoice",
     "schema_name": "Invoice",
     "source_pdf": "evals/datasets/invoices_v1/invoice-004.pdf",

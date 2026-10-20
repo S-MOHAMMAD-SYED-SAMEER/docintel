@@ -8,7 +8,6 @@ that this override is scoped to the demo app instance only: the normal
 
 import uuid
 
-from fastapi.testclient import TestClient
 from sqlalchemy import Engine
 from sqlalchemy.orm import Session
 

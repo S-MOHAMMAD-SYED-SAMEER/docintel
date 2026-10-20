@@ -10,7 +10,6 @@ from typing import Annotated, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, WithJsonSchema
 
-
 # Amounts travel as decimal strings. Pydantic parses a string into Decimal
 # happily, and asking for a string keeps the model away from float rounding —
 # a JSON number would arrive as a float and 1234.56 would stop being exact.

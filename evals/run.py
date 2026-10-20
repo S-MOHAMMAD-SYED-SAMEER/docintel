@@ -13,7 +13,8 @@ import sys
 from app.config import get_settings
 from app.db.session import get_sessionmaker
 from evals import dataset as dataset_module
-from evals import providers, report as report_module, runner
+from evals import providers, runner
+from evals import report as report_module
 
 EXIT_OK = 0
 EXIT_FAILED_DOCUMENTS = 1

@@ -1,0 +1,136 @@
+# Four jobs.
+#   test          Linux: lint (ruff), then the whole suite against a real PostgreSQL.
+#   windows       The development machine's OS: everything that needs no database (the database tests skip).
+#   docker-build  Builds the image and runs the documented demo stack (`docker compose up --build`), then
+#                 triggers an extraction on a seeded invoice and checks the record.
+#   audit         pip-audit over the installed dependencies.
+#
+# No Anthropic key is set anywhere in this file: the whole suite passes, and does, without one (an autouse
+# fixture in tests/conftest.py makes any real request fail the test).
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: docintel
+          POSTGRES_PASSWORD: docintel
+          # The test fixtures refuse a database whose name does not end in `_test`.
+          POSTGRES_DB: docintel_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U docintel"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      DOCINTEL_DATABASE_URL: postgresql+psycopg://docintel:docintel@localhost:5432/docintel_test
+      DOCINTEL_TEST_DATABASE_URL: postgresql+psycopg://docintel:docintel@localhost:5432/docintel_test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install project dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Run the test suite
+        run: pytest
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install project dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run the tests that need no database
+        run: pytest -q
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The compose file is valid
+        run: docker compose config -q
+
+      - name: Build and start the stack (db, migrate, app, seed, demo)
+        run: docker compose up --build -d
+
+      - name: Wait until the demo is up
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:8001/health > health.json 2>/dev/null; then
+              cat health.json; echo; exit 0
+            fi
+            sleep 5
+          done
+          echo "the demo did not come up in 5 minutes"
+          docker compose logs
+          exit 1
+
+      - name: Extract a seeded invoice through the demo and read the record
+        run: |
+          # The demo seeds three known invoices under fixed ids (uuid5 of the fixture name).
+          ID=$(docker compose exec -T demo python -c "from demo.seed import seed_document_id; print(seed_document_id('invoice-003'))")
+          curl -fsS -X POST "http://localhost:8001/api/v1/documents/${ID}/extract" -o /dev/null
+          for i in $(seq 1 30); do
+            code=$(curl -s -o record.json -w '%{http_code}' "http://localhost:8001/api/v1/documents/${ID}/export?format=json")
+            [ "$code" = "200" ] && break
+            sleep 2
+          done
+          python3 - <<'PY'
+          import json
+          record = json.load(open("record.json"))
+          assert record["document"]["status"] == "needs_review", record["document"]
+          assert record["extraction"]["model_name"] == "demo-fixture-provider", record["extraction"]
+          assert record["fields"]["purchase_order_number"]["needs_review"] is True
+          print("extracted", len(record["fields"]), "fields; status", record["document"]["status"])
+          PY
+
+      - name: Logs, if anything failed
+        if: failure()
+        run: docker compose logs
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install the project and pip-audit
+        run: |
+          pip install -e .
+          pip install pip-audit
+
+      - name: Audit the installed dependencies
+        run: pip-audit --skip-editable

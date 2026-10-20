@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.models import Document, DocumentStatus
 
-from .conftest import FakeProvider, VALID_INVOICE_PAYLOAD
+from .conftest import VALID_INVOICE_PAYLOAD, FakeProvider
 from .test_review_api import CONFIDENT_PAYLOAD, MANY_FLAGGED_PAYLOAD, _payload_with
 
 
@@ -298,9 +298,9 @@ def test_an_empty_box_clears_the_value(
     api_client.post(f"/review/{field_id}", data={"corrected_value": "   "})
 
     with Session(migrated_engine) as session:
-        from app.models import FieldValue
-
         import uuid as _uuid
+
+        from app.models import FieldValue
 
         assert session.get(FieldValue, _uuid.UUID(field_id)).value is None
 
