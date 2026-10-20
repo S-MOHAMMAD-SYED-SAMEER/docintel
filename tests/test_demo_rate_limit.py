@@ -23,7 +23,6 @@ from app.api.rate_limit import (
     reset_rate_limiter,
 )
 from app.config import get_settings
-from app.main import create_app
 from demo.app import create_demo_app
 from demo.seed import seed_demo_documents
 

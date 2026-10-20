@@ -8,7 +8,6 @@ import uuid
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine
-from sqlalchemy.orm import Session
 
 from app.models import Document, DocumentStatus
 

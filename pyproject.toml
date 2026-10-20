@@ -2,6 +2,8 @@
 name = "docintel"
 version = "0.1.0"
 description = "Document intelligence with human review: extract business documents to a validated schema, score per-field confidence, route uncertain fields to a review queue."
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.115",
@@ -27,6 +29,7 @@ dependencies = [
 dev = [
     "pytest>=8.3",
     "httpx>=0.28",
+    "ruff>=0.8",
 ]
 
 [build-system]
@@ -38,3 +41,15 @@ include = ["app*", "evals*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py313"
+
+[tool.ruff.lint]
+# What is enforced: syntax errors and the pyflakes family (unused imports and variables, undefined
+# names), basic style errors (E4, E7, E9), and import order. Not enforced: line length and formatting,
+# which would rewrite most of the codebase for no behavioural gain.
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "demo", "evals", "tests"]

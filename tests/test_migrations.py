@@ -1,9 +1,10 @@
 """The migration itself, not the schema it happens to produce."""
 
-from alembic import command
 from alembic.config import Config as AlembicConfig
 from alembic.script import ScriptDirectory
 from sqlalchemy import Engine, create_engine, inspect, text
+
+from alembic import command
 
 
 def test_single_head(alembic_config: AlembicConfig) -> None:

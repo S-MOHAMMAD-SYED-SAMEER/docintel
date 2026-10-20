@@ -16,8 +16,6 @@ from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
 from app.api.demo_guard import demo_mutation_refused, require_mutation_allowed
-from app.config import get_settings
-from app.db.session import reset_engine
 from app.main import create_app
 from app.models import Correction, Document, FieldValue
 from demo.app import create_demo_app

@@ -7,7 +7,6 @@ import json
 
 import pytest
 
-from app.config import Settings
 from app.confidence import (
     ARITHMETIC,
     MODEL,
@@ -17,6 +16,7 @@ from app.confidence import (
     score_extraction,
     score_field,
 )
+from app.config import Settings
 from app.extraction import _as_text
 from app.extractors import Invoice
 from app.validation import get_validator

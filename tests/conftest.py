@@ -8,9 +8,9 @@ from pathlib import Path
 import pypdfium2 as pdfium
 import pytest
 import sqlalchemy
-from PIL import Image
 from alembic.config import Config as AlembicConfig
 from fastapi.testclient import TestClient
+from PIL import Image
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session
 

@@ -1,6 +1,5 @@
 """The human correction workflow."""
 
-import json
 import uuid
 
 import pytest

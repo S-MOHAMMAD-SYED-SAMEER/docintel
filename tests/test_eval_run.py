@@ -11,11 +11,8 @@ from sqlalchemy.orm import Session
 from app.models import EvalRun
 from evals import dataset as dataset_module
 from evals import providers, runner
-from evals.metrics import Report
 from evals.providers import StubProvider
 from evals.report import render
-
-from .conftest import VALID_INVOICE_PAYLOAD
 
 
 class LabelEchoProvider:
