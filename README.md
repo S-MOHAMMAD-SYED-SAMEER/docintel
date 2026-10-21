@@ -5,11 +5,12 @@ into a validated schema, score confidence per field, and route anything
 uncertain to a human review queue.
 
 **Status:** feature-complete through milestone 10, plus a hardened
-public demo. 623 tests collected, 623 passing (see
+public demo. 641 tests collected, 641 passing (see
 [Testing](#testing) for what that number covers and the one
 previously-reported, environment-dependent flake this run did not hit).
 CI runs the suite on Linux (with PostgreSQL) and Windows, builds the Docker image and runs the demo stack.
-No real-model benchmark has been run — see [Evaluation](#evaluation).
+A first set of real-model runs was made on 2026-10-21, on synthetic documents, one run of each prompt, one model:
+see [Evaluation](#evaluation) for the numbers and, next to them, what they do not show. They are not an accuracy figure.
 
 ---
 
@@ -77,7 +78,7 @@ asking a language model whether it added up correctly.
 | **Reproducible evaluation** | A committed, deterministic, labelled dataset and a CLI that measures accuracy, review rate, false-confident rate, cost and latency. |
 | **Cost and latency tracking** | Recorded per extraction from provider usage; never invented when the provider reports none. |
 | **PostgreSQL + Alembic** | Seven migrations, each verified to upgrade, downgrade and re-upgrade on a fresh database. |
-| **Test coverage** | 623 tests across 35 files, including a hard guard that no test can reach the real API. |
+| **Test coverage** | 641 tests across 37 files, including a hard guard that no test can reach the real API. |
 
 ---
 
@@ -541,21 +542,46 @@ document identically, never sees the labels, and invents no cost or latency.
 > **The stub result is not extraction accuracy.** It measures the harness. Its
 > accuracy figure is near zero by construction and says nothing about the model.
 
-### What has *not* been measured
+### Results of the real-model runs (2026-10-21)
 
-**Real-model benchmark results are intentionally not claimed yet. Run the
-evaluation with the Anthropic provider and appropriate API credits to obtain
-model-specific accuracy, cost, and latency measurements.**
+`claude-haiku-4-5` (the API resolved it to `claude-haiku-4-5-20251001`), adapter retries off, default sampling, the default
+confidence weights and threshold (0.85), **one run of each prompt**. The plan, the caps (80 requests and USD 2.00 for the
+whole piece of work) and the decision rule were committed before the first request ([docs/EVAL.md](docs/EVAL.md)). Full
+record, with every document, every wrong field and what surprised me:
+[docs/results/2026-10-21-real-runs.md](docs/results/2026-10-21-real-runs.md).
 
-Specifically, this repository makes **no claim** about:
+| Fields correct (of evaluated) | `invoice/v1` | `invoice/v2` (now the default) |
+|---|---|---|
+| `invoices_v1`: 20 synthetic invoices, text PDFs (260 fields) | 257 of 260 | 260 of 260 |
+| `invoices_hard_v1`: 10 harder synthetic invoices, 5 of them images with no text layer (130 fields) | 127 of 130 | 127 of 130 |
+| Both sets, 30 documents (390 fields): wrong fields | 6 | 3 |
+| Both sets: wrong **and not flagged for review** (false-confident) | 4 | 2 |
+| Both sets: fields flagged for review | 3 (0.77%) | 4 (1.03%) |
 
-- exact-match accuracy against the README's ≥90% acceptance target
-- false-confident rate against the <5% acceptance target
-- cost per document
-- p50 / p95 latency
+Purchase orders (`purchase_orders_smoke`, `purchase_order/v1`, 3 documents): 30 of 30 fields correct, none flagged; this shows the
+second type runs against the real model, nothing more. Cost: about USD 0.008 a two-page invoice at the model's published price
+(from the recorded token counts, not an invoice), about 5.6 s a document.
 
-No `eval_runs` row produced by a real model exists in this repository, and none
-of the numbers above should be quoted until one does.
+**Read these with their limits next to them.**
+
+- The documents are **synthetic** and the labels are **by construction** (the values they were rendered from). `invoices_hard_v1`
+  was reviewed by ChatGPT and Claude and approved by Sameer before any run (*Written by Claude (generated; labels are the render
+  inputs); reviewed by ChatGPT and Claude; final decisions by Sameer*); it is ten documents from a small invented pool, a smoke
+  test with some teeth, not a benchmark.
+- **One run of each prompt, one model, one day, default sampling.** There is no estimate of run-to-run variation, and the failure
+  studied (copying a long VAT number) came out right once and wrong three times from the same printed string.
+- **By the rule written beforehand `invoice/v2` is the default, but all of the improvement is on `invoices_v1`, the set it was
+  written from.** On the hard set v1 and v2 each got 127 of 130 and missed the same three fields. v2 is one added paragraph about
+  copying identifiers (`docs/PROMPTS.md`).
+- The three misses on the hard set were a date `04/03/2026` read month-first (flagged for review by the date check: the system
+  worked as designed), an address the model "corrected" from `Munchen` to `München`, and a 13-character VAT number copied wrongly
+  (not flagged, reported at 0.85 and 0.92).
+- **Two defects of the scorer were found and not fixed for these runs**, so that the two prompts were scored alike: the text-layer
+  check accepts a truncated value and a value with an invisible character as "found" (two of the three first-run misses were
+  therefore not flagged), and on an image the model's own confidence is the only signal.
+- The false-confident counts (4 and 2 of 390 fields) are far too small to say how well the confidence weighting works.
+
+Nothing here is a claim about accuracy on real invoices, about other models, or about production readiness.
 
 ### Running an evaluation
 
@@ -642,6 +668,7 @@ Environment-only, prefix `DOCINTEL_`. See `.env.example`; never commit a real
 | `DOCINTEL_ANTHROPIC_API_KEY` | empty | The credential. `ANTHROPIC_API_KEY` (the SDK's own name) in the environment or in `.env` works too; `DOCINTEL_ANTHROPIC_API_KEY` wins if both are set. With none, an extraction fails with a clear "no credential" error. |
 | `DOCINTEL_EXTRACTION_MODEL` | `claude-haiku-4-5` | The model ID sent to the API. Not yet verified against the live API. |
 | `DOCINTEL_EXTRACTION_TIMEOUT_SECONDS` | `120` | A request is cut off after this long. |
+| `DOCINTEL_INVOICE_PROMPT_VERSION` | `invoice/v2` | The invoice prompt: `invoice/v2` (the default, chosen by the rule in `docs/EVAL.md`) or `invoice/v1`. Stored with every extraction. |
 | `DOCINTEL_EXTRACTION_MAX_RETRIES` | `2` | SDK retries of transient failures; `0` = never (required for a counted evaluation run). |
 | `DOCINTEL_MAX_PAGES` / `DOCINTEL_MAX_IMAGE_BYTES_TOTAL` | `20` / 20 MiB | A document over either is refused before any model call. |
 | `DOCINTEL_PRICING_USD_PER_MTOK` | `{}` | JSON `{"<model id>": [input, output]}` to add or correct a price (the built-in table, with its source and date, is in `app/providers/pricing.py`). A model with no price has no cost recorded. |
@@ -740,11 +767,11 @@ exception built specifically to be exposed publicly — see
 ## Testing
 
 ```bash
-pytest                     # 623 tests
+pytest                     # 641 tests
 pytest -q tests/test_purchase_order.py
 ```
 
-With PostgreSQL running: 623 tests collected, 623 pass. A previous count
+With PostgreSQL running: 641 tests collected, 641 pass. A previous count
 (478 collected, 477 pass) reported one failure,
 `tests/test_eval_cli.py::test_json_output_is_machine_readable`, as a
 known, environment-specific artifact — SQLAlchemy log output occasionally
@@ -756,7 +783,7 @@ underlying mechanism that could cause it, only the environment happened
 not to trigger it this time.
 
 Tests that need PostgreSQL are skipped when no server answers, so `pytest`
-runs without a database at 356 pass, 267 skip (623 collected either way).
+runs without a database at 374 pass, 267 skip (641 collected either way).
 Database tests migrate a dedicated test database to head and tear it down on
 every run.
 

@@ -295,7 +295,7 @@ def test_the_invoice_configuration_is_untouched() -> None:
     extractor = get_extractor("invoice")
 
     assert extractor.schema is Invoice
-    assert extractor.prompt_version == "invoice/v1"
+    assert extractor.prompt_version == "invoice/v2"
 
 
 def test_the_provider_receives_the_purchase_order_schema_and_prompt(

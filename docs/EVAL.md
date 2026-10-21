@@ -1,6 +1,6 @@
 # Evaluation: the plan for the first real-model runs, written before any of them
 
-**Status: the first real-model runs are under way (see "Record of the runs" at the end).** This file was committed before any request, so the plan and the decision rule could not
+**Status: the planned real-model runs of 2026-10-21 are done except the recording (see "Record of the runs" at the end and `docs/results/2026-10-21-real-runs.md`).** This file was committed before any request, so the plan and the decision rule could not
 be bent to a result. When the runs have been made, their numbers go in `docs/results/` and are summarised in the README
 with their limits; this file keeps the plan as it was written.
 
@@ -122,4 +122,24 @@ projects) checks that every figure the README prints is in the committed result 
 | 2026-10-21 | 4 | Offline analysis of step 2's stored replies: three `vendor_tax_id` misses on one repeated string; see `docs/PROMPTS.md` | 0 |
 | 2026-10-21 | 5 | `invoice/v2` written from step 4 only and committed (this file's decision rule applies unchanged) | 0 |
 
-The numbers of each run are published in the README and `docs/results/` once all runs of the plan are done.
+| 2026-10-21 | 6 | `invoices_v1` with `invoice/v2` (20) and `invoices_hard_v1` with `invoice/v2` (10): completed | 61 / $0.482 |
+| 2026-10-21 | 7 | `purchase_orders_smoke`, `purchase_order/v1`, 3 documents: completed | 64 / $0.505 |
+| 2026-10-21 | 8 | The recording: **not yet made** | |
+
+**Ledger after the runs: 64 of 80 requests and $0.505365 of $2.00.** No 401, 403, 429, 503, 529, quota or credit error; nothing was retried.
+
+### What the runs found, and the decision
+
+| Over the same 30 documents (390 fields) | v1 | v2 | The rule | Met |
+|---|---|---|---|---|
+| Wrong fields | 6 of 390 | 3 of 390 | (5) fewer wrong fields or fewer false-confident | yes |
+| False-confident fields | 4 | 2 | (1) no more than v1 | yes |
+| Acceptance fields correct (`invoice_number`, `invoice_date`, `total`) | 89 of 90 | 89 of 90 | (2) no lower | yes |
+| Overall exact-match | 384 of 390 | 387 of 390 | (3) no lower | yes |
+| Fields flagged for review | 3 of 390 (0.77%) | 4 of 390 (1.03%) | (4) at most 5 points higher | yes |
+
+**`invoice/v2` becomes the default** (`DOCINTEL_INVOICE_PROMPT_VERSION`, default `invoice/v2`), by the rule as written. Read it with these limits:
+all of the difference is on `invoices_v1` (257 of 260 correct with v1, 260 of 260 with v2), the set v2 was written from; on the hard set
+(the out-of-sample check) v1 and v2 each got 127 of 130 and missed the same three fields. Each prompt was run once on each set at the
+model's default sampling, on synthetic documents whose labels are by construction, with one model. The runs are not an accuracy figure and
+support no claim about real invoices. Per-field results, every wrong field and the surprises are in `docs/results/2026-10-21-real-runs.md`.

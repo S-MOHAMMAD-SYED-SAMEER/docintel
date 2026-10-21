@@ -298,7 +298,7 @@ def test_the_report_contains_every_required_metric(
     for expected in (
         "invoices_v1",
         "label-echo",
-        "invoice/v1",
+        "invoice/v2",
         "Exact-match accuracy per field",
         "invoice_number",
         "review rate",

@@ -47,9 +47,9 @@ class Settings(BaseSettings):
     # Ceiling for the extraction response. An invoice schema with line items is
     # a few thousand tokens; the headroom is for long line-item tables.
     extraction_max_tokens: int = Field(default=16000, gt=0)
-    # Which invoice prompt is used: `invoice/v1` (the default) or `invoice/v2` (see docs/PROMPTS.md and docs/EVAL.md for
-    # how the default is decided). The version is stored with every extraction.
-    invoice_prompt_version: str = "invoice/v1"
+    # Which invoice prompt is used: `invoice/v2` (the default, chosen by the rule in docs/EVAL.md after the runs of
+    # 2026-10-21) or `invoice/v1`. The version is stored with every extraction.
+    invoice_prompt_version: str = "invoice/v2"
     # How the Anthropic adapter treats a slow or failing service. Stated here, never left to the SDK's
     # defaults (a 10-minute read timeout inside a background task, two silent retries).
     # A request is cut off after this many seconds:

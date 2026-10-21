@@ -169,7 +169,7 @@ def test_entry_carries_the_extraction_provenance(
 
     item = _by_name(_items(api_client))["total"]
     assert item["model_name"] == "fake-model-1"
-    assert item["prompt_version"] == "invoice/v1"
+    assert item["prompt_version"] == "invoice/v2"
     uuid.UUID(item["extraction_id"])
     uuid.UUID(item["field_id"])
 

@@ -51,7 +51,7 @@ def test_extract_persists_an_extraction(
     with Session(migrated_engine) as session:
         extraction = session.execute(select(Extraction)).scalar_one()
         assert extraction.document_id == rendered_document.id
-        assert extraction.prompt_version == "invoice/v1"
+        assert extraction.prompt_version == "invoice/v2"
         assert len(extraction.field_values) == 13
 
         document = session.get(Document, rendered_document.id)
