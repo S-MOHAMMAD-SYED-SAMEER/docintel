@@ -627,7 +627,7 @@ Environment-only, prefix `DOCINTEL_`. See `.env.example`; never commit a real
 | Variable | Default | Notes |
 | --- | --- | --- |
 | `DOCINTEL_DATABASE_URL` | local dev URL | **Override in production.** The default carries a development credential and points at localhost. |
-| `DOCINTEL_ANTHROPIC_API_KEY` | empty | Empty falls back to the SDK's own `ANTHROPIC_API_KEY` / profile lookup. |
+| `DOCINTEL_ANTHROPIC_API_KEY` | empty | The credential. `ANTHROPIC_API_KEY` (the SDK's own name) in the environment or in `.env` works too; `DOCINTEL_ANTHROPIC_API_KEY` wins if both are set. With none, an extraction fails with a clear "no credential" error. |
 | `DOCINTEL_EXTRACTION_MODEL` | `claude-haiku-4-5` | The model ID sent to the API. Not yet verified against the live API. |
 | `DOCINTEL_EXTRACTION_TIMEOUT_SECONDS` | `120` | A request is cut off after this long. |
 | `DOCINTEL_EXTRACTION_MAX_RETRIES` | `2` | SDK retries of transient failures; `0` = never (required for a counted evaluation run). |
