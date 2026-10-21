@@ -49,9 +49,9 @@ invoice through the demo and checks the record) and **`audit`** (`pip-audit`).
 
 | Environment | Result (2026-10-21, after the real runs) | Why the rest is skipped |
 |---|---|---|
-| CI, Linux (`test`) | 641 collected, 641 passed | nothing |
-| CI, Windows (`windows`) | 374 passed, 267 skipped | a Windows runner has no PostgreSQL service, so every database test skips; it exists to catch what only Windows shows |
-| No database, anywhere | 374 passed, 267 skipped | the same tests |
+| CI, Linux (`test`) | 658 collected, 658 passed | nothing |
+| CI, Windows (`windows`) | 391 passed, 267 skipped | a Windows runner has no PostgreSQL service, so every database test skips; it exists to catch what only Windows shows |
+| No database, anywhere | 391 passed, 267 skipped | the same tests |
 
 ## What a green run does not show
 

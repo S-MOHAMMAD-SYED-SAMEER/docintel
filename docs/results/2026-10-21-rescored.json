@@ -1,0 +1,138 @@
+{
+  "what": "The saved model outputs of the real runs of 2026-10-21, re-scored offline (no requests) with the text-layer check that now ships. Model replies, extracted values and labels are unchanged; only the text-layer signal is recomputed, from the dataset's own files. 'as_run' is the check that was in use when the runs were made, recomputed here and verified to reproduce every saved flag and confidence.",
+  "threshold": 0.85,
+  "runs": [
+    {
+      "run": "2026-10-21-invoices_v1-invoice-v1",
+      "dataset": "invoices_v1",
+      "prompt_version": "invoice/v1",
+      "fields_evaluated": 260,
+      "as_run": {
+        "correct_confident": 257,
+        "correct_flagged": 0,
+        "wrong_flagged": 1,
+        "wrong_confident": 2,
+        "flagged": 1
+      },
+      "with_fixed_check": {
+        "correct_confident": 257,
+        "correct_flagged": 0,
+        "wrong_flagged": 3,
+        "wrong_confident": 0,
+        "flagged": 3
+      },
+      "fields_whose_text_layer_verdict_or_flag_changed": [
+        {
+          "filename": "invoice-005.pdf",
+          "field": "vendor_tax_id",
+          "expected": "FR40123456824",
+          "extracted": "FR4012345682",
+          "correct": false,
+          "text_layer_as_run": "found",
+          "text_layer_fixed": "not found",
+          "confidence_as_run": 0.9333,
+          "confidence_fixed": 0.6,
+          "flagged_as_run": false,
+          "flagged_fixed": true
+        },
+        {
+          "filename": "invoice-015.pdf",
+          "field": "vendor_tax_id",
+          "expected": "FR40123456824",
+          "extracted": "FR4012345\u200b6824",
+          "correct": false,
+          "text_layer_as_run": "found",
+          "text_layer_fixed": "not found",
+          "confidence_as_run": 0.9333,
+          "confidence_fixed": 0.6,
+          "flagged_as_run": false,
+          "flagged_fixed": true
+        }
+      ]
+    },
+    {
+      "run": "2026-10-21-invoices_v1-invoice-v2",
+      "dataset": "invoices_v1",
+      "prompt_version": "invoice/v2",
+      "fields_evaluated": 260,
+      "as_run": {
+        "correct_confident": 260,
+        "correct_flagged": 0,
+        "wrong_flagged": 0,
+        "wrong_confident": 0,
+        "flagged": 0
+      },
+      "with_fixed_check": {
+        "correct_confident": 260,
+        "correct_flagged": 0,
+        "wrong_flagged": 0,
+        "wrong_confident": 0,
+        "flagged": 0
+      },
+      "fields_whose_text_layer_verdict_or_flag_changed": []
+    },
+    {
+      "run": "2026-10-21-invoices_hard_v1-invoice-v1",
+      "dataset": "invoices_hard_v1",
+      "prompt_version": "invoice/v1",
+      "fields_evaluated": 130,
+      "as_run": {
+        "correct_confident": 126,
+        "correct_flagged": 1,
+        "wrong_flagged": 1,
+        "wrong_confident": 2,
+        "flagged": 2
+      },
+      "with_fixed_check": {
+        "correct_confident": 126,
+        "correct_flagged": 1,
+        "wrong_flagged": 1,
+        "wrong_confident": 2,
+        "flagged": 2
+      },
+      "fields_whose_text_layer_verdict_or_flag_changed": []
+    },
+    {
+      "run": "2026-10-21-invoices_hard_v1-invoice-v2",
+      "dataset": "invoices_hard_v1",
+      "prompt_version": "invoice/v2",
+      "fields_evaluated": 130,
+      "as_run": {
+        "correct_confident": 124,
+        "correct_flagged": 3,
+        "wrong_flagged": 1,
+        "wrong_confident": 2,
+        "flagged": 4
+      },
+      "with_fixed_check": {
+        "correct_confident": 124,
+        "correct_flagged": 3,
+        "wrong_flagged": 1,
+        "wrong_confident": 2,
+        "flagged": 4
+      },
+      "fields_whose_text_layer_verdict_or_flag_changed": []
+    },
+    {
+      "run": "2026-10-21-purchase_orders_smoke-purchase-order-v1",
+      "dataset": "purchase_orders_smoke",
+      "prompt_version": "purchase_order/v1",
+      "fields_evaluated": 30,
+      "as_run": {
+        "correct_confident": 30,
+        "correct_flagged": 0,
+        "wrong_flagged": 0,
+        "wrong_confident": 0,
+        "flagged": 0
+      },
+      "with_fixed_check": {
+        "correct_confident": 30,
+        "correct_flagged": 0,
+        "wrong_flagged": 0,
+        "wrong_confident": 0,
+        "flagged": 0
+      },
+      "fields_whose_text_layer_verdict_or_flag_changed": []
+    }
+  ]
+}

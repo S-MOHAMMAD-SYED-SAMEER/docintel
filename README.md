@@ -5,7 +5,7 @@ into a validated schema, score confidence per field, and route anything
 uncertain to a human review queue.
 
 **Status:** feature-complete through milestone 10, plus a hardened
-public demo. 641 tests collected, 641 passing (see
+public demo. 658 tests collected, 658 passing (see
 [Testing](#testing) for what that number covers and the one
 previously-reported, environment-dependent flake this run did not hit).
 CI runs the suite on Linux (with PostgreSQL) and Windows, builds the Docker image and runs the demo stack.
@@ -78,7 +78,7 @@ asking a language model whether it added up correctly.
 | **Reproducible evaluation** | A committed, deterministic, labelled dataset and a CLI that measures accuracy, review rate, false-confident rate, cost and latency. |
 | **Cost and latency tracking** | Recorded per extraction from provider usage; never invented when the provider reports none. |
 | **PostgreSQL + Alembic** | Seven migrations, each verified to upgrade, downgrade and re-upgrade on a fresh database. |
-| **Test coverage** | 641 tests across 37 files, including a hard guard that no test can reach the real API. |
+| **Test coverage** | 658 tests across 38 files, including a hard guard that no test can reach the real API. |
 
 ---
 
@@ -555,8 +555,22 @@ record, with every document, every wrong field and what surprised me:
 | `invoices_v1`: 20 synthetic invoices, text PDFs (260 fields) | 257 of 260 | 260 of 260 |
 | `invoices_hard_v1`: 10 harder synthetic invoices, 5 of them images with no text layer (130 fields) | 127 of 130 | 127 of 130 |
 | Both sets, 30 documents (390 fields): wrong fields | 6 | 3 |
-| Both sets: wrong **and not flagged for review** (false-confident) | 4 | 2 |
-| Both sets: fields flagged for review | 3 (0.77%) | 4 (1.03%) |
+
+What the review flag did with those wrong fields. The model's replies, the extracted values and the labels are the same in
+both blocks; the only difference is the text-layer check (the fourth confidence signal), which was replaced after the runs
+(see below) and the saved outputs re-scored offline, with no new requests:
+
+| Over the 390 fields | `invoice/v1` | `invoice/v2` |
+|---|---|---|
+| **As run** (old check): wrong and **not flagged** for review | **4** | **2** |
+| **As run**: fields flagged for review | 3 (0.77%) | 4 (1.03%) |
+| **With the fixed check** (re-scored offline): wrong and **not flagged** | **2** | **2** |
+| **With the fixed check**: fields flagged for review | 5 (1.28%) | 4 (1.03%) |
+
+So with v2: **387 of 390 fields correct, 3 wrong, 2 of those not flagged, as run and with the fixed check alike.** With v1:
+384 of 390 correct, 6 wrong, 4 not flagged as run and 2 with the fixed check. The fixed check flags no correct field that the old
+one did not (no new false alarms on these documents). The two wrong values still not flagged are both on image-only documents,
+which have no text layer to check: see the limits.
 
 Purchase orders (`purchase_orders_smoke`, `purchase_order/v1`, 3 documents): 30 of 30 fields correct, none flagged; this shows the
 second type runs against the real model, nothing more. Cost: about USD 0.008 a two-page invoice at the model's published price
@@ -576,10 +590,23 @@ second type runs against the real model, nothing more. Cost: about USD 0.008 a t
 - The three misses on the hard set were a date `04/03/2026` read month-first (flagged for review by the date check: the system
   worked as designed), an address the model "corrected" from `Munchen` to `München`, and a 13-character VAT number copied wrongly
   (not flagged, reported at 0.85 and 0.92).
-- **Two defects of the scorer were found and not fixed for these runs**, so that the two prompts were scored alike: the text-layer
-  check accepts a truncated value and a value with an invisible character as "found" (two of the three first-run misses were
-  therefore not flagged), and on an image the model's own confidence is the only signal.
-- The false-confident counts (4 and 2 of 390 fields) are far too small to say how well the confidence weighting works.
+- **The text-layer check had a defect, found by these runs.** It matched a substring after dropping everything but letters and
+  digits, so a truncated value and a value with an invisible character both counted as "on the page"; two of the three first-run
+  VAT misses were therefore not flagged. It was **not fixed during the runs**, so that the two prompts were scored alike. It was
+  replaced afterwards by an exact match on whole tokens after Unicode NFKC, ignoring invisible characters on the page and
+  treating an invisible character in the *value* as a mismatch ([`app/validation/text_layer.py`](app/validation/text_layer.py)),
+  and the saved outputs were re-scored offline (`python -m evals.rescore`, [`docs/results/2026-10-21-rescored.json`](docs/results/2026-10-21-rescored.json)).
+  "As run" and "with the fixed check" are published side by side because the second was chosen after seeing the first; the new
+  check was specified from three known cases, not tuned on the other results. It still accepts a truncation at a word boundary
+  of a multi-word value (`Acme Supplies` for `Acme Supplies BV`).
+- **On image-only documents the model's own confidence is the only signal** (there is no text layer), so a wrong value the model
+  is sure of is not flagged. Both wrong values still unflagged with the fixed check are of this kind (an address, and a VAT number
+  copied wrongly at 0.92).
+- **The threshold (0.85) is unchanged, and it has a boundary case:** a field scoring exactly 0.850 is not below it and passes. One
+  wrong value (`hard-008`, `invoice/v1`) sat exactly there.
+- **`Munchen` against `München` stays scored wrong:** the page says `Munchen` and the model changed printed text, which is the
+  behaviour an extraction task must not have.
+- The false-confident counts (2 to 4 of 390 fields) are far too small to say how well the confidence weighting works.
 
 Nothing here is a claim about accuracy on real invoices, about other models, or about production readiness.
 
@@ -767,11 +794,11 @@ exception built specifically to be exposed publicly — see
 ## Testing
 
 ```bash
-pytest                     # 641 tests
+pytest                     # 658 tests
 pytest -q tests/test_purchase_order.py
 ```
 
-With PostgreSQL running: 641 tests collected, 641 pass. A previous count
+With PostgreSQL running: 658 tests collected, 658 pass. A previous count
 (478 collected, 477 pass) reported one failure,
 `tests/test_eval_cli.py::test_json_output_is_machine_readable`, as a
 known, environment-specific artifact — SQLAlchemy log output occasionally
@@ -783,7 +810,7 @@ underlying mechanism that could cause it, only the environment happened
 not to trigger it this time.
 
 Tests that need PostgreSQL are skipped when no server answers, so `pytest`
-runs without a database at 374 pass, 267 skip (641 collected either way).
+runs without a database at 391 pass, 267 skip (658 collected either way).
 Database tests migrate a dedicated test database to head and tear it down on
 every run.
 
