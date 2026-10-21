@@ -1,0 +1,381 @@
+{
+  "dataset": "invoices_hard_v1",
+  "synthetic": true,
+  "description": "Ten synthetic invoices that are harder to read than invoices_v1: scans and photographs with no text layer, skew, blur, noise, a stamp and a scribble, other layouts and wording, European formats, a credit note, a missing due date, a two-page table. Labels are the values used to render each document.",
+  "documents": [
+    {
+      "document_id": "hard-001",
+      "filename": "hard-001.png",
+      "fields": {
+        "invoice_number": "INV-2026-2201",
+        "invoice_date": "2026-02-09",
+        "due_date": "2026-02-23",
+        "vendor_name": "Kestrel Print & Sign",
+        "vendor_address": "88 Mill Lane, Leeds LS1 5QR",
+        "vendor_tax_id": "GB223344556",
+        "customer_name": "Riverbend Cafe",
+        "purchase_order_number": "PO-7781",
+        "currency": "GBP",
+        "subtotal": "205.00",
+        "tax": "41.00",
+        "total": "246.00",
+        "line_items": [
+          {
+            "description": "Hex bolt M8 (box of 100)",
+            "quantity": "6",
+            "unit_price": "12.50",
+            "amount": "75.00"
+          },
+          {
+            "description": "Laminated sign, A2",
+            "quantity": "2",
+            "unit_price": "65.00",
+            "amount": "130.00"
+          }
+        ]
+      }
+    },
+    {
+      "document_id": "hard-002",
+      "filename": "hard-002.png",
+      "fields": {
+        "invoice_number": "RE-2026-0457",
+        "invoice_date": "2026-03-04",
+        "due_date": "2026-04-03",
+        "vendor_name": "Lindenhof Beratung GmbH",
+        "vendor_address": "Goethestrasse 14, 80336 Munchen",
+        "vendor_tax_id": "DE811234567",
+        "customer_name": "Tallow Works",
+        "purchase_order_number": null,
+        "currency": "EUR",
+        "subtotal": "1324.50",
+        "tax": "251.66",
+        "total": "1576.16",
+        "line_items": [
+          {
+            "description": "Beratung, Stunden",
+            "quantity": "12",
+            "unit_price": "95.00",
+            "amount": "1140.00"
+          },
+          {
+            "description": "Reisekosten",
+            "quantity": "1",
+            "unit_price": "184.50",
+            "amount": "184.50"
+          }
+        ]
+      }
+    },
+    {
+      "document_id": "hard-003",
+      "filename": "hard-003.pdf",
+      "fields": {
+        "invoice_number": "INV-A-31207",
+        "invoice_date": "2026-03-04",
+        "due_date": "2026-03-18",
+        "vendor_name": "Meridian Logistics SA",
+        "vendor_address": "7 Rue Carnot, 69002 Lyon",
+        "vendor_tax_id": "FR40123456824",
+        "customer_name": "Corvus Studio",
+        "purchase_order_number": "PO-5519",
+        "currency": "EUR",
+        "subtotal": "378.00",
+        "tax": "79.38",
+        "total": "457.38",
+        "line_items": [
+          {
+            "description": "Widget, blue",
+            "quantity": "9",
+            "unit_price": "40.00",
+            "amount": "360.00"
+          },
+          {
+            "description": "Courier delivery",
+            "quantity": "1",
+            "unit_price": "18.00",
+            "amount": "18.00"
+          }
+        ]
+      }
+    },
+    {
+      "document_id": "hard-004",
+      "filename": "hard-004.pdf",
+      "fields": {
+        "invoice_number": "CN-2026-0098",
+        "invoice_date": "2026-01-27",
+        "due_date": "2026-02-10",
+        "vendor_name": "Northwind Trading Ltd",
+        "vendor_address": "4 Dock Road, Bristol BS1 4RN",
+        "vendor_tax_id": "GB987654321",
+        "customer_name": "Beta Ltd",
+        "purchase_order_number": "PO-6120",
+        "currency": "GBP",
+        "subtotal": "-185.00",
+        "tax": "-37.00",
+        "total": "-222.00",
+        "line_items": [
+          {
+            "description": "Widget, red",
+            "quantity": "-3",
+            "unit_price": "40.00",
+            "amount": "-120.00"
+          },
+          {
+            "description": "Laminated sign, A2",
+            "quantity": "-1",
+            "unit_price": "65.00",
+            "amount": "-65.00"
+          }
+        ]
+      }
+    },
+    {
+      "document_id": "hard-005",
+      "filename": "hard-005.jpg",
+      "fields": {
+        "invoice_number": "INV-2026-3340",
+        "invoice_date": "2026-05-18",
+        "due_date": "2026-06-01",
+        "vendor_name": "Bluegrass Hardware Inc",
+        "vendor_address": "900 Sycamore St, Austin TX 78701",
+        "vendor_tax_id": "US45-6789012",
+        "customer_name": "Hollis & Dane LLP",
+        "purchase_order_number": "PO-9902",
+        "currency": "USD",
+        "subtotal": "215.50",
+        "tax": "17.24",
+        "total": "232.74",
+        "line_items": [
+          {
+            "description": "Widget, blue",
+            "quantity": "4",
+            "unit_price": "40.00",
+            "amount": "160.00"
+          },
+          {
+            "description": "Hex bolt M8 (box of 100)",
+            "quantity": "3",
+            "unit_price": "12.50",
+            "amount": "37.50"
+          },
+          {
+            "description": "Courier delivery",
+            "quantity": "1",
+            "unit_price": "18.00",
+            "amount": "18.00"
+          }
+        ]
+      }
+    },
+    {
+      "document_id": "hard-006",
+      "filename": "hard-006.pdf",
+      "fields": {
+        "invoice_number": "INV-2026-4412",
+        "invoice_date": "2026-06-30",
+        "due_date": "2026-07-30",
+        "vendor_name": "Acme Supplies BV",
+        "vendor_address": "12 Kade, 1011 AB Amsterdam",
+        "vendor_tax_id": "NL123456789B01",
+        "customer_name": "Corvus Studio",
+        "purchase_order_number": "PO-8873",
+        "currency": "EUR",
+        "subtotal": "1563.50",
+        "tax": "328.34",
+        "total": "1891.84",
+        "line_items": [
+          {
+            "description": "Widget, blue",
+            "quantity": "10",
+            "unit_price": "40.00",
+            "amount": "400.00"
+          },
+          {
+            "description": "Widget, red",
+            "quantity": "5",
+            "unit_price": "40.00",
+            "amount": "200.00"
+          },
+          {
+            "description": "Hex bolt M8 (box of 100)",
+            "quantity": "20",
+            "unit_price": "12.50",
+            "amount": "250.00"
+          },
+          {
+            "description": "Courier delivery",
+            "quantity": "2",
+            "unit_price": "18.00",
+            "amount": "36.00"
+          },
+          {
+            "description": "Laminated sign, A2",
+            "quantity": "3",
+            "unit_price": "65.00",
+            "amount": "195.00"
+          },
+          {
+            "description": "Widget, blue",
+            "quantity": "7",
+            "unit_price": "40.00",
+            "amount": "280.00"
+          },
+          {
+            "description": "Hex bolt M8 (box of 100)",
+            "quantity": "11",
+            "unit_price": "12.50",
+            "amount": "137.50"
+          },
+          {
+            "description": "Laminated sign, A2",
+            "quantity": "1",
+            "unit_price": "65.00",
+            "amount": "65.00"
+          }
+        ]
+      }
+    },
+    {
+      "document_id": "hard-007",
+      "filename": "hard-007.pdf",
+      "fields": {
+        "invoice_number": "INV-77-0192",
+        "invoice_date": "2026-07-14",
+        "due_date": "2026-08-13",
+        "vendor_name": "Kestrel Print & Sign",
+        "vendor_address": "88 Mill Lane, Leeds LS1 5QR",
+        "vendor_tax_id": "GB223344556",
+        "customer_name": "Tallow Works",
+        "purchase_order_number": "PO-3358",
+        "currency": "GBP",
+        "subtotal": "652.00",
+        "tax": "130.40",
+        "total": "782.40",
+        "line_items": [
+          {
+            "description": "Widget, red",
+            "quantity": "12",
+            "unit_price": "40.00",
+            "amount": "480.00"
+          },
+          {
+            "description": "Laminated sign, A2",
+            "quantity": "2",
+            "unit_price": "65.00",
+            "amount": "130.00"
+          },
+          {
+            "description": "Freight and handling",
+            "quantity": "1",
+            "unit_price": "42.00",
+            "amount": "42.00"
+          }
+        ]
+      }
+    },
+    {
+      "document_id": "hard-008",
+      "filename": "hard-008.png",
+      "fields": {
+        "invoice_number": "9-208841",
+        "invoice_date": "2026-08-21",
+        "due_date": "2026-09-20",
+        "vendor_name": "Meridian Logistics SA",
+        "vendor_address": "7 Rue Carnot, 69002 Lyon",
+        "vendor_tax_id": "FR40123456824",
+        "customer_name": "Riverbend Cafe",
+        "purchase_order_number": "PO-1042",
+        "currency": "EUR",
+        "subtotal": "387.50",
+        "tax": "38.75",
+        "total": "426.25",
+        "line_items": [
+          {
+            "description": "Hex bolt M8 (box of 100)",
+            "quantity": "15",
+            "unit_price": "12.50",
+            "amount": "187.50"
+          },
+          {
+            "description": "Widget, blue",
+            "quantity": "5",
+            "unit_price": "40.00",
+            "amount": "200.00"
+          }
+        ]
+      }
+    },
+    {
+      "document_id": "hard-009",
+      "filename": "hard-009.pdf",
+      "fields": {
+        "invoice_number": "INV-2026-5005",
+        "invoice_date": "2026-09-02",
+        "due_date": null,
+        "vendor_name": "Northwind Trading Ltd",
+        "vendor_address": "4 Dock Road, Bristol BS1 4RN",
+        "vendor_tax_id": null,
+        "customer_name": "Hollis & Dane LLP",
+        "purchase_order_number": null,
+        "currency": "GBP",
+        "subtotal": "258.00",
+        "tax": "0.00",
+        "total": "258.00",
+        "line_items": [
+          {
+            "description": "Widget, blue",
+            "quantity": "6",
+            "unit_price": "40.00",
+            "amount": "240.00"
+          },
+          {
+            "description": "Courier delivery",
+            "quantity": "1",
+            "unit_price": "18.00",
+            "amount": "18.00"
+          }
+        ]
+      }
+    },
+    {
+      "document_id": "hard-010",
+      "filename": "hard-010.png",
+      "fields": {
+        "invoice_number": "INV-2026-6120",
+        "invoice_date": "2026-10-05",
+        "due_date": "2026-11-04",
+        "vendor_name": "Acme Supplies BV",
+        "vendor_address": "12 Kade, 1011 AB Amsterdam",
+        "vendor_tax_id": "NL123456789B01",
+        "customer_name": "Beta Ltd",
+        "purchase_order_number": "PO-2210",
+        "currency": "EUR",
+        "subtotal": "435.00",
+        "tax": "91.35",
+        "total": "526.35",
+        "line_items": [
+          {
+            "description": "Widget, red",
+            "quantity": "8",
+            "unit_price": "40.00",
+            "amount": "320.00"
+          },
+          {
+            "description": "Hex bolt M8 (box of 100)",
+            "quantity": "4",
+            "unit_price": "12.50",
+            "amount": "50.00"
+          },
+          {
+            "description": "Laminated sign, A2",
+            "quantity": "1",
+            "unit_price": "65.00",
+            "amount": "65.00"
+          }
+        ]
+      }
+    }
+  ]
+}

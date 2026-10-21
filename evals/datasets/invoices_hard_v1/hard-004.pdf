@@ -1,0 +1,54 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 611 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+40 750 Td
+(Northwind Trading Ltd) Tj T*
+(4 Dock Road, Bristol BS1 4RN) Tj T*
+(VAT GB987654321) Tj T*
+() Tj T*
+(CREDIT NOTE CN-2026-0098) Tj T*
+(Date 2026-01-27) Tj T*
+(Due 2026-02-10) Tj T*
+() Tj T*
+(Bill to: Beta Ltd) Tj T*
+(Your ref: PO-6120) Tj T*
+() Tj T*
+(Description                      Qty    Unit price      Amount) Tj T*
+(Widget, red                       -3        40.00     \(120.00\)) Tj T*
+(Laminated sign, A2                -1        65.00      \(65.00\)) Tj T*
+() Tj T*
+(Subtotal    GBP \(185.00\)) Tj T*
+(Tax         GBP \(37.00\)) Tj T*
+(TOTAL       GBP \(222.00\)) Tj T*
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000183 00000 n 
+0000000309 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+971
+%%EOF

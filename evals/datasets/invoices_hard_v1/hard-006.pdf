@@ -1,0 +1,80 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 766 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+40 750 Td
+(Acme Supplies BV) Tj T*
+(12 Kade, 1011 AB Amsterdam) Tj T*
+(VAT NL123456789B01) Tj T*
+() Tj T*
+(INVOICE INV-2026-4412) Tj T*
+(Invoice date 2026-06-30) Tj T*
+(Due date 2026-07-30) Tj T*
+() Tj T*
+(Bill to: Corvus Studio) Tj T*
+(Purchase order: PO-8873) Tj T*
+() Tj T*
+(Description                      Qty    Unit price      Amount) Tj T*
+(Widget, blue                      10        40.00       400.00) Tj T*
+(Widget, red                        5        40.00       200.00) Tj T*
+(Hex bolt M8 \(box of 100\)          20        12.50       250.00) Tj T*
+(Courier delivery                   2        18.00        36.00) Tj T*
+(Laminated sign, A2                 3        65.00       195.00) Tj T*
+() Tj T*
+(\(continued overleaf\)) Tj T*
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 467 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+40 750 Td
+(INVOICE INV-2026-4412  page 2) Tj T*
+() Tj T*
+(Description                      Qty    Unit price      Amount) Tj T*
+(Widget, blue                       7        40.00       280.00) Tj T*
+(Hex bolt M8 \(box of 100\)          11        12.50       137.50) Tj T*
+(Laminated sign, A2                 1        65.00        65.00) Tj T*
+() Tj T*
+(Subtotal   EUR 1,563.50) Tj T*
+(Tax        EUR 328.34) Tj T*
+(TOTAL      EUR 1,891.84) Tj T*
+ET
+endstream
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000189 00000 n 
+0000000315 00000 n 
+0000001132 00000 n 
+0000001258 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+1776
+%%EOF

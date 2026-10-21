@@ -5,7 +5,7 @@ into a validated schema, score confidence per field, and route anything
 uncertain to a human review queue.
 
 **Status:** feature-complete through milestone 10, plus a hardened
-public demo. 605 tests collected, 605 passing (see
+public demo. 621 tests collected, 621 passing (see
 [Testing](#testing) for what that number covers and the one
 previously-reported, environment-dependent flake this run did not hit).
 CI runs the suite on Linux (with PostgreSQL) and Windows, builds the Docker image and runs the demo stack.
@@ -77,7 +77,7 @@ asking a language model whether it added up correctly.
 | **Reproducible evaluation** | A committed, deterministic, labelled dataset and a CLI that measures accuracy, review rate, false-confident rate, cost and latency. |
 | **Cost and latency tracking** | Recorded per extraction from provider usage; never invented when the provider reports none. |
 | **PostgreSQL + Alembic** | Seven migrations, each verified to upgrade, downgrade and re-upgrade on a fresh database. |
-| **Test coverage** | 605 tests across 34 files, including a hard guard that no test can reach the real API. |
+| **Test coverage** | 621 tests across 35 files, including a hard guard that no test can reach the real API. |
 
 ---
 
@@ -526,6 +526,13 @@ says, **independently of anything a model later claims it says**. Every invoice
 is internally consistent — line items sum to subtotal, subtotal + tax = total —
 verified by a test.
 
+`evals/datasets/invoices_hard_v1/` is a second, **harder set of 10 synthetic invoices**: five images
+with no text layer (a skewed scan, a photograph, one with a PAID stamp and a scribble over the totals, and others),
+other layouts and wording, European date and number formats, a credit note, a missing due date, a two-page table.
+It is **frozen** (a sha256 in `docs/EVAL.md` and a test that fails if any file changes) and was reviewed before any
+run: *written by Claude (generated; labels are the render inputs); reviewed by ChatGPT and Claude; final decisions by
+Sameer.* It is a small smoke test with some teeth, not a benchmark: ten documents from a small invented pool.
+
 Running with `--provider stub` exercises the harness offline. It verifies:
 dataset loading, extraction orchestration, metric calculation, `eval_runs`
 persistence, report rendering and CLI behaviour. The stub answers every
@@ -610,7 +617,12 @@ confused with "wrong and nobody was told".
 (`1,210.00` == `1210.0`), line items compare structurally, other values have
 whitespace collapsed. Case and punctuation are **not** normalised — `ACME` and
 `Acme`, `INV20261001` and `INV-2026-1001`, are different answers. An absent
-value matches only another absent value.
+value matches only another absent value, so a model that fills in a date where
+the document says "Payable on receipt" (the correct `due_date` is null) is
+scored wrong. One more rule, for credit notes: on a line item whose amount is
+negative, the quantity and the unit price are compared without their sign (the
+minus may be written on either; the description and the amount must still
+match). Both rules were fixed before any real run; see [docs/EVAL.md](docs/EVAL.md).
 
 Every run writes an `eval_runs` row: dataset, prompt version, model, document
 count, per-field accuracy, both rates, mean cost and latency, plus a `metrics`
@@ -728,11 +740,11 @@ exception built specifically to be exposed publicly — see
 ## Testing
 
 ```bash
-pytest                     # 605 tests
+pytest                     # 621 tests
 pytest -q tests/test_purchase_order.py
 ```
 
-With PostgreSQL running: 605 tests collected, 605 pass. A previous count
+With PostgreSQL running: 621 tests collected, 621 pass. A previous count
 (478 collected, 477 pass) reported one failure,
 `tests/test_eval_cli.py::test_json_output_is_machine_readable`, as a
 known, environment-specific artifact — SQLAlchemy log output occasionally
@@ -744,7 +756,7 @@ underlying mechanism that could cause it, only the environment happened
 not to trigger it this time.
 
 Tests that need PostgreSQL are skipped when no server answers, so `pytest`
-runs without a database at 339 pass, 266 skip (605 collected either way).
+runs without a database at 354 pass, 267 skip (621 collected either way).
 Database tests migrate a dedicated test database to head and tear it down on
 every run.
 

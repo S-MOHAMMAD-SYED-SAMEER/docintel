@@ -32,12 +32,36 @@ logged at the end of every run.
 | Dataset | Documents | What it is | Status |
 |---|---|---|---|
 | `invoices_v1` | 20 | Synthetic invoices, ten-point Courier PDFs with a clean text layer, labels are the values they were rendered from | committed |
-| `invoices_hard_v1` | 10 | Synthetic invoices that are harder: five images with no text layer (a scan, a photograph, a stamp and a scribble), skew, blur, other layouts, European formats, a credit note, a missing due date, a two-page table | **drafted, in review; frozen (sha256) before any real run** |
+| `invoices_hard_v1` | 10 | Synthetic invoices that are harder: five images with no text layer (a scan, a photograph, a stamp and a scribble), skew, blur, other layouts, European formats, a credit note, a missing due date, a two-page table | **approved by Sameer on 2026-10-21 with no label changes; frozen (sha256 below) before any real run** |
 | `purchase_orders_smoke` | 3 | Proves the second document type runs end to end; not a benchmark | committed |
 
-Provenance, stated wherever a number from the hard set is quoted: *written by Claude (generated; the labels are the render
-inputs); reviewed by ChatGPT and Claude; final decisions by Sameer.* The hard set's labels are never changed after a model
-has seen the documents; a change would be a new dataset version.
+Provenance, stated wherever a number from the hard set is quoted: *Written by Claude (generated; labels are the render
+inputs); reviewed by ChatGPT and Claude; final decisions by Sameer.* ChatGPT reviewed every field of every document and found
+0 wrong labels and 0 unreadable documents; Sameer approved with no label changes. The hard set's labels are never changed
+after a model has seen the documents; a change would be a new dataset version.
+
+### The hard set is frozen
+
+`python -m evals.freeze invoices_hard_v1` prints one sha256 over every file of the dataset (text files with line endings
+normalised; images and PDFs as they are), and `tests/test_hard_set_frozen.py` fails if any file differs from it.
+
+```
+hard-set-sha256: db2962fdacc1b5c84577bb062076b47875103c73cd9b771b5409c3206149cc24
+```
+
+### Two scoring rules, decided with the approval and written before any run
+
+1. **Credit note (`hard-004`).** A line item whose amount is negative counts as correct if the amount is the correct negative
+   value, whether the minus is written on the quantity or on the unit price. In `evals/metrics.py`, on a row with a negative
+   amount the quantity and the unit price are compared without their sign; the description and the amount must still match,
+   so a lost sign on the amount, a different quantity or a different price is still wrong. A row with a positive amount is
+   compared exactly as before.
+2. **"Payable on receipt" (`hard-009`).** The correct `due_date` is null. A model that fills in a date (the invoice date, for
+   example) is scored wrong; an absent value matches only another absent value (this was already the rule, and is now tested
+   for this case).
+
+Both are tested (`tests/test_eval_metrics.py`) and apply to every run, including the runs of `invoices_v1`, where no row has a
+negative amount and no due date is null in a way that changes anything.
 
 ## The order, and the request budget
 
