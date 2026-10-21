@@ -8,7 +8,7 @@ from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -35,7 +35,14 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://docintel:docintel@localhost:5432/docintel"
 
     # Extraction provider.
-    anthropic_api_key: str = ""
+    # The credential. `DOCINTEL_ANTHROPIC_API_KEY` or the SDK's own `ANTHROPIC_API_KEY`, in the environment or in
+    # `.env`: a `.env` that holds the conventional name works without the process having to export it first.
+    # `DOCINTEL_ANTHROPIC_API_KEY` wins when both are set. Empty means the SDK's own lookup (and no key means
+    # an extraction fails with a clear `ProviderAuthError`).
+    anthropic_api_key: str = Field(
+        default="",
+        validation_alias=AliasChoices("DOCINTEL_ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY"),
+    )
     extraction_model: str = "claude-haiku-4-5"
     # Ceiling for the extraction response. An invoice schema with line items is
     # a few thousand tokens; the headroom is for long line-item tables.

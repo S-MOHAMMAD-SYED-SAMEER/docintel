@@ -56,7 +56,7 @@ alembic upgrade head
 `.env` is git-ignored (`.gitignore` lists `.env` and `.env.*`). Every value has a working default; nothing is needed just to
 run the tests or the demo. For a real run you need two things:
 
-- **The key**, as `DOCINTEL_ANTHROPIC_API_KEY` in `.env` (or `ANTHROPIC_API_KEY` in the process environment). Never commit it,
+- **The key**, as `DOCINTEL_ANTHROPIC_API_KEY` or the SDK's own `ANTHROPIC_API_KEY`, in `.env` or in the process environment (the first wins if both are set). Never commit it,
   never paste it into an issue or a log. If you start the app with an inherited `ANTHROPIC_API_KEY` you did not intend to use,
   remove it for that command (`env -u ANTHROPIC_API_KEY ...`) and rely on `.env`.
 - **The model**: `DOCINTEL_EXTRACTION_MODEL=claude-haiku-4-5`. A misspelling here fails at the first request, not at start-up.
