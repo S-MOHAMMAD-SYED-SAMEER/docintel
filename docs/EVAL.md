@@ -143,3 +143,41 @@ all of the difference is on `invoices_v1` (257 of 260 correct with v1, 260 of 26
 (the out-of-sample check) v1 and v2 each got 127 of 130 and missed the same three fields. Each prompt was run once on each set at the
 model's default sampling, on synthetic documents whose labels are by construction, with one model. The runs are not an accuracy figure and
 support no claim about real invoices. Per-field results, every wrong field and the surprises are in `docs/results/2026-10-21-real-runs.md`.
+
+### The text-layer check, fixed after the runs, and the saved outputs re-scored (2026-10-21)
+
+**Why.** The runs found that the check "is the extracted string on the page?" (the fourth confidence signal) accepted a
+truncated value and a value with an invisible character. It was left alone during the runs so that v1 and v2 were scored alike.
+
+**What changed** (`app/validation/text_layer.py`, decided by Sameer): exact match on whole tokens after Unicode NFKC and
+case-folding; the page is split on whitespace and only punctuation, symbols and separators *inside* a token are ignored
+(`1210.00` still matches `EUR 1,210.00`); there is no substring pass; invisible (Unicode "format") characters are dropped from the
+page, because text extraction can insert them, but a value that contains one is never found. Tests include the three real cases
+(a dropped last digit, a dropped middle digit and a zero-width space), in `tests/test_text_layer.py`.
+
+**Re-scoring.** `python -m evals.rescore` re-scores the saved outputs offline, with no request: model replies, extracted values and
+labels are read from `docs/results/` and not changed; only the text-layer signal is recomputed, from the dataset's document files.
+It first recomputes the check that was in use and requires every saved flag and confidence to be reproduced exactly (they were:
+all 810 fields of the five runs; `tests/test_rescore.py` checks it), then recomputes with the new one. Output: `docs/results/2026-10-21-rescored.json`.
+
+| Over the same 30 documents (390 fields) | `invoice/v1` as run | `invoice/v1` fixed check | `invoice/v2` as run | `invoice/v2` fixed check |
+|---|---|---|---|---|
+| Wrong fields | 6 | 6 | 3 | 3 |
+| Wrong and not flagged (false-confident) | 4 | 2 | 2 | 2 |
+| Wrong and flagged | 2 | 4 | 1 | 1 |
+| Correct but flagged | 1 | 1 | 3 | 3 |
+| Flagged in all | 3 (0.77%) | 5 (1.28%) | 4 (1.03%) | 4 (1.03%) |
+
+The decision rule above was evaluated on the **as run** numbers, as written, and its outcome (v2 is the default) is not changed
+by the fix: on the fixed numbers v2 is still no worse on any of its five conditions. The fixed check turned no correct field into a
+flagged one on these documents.
+
+**Known limits, stated here so they are not discovered later:**
+- The two wrong values still unflagged (one address and one VAT number, both on image-only documents) cannot be caught by this
+  signal: **on an image-only document the model's own confidence is the only signal.**
+- **The threshold stays at 0.85.** A final score of exactly 0.850 is not below it, so it passes: one wrong VAT number (`hard-008`,
+  `invoice/v1`) sat exactly on the boundary.
+- `Munchen` read as `München` stays **scored wrong**: the model altered printed text.
+- The new check still accepts a truncation at a word boundary of a multi-word value.
+- "With the fixed check" was chosen after seeing "as run"; it was specified from three known cases, and the other results were not
+  used to tune it. One run of each prompt, 30 synthetic documents, labels by construction, one model.

@@ -52,7 +52,8 @@ It does not touch the schema, the checker, the scoring or the review threshold.
   1. The text-layer check passed a **truncated** value and a value with an **invisible character** (both gave `found`): its
      matching is a substring match after dropping spaces and punctuation, so a prefix of the printed string, or the string
      with a zero-width space inside, still counts as "on the page". Two of the three misses were therefore not flagged. This is
-     a defect of the scorer, reported in the results and to be fixed after the study.
+     a defect of the scorer, reported in the results. **Fixed after the runs** (exact match on whole tokens after NFKC; see
+     `docs/EVAL.md`); the table below is "as run", and the re-scored figures are in `docs/results/2026-10-21-rescored.json`.
   2. The model's self-reported confidence (0.90) was the same on the right and the wrong copies.
 
 ## What happened when v2 was run (2026-10-21; full record in `docs/results/2026-10-21-real-runs.md`)
@@ -66,5 +67,5 @@ It does not touch the schema, the checker, the scoring or the review threshold.
 
 By the rule written beforehand, v2 is the default. **All of the difference is on `invoices_v1`, the set v2 was written from.** On
 the hard set, where v2 was not tuned, v1 and v2 each missed the same three fields. One run each at default sampling, so the
-`invoices_v1` difference is as consistent with chance as with the prompt. The scorer weaknesses listed above were not fixed
-for these runs and remain open.
+`invoices_v1` difference is as consistent with chance as with the prompt. The text-layer defect listed above was not fixed
+during these runs; with it fixed and the saved outputs re-scored, v1 has 2 wrong-and-unflagged fields instead of 4 and v2 still 2.
