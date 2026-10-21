@@ -1,6 +1,6 @@
 # Evaluation: the plan for the first real-model runs, written before any of them
 
-**Status: no real-model request has been made.** This file is committed first, so the plan and the decision rule cannot
+**Status: the first real-model runs are under way (see "Record of the runs" at the end).** This file was committed before any request, so the plan and the decision rule could not
 be bent to a result. When the runs have been made, their numbers go in `docs/results/` and are summarised in the README
 with their limits; this file keeps the plan as it was written.
 
@@ -111,3 +111,15 @@ one, is **in-sample for `invoices_v1`** (the revision is written from its failur
 `docs/results/<date>-<dataset>-<model>-<prompt>.json` (the report as `evals.run --json` prints it, plus the ledger totals) and a
 short `.md` beside each; the README's "Evaluation" section is rewritten from those files only. A test (as in the other
 projects) checks that every figure the README prints is in the committed result files.
+
+## Record of the runs (added as they happen; the plan above is unchanged)
+
+| Date | Step | What | Requests / USD (ledger) |
+|---|---|---|---|
+| 2026-10-21 | 1 | One smoke extraction of `invoice-001` through the live app. Not part of any result. | 1 / $0.0082 |
+| 2026-10-21 | 2 | `invoices_v1`, `invoice/v1`, 20 documents: completed, no document failed to extract | 21 / $0.174 |
+| 2026-10-21 | 3 | `invoices_hard_v1`, `invoice/v1`, 10 documents: completed. **Not read** (only the ledger line was looked at) | 31 / $0.243 |
+| 2026-10-21 | 4 | Offline analysis of step 2's stored replies: three `vendor_tax_id` misses on one repeated string; see `docs/PROMPTS.md` | 0 |
+| 2026-10-21 | 5 | `invoice/v2` written from step 4 only and committed (this file's decision rule applies unchanged) | 0 |
+
+The numbers of each run are published in the README and `docs/results/` once all runs of the plan are done.
