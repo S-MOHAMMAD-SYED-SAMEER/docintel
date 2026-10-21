@@ -5,7 +5,7 @@ into a validated schema, score confidence per field, and route anything
 uncertain to a human review queue.
 
 **Status:** feature-complete through milestone 10, plus a hardened
-public demo. 658 tests collected, 641 passing (see
+public demo. 658 tests collected, 658 passing (see
 [Testing](#testing) for what that number covers and the one
 previously-reported, environment-dependent flake this run did not hit).
 CI runs the suite on Linux (with PostgreSQL) and Windows, builds the Docker image and runs the demo stack.
@@ -798,7 +798,7 @@ pytest                     # 658 tests
 pytest -q tests/test_purchase_order.py
 ```
 
-With PostgreSQL running: 658 tests collected, 641 pass. A previous count
+With PostgreSQL running: 658 tests collected, 658 pass. A previous count
 (478 collected, 477 pass) reported one failure,
 `tests/test_eval_cli.py::test_json_output_is_machine_readable`, as a
 known, environment-specific artifact — SQLAlchemy log output occasionally
