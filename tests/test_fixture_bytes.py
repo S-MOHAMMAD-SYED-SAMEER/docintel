@@ -21,7 +21,7 @@ PDFS = sorted(DATASETS.glob("*/*.pdf"))
 
 
 def test_there_are_pdfs_to_check() -> None:
-    assert len(PDFS) == 23
+    assert len(PDFS) == 28  # 20 + 3 + the 5 PDFs of invoices_hard_v1
 
 
 @pytest.mark.parametrize("pdf", PDFS, ids=lambda path: path.name)

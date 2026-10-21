@@ -7,14 +7,20 @@ between them is all that happens.
 
 Normalisation (see `normalise`) removes presentation only:
 
-  * `line_items`   compared structurally, row by row, with amounts as numbers
+  * `line_items`   compared structurally, row by row, with amounts as numbers.
+                   One scoring rule (decided with the harder set, before any run): on a row whose amount is
+                   NEGATIVE (a credit note), the sign is carried by the amount, so the minus on the quantity or
+                   on the unit price is not scored: -3 x 40.00 = -120.00 and 3 x -40.00 = -120.00 are both
+                   correct for the expected row -3 x 40.00 = -120.00. A row with a positive amount is compared
+                   exactly as before, and a wrong magnitude or a wrong amount is still wrong
   * money fields   compared as decimals, so 1,210.00 == 1210.0 == 1210.00
   * date fields    compared as calendar dates
   * everything else  whitespace trimmed and runs collapsed; case and
                      punctuation are NOT touched, because "ACME" and "Acme" are
                      different answers on an invoice
 
-An absent value matches only another absent value.
+An absent value matches only another absent value. So an expected `due_date` of null ("Payable on receipt")
+is answered correctly only with null: a model that fills in a date (the invoice date, say) is scored wrong.
 """
 
 import math
@@ -77,15 +83,23 @@ def _normalise_rows(value: Any) -> Any:
         if not isinstance(row, dict):
             rows.append(_normalise_text(row))
             continue
-        rows.append(
-            tuple(
-                sorted(
-                    (key, normalise(key, cell))
-                    for key, cell in row.items()
-                )
-            )
-        )
+        cells = {key: normalise(key, cell) for key, cell in row.items()}
+        _carry_a_credit_sign_on_the_amount(cells)
+        rows.append(tuple(sorted(cells.items())))
     return rows
+
+
+def _carry_a_credit_sign_on_the_amount(cells: dict[str, Any]) -> None:
+    """On a row with a negative amount, compare the quantity and the unit price without their sign.
+
+    A credit note can be written with the minus on the quantity or on the price; the amount is what a
+    reader takes the line to be worth, so it carries the sign. Only a negative amount triggers this.
+    """
+    amount = cells.get("amount")
+    if isinstance(amount, Decimal) and amount < 0:
+        for key in ("quantity", "unit_price"):
+            if isinstance(cells.get(key), Decimal):
+                cells[key] = abs(cells[key])
 
 
 def matches(field_name: str, extracted: Any, expected: Any) -> bool:

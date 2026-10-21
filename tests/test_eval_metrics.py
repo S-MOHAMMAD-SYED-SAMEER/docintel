@@ -425,3 +425,42 @@ def test_a_null_label_matched_by_a_real_extraction_is_correct() -> None:
     )
 
     assert observation.correct is True
+
+
+# --- scoring rules decided with the harder set, before any real run --------------------------------------
+
+
+def _credit_row(quantity: str, unit_price: str, amount: str = "-120.00", description: str = "Widget, red") -> list[dict]:
+    return [{"description": description, "quantity": quantity, "unit_price": unit_price, "amount": amount}]
+
+
+def test_a_credit_note_row_is_correct_with_the_minus_on_the_quantity_or_on_the_price() -> None:
+    expected = _credit_row("-3", "40.00")
+
+    assert matches("line_items", _credit_row("-3", "40.00"), expected)  # as labelled
+    assert matches("line_items", _credit_row("3", "-40.00"), expected)  # the minus on the price instead
+    assert matches("line_items", _credit_row("3", "40.00"), expected)  # no minus on either, amount negative
+
+
+def test_a_credit_note_row_with_the_wrong_amount_or_magnitude_is_still_wrong() -> None:
+    expected = _credit_row("-3", "40.00")
+
+    assert not matches("line_items", _credit_row("-3", "40.00", amount="120.00"), expected)  # the amount lost its sign
+    assert not matches("line_items", _credit_row("-4", "40.00", amount="-160.00"), expected)  # a different quantity
+    assert not matches("line_items", _credit_row("-3", "45.00", amount="-135.00"), expected)  # a different price
+    assert not matches("line_items", _credit_row("-3", "40.00", description="Widget, blue"), expected)
+
+
+def test_the_credit_sign_rule_does_not_loosen_a_positive_row() -> None:
+    expected = _credit_row("3", "40.00", amount="120.00")
+
+    assert matches("line_items", _credit_row("3", "40.00", amount="120.00"), expected)
+    assert not matches("line_items", _credit_row("-3", "40.00", amount="120.00"), expected)  # a stray minus on a positive row
+
+
+def test_a_filled_in_date_where_the_label_is_null_is_wrong_and_null_is_right() -> None:
+    """hard-009 says 'Payable on receipt': the correct due_date is null. Filling in the invoice date is a miss."""
+    assert matches("due_date", None, None)
+    assert not matches("due_date", "2026-09-02", None)
+    assert not matches("due_date", "", None)
+    assert not matches("due_date", None, "2026-09-02")

@@ -1,0 +1,42 @@
+{
+  "hard-001": {
+    "kind": "scan",
+    "why_hard": "Skewed 2.5 degrees, blurred and noisy; image only (no text layer)."
+  },
+  "hard-002": {
+    "kind": "clean-image",
+    "why_hard": "Day-first dotted dates, decimal commas and thousands dots, a euro sign and no currency code; image only."
+  },
+  "hard-003": {
+    "kind": "text-pdf",
+    "why_hard": "04/03/2026 could be April 3 or March 4; the due date 18/03/2026 shows it is day-first. Text layer present."
+  },
+  "hard-004": {
+    "kind": "text-pdf",
+    "why_hard": "A credit note: negative quantities and amounts, shown in brackets; the label keeps the sign. Text layer present."
+  },
+  "hard-005": {
+    "kind": "photo",
+    "why_hard": "A low-resolution, heavily compressed photograph with a shadow across the lower half; image only."
+  },
+  "hard-006": {
+    "kind": "text-pdf",
+    "why_hard": "Eight line items run onto a second page and the totals are only on page two. Text layer present."
+  },
+  "hard-007": {
+    "kind": "text-pdf",
+    "why_hard": "A freight row inside the table, and a 'Total due' line that comes before the details. Text layer present."
+  },
+  "hard-008": {
+    "kind": "clean-image",
+    "why_hard": "An order number and an account number beside the invoice number, a Ship-to that differs from the Bill-to, and a payment-processor line at the top; image only."
+  },
+  "hard-009": {
+    "kind": "text-pdf",
+    "why_hard": "No due date ('payable on receipt'), no tax id, no purchase order, and a tax of 0.00 (reverse charge). Text layer present."
+  },
+  "hard-010": {
+    "kind": "scan",
+    "why_hard": "A semi-transparent PAID stamp across the total, a pen scribble, a smudge and a small dense font; image only."
+  }
+}

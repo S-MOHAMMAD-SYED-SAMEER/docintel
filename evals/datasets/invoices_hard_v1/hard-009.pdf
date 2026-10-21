@@ -1,0 +1,54 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 625 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+40 750 Td
+(Northwind Trading Ltd) Tj T*
+(4 Dock Road, Bristol BS1 4RN) Tj T*
+() Tj T*
+(INVOICE INV-2026-5005) Tj T*
+(Date 2026-09-02) Tj T*
+(Payable on receipt) Tj T*
+() Tj T*
+(Bill to: Hollis & Dane LLP) Tj T*
+() Tj T*
+(Reverse charge: VAT to be accounted for by the recipient) Tj T*
+() Tj T*
+(Description                      Qty    Unit price      Amount) Tj T*
+(Widget, blue                       6        40.00       240.00) Tj T*
+(Courier delivery                   1        18.00        18.00) Tj T*
+() Tj T*
+(Subtotal   GBP 258.00) Tj T*
+(Tax        GBP 0.00) Tj T*
+(TOTAL      GBP 258.00) Tj T*
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000183 00000 n 
+0000000309 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+985
+%%EOF

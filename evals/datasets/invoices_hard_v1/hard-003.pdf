@@ -1,0 +1,55 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 612 >>
+stream
+BT
+/F1 10 Tf
+13 TL
+40 750 Td
+(TOTAL DUE  EUR 457.38) Tj T*
+() Tj T*
+(Meridian Logistics SA) Tj T*
+(7 Rue Carnot, 69002 Lyon) Tj T*
+(Tax ID FR40123456824) Tj T*
+() Tj T*
+(Invoice no. INV-A-31207) Tj T*
+(Issued 04/03/2026) Tj T*
+(Payment due 18/03/2026) Tj T*
+(Customer: Corvus Studio) Tj T*
+(PO PO-5519) Tj T*
+() Tj T*
+(Description                      Qty    Unit price      Amount) Tj T*
+(Widget, blue                       9        40.00       360.00) Tj T*
+(Courier delivery                   1        18.00        18.00) Tj T*
+() Tj T*
+(Net EUR 378.00) Tj T*
+(VAT EUR 79.38) Tj T*
+(Gross EUR 457.38) Tj T*
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000183 00000 n 
+0000000309 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+972
+%%EOF
