@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict
 from app.extractors.base import ExtractedField, Money
 
 PROMPT_VERSION = "invoice/v1"
+PROMPT_V2_VERSION = "invoice/v2"
 
 
 class InvoiceLineItem(BaseModel):
@@ -96,8 +97,27 @@ Return only the structured response.\
 """
 
 
+# invoice/v2: invoice/v1 plus ONE added paragraph about copying identifiers, written from the first real run's failures on
+# `invoices_v1` and nothing else (see docs/PROMPTS.md). Everything else is the v1 text, byte for byte.
+IDENTIFIER_NOTE = """- Identifiers (`invoice_number`, `purchase_order_number` and `vendor_tax_id`) are copied exactly as printed, one character at a time and in the same order. Do not drop, add, swap or merge a character, do not reformat or correct them, and do not insert spaces or invisible characters (such as a zero-width space). Long runs of digits, such as a VAT or tax number, are where copying goes wrong: once you have written one, check that it has the same number of characters as on the page. A confidence of 0.9 or more means you checked every character; if you could not, report less.
+"""
+
+_ANCHOR = "- Dates must be ISO 8601"
+assert _ANCHOR in PROMPT
+PROMPT_V2 = PROMPT.replace(_ANCHOR, IDENTIFIER_NOTE + _ANCHOR, 1)
+
+
 class InvoiceExtractor:
     doc_type = "invoice"
     prompt_version = PROMPT_VERSION
     schema = Invoice
     prompt = PROMPT
+
+
+class InvoiceExtractorV2:
+    """The same schema as `InvoiceExtractor`, with the v2 prompt. Selected by `DOCINTEL_INVOICE_PROMPT_VERSION`."""
+
+    doc_type = "invoice"
+    prompt_version = PROMPT_V2_VERSION
+    schema = Invoice
+    prompt = PROMPT_V2
