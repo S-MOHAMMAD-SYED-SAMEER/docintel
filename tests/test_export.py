@@ -61,7 +61,7 @@ def test_json_export_carries_the_document_and_extraction(
     assert body["document"]["doc_type"] == "invoice"
     assert body["document"]["status"] == DocumentStatus.EXTRACTED
     assert body["extraction"]["model_name"] == "fake-model-1"
-    assert body["extraction"]["prompt_version"] == "invoice/v1"
+    assert body["extraction"]["prompt_version"] == "invoice/v2"
 
 
 def test_json_export_includes_every_invoice_field(

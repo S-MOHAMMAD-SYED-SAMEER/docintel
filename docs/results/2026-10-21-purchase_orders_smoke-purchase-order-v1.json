@@ -1,0 +1,923 @@
+{
+  "meta": {
+    "run": "2026-10-21-purchase_orders_smoke-purchase-order-v1",
+    "date": "2026-10-21",
+    "dataset": "purchase_orders_smoke",
+    "documents": 3,
+    "model_requested": "claude-haiku-4-5",
+    "model_resolved_by_the_api": "claude-haiku-4-5-20251001",
+    "prompt_version": "purchase_order/v1",
+    "adapter_retries": 0,
+    "temperature": "not set (the API default)",
+    "confidence_threshold": 0.85,
+    "confidence_weights": {
+      "model": 0.4,
+      "schema": 0.2,
+      "arithmetic": 0.2,
+      "text_layer": 0.2
+    },
+    "synthetic": true,
+    "labels": "by construction (the values the documents were rendered from)",
+    "provenance": "Written by Claude (generated; labels are the render inputs); no independent review."
+  },
+  "report": {
+    "dataset": "purchase_orders_smoke",
+    "model_name": "claude-haiku-4-5-20251001",
+    "prompt_version": "purchase_order/v1",
+    "documents": 3,
+    "failed_documents": [],
+    "fields_evaluated": 30,
+    "overall_accuracy": 1.0,
+    "field_accuracy": {
+      "purchase_order_number": {
+        "evaluated": 3,
+        "correct": 3,
+        "accuracy": 1.0
+      },
+      "order_date": {
+        "evaluated": 3,
+        "correct": 3,
+        "accuracy": 1.0
+      },
+      "delivery_date": {
+        "evaluated": 3,
+        "correct": 3,
+        "accuracy": 1.0
+      },
+      "vendor_name": {
+        "evaluated": 3,
+        "correct": 3,
+        "accuracy": 1.0
+      },
+      "customer_name": {
+        "evaluated": 3,
+        "correct": 3,
+        "accuracy": 1.0
+      },
+      "currency": {
+        "evaluated": 3,
+        "correct": 3,
+        "accuracy": 1.0
+      },
+      "subtotal": {
+        "evaluated": 3,
+        "correct": 3,
+        "accuracy": 1.0
+      },
+      "tax": {
+        "evaluated": 3,
+        "correct": 3,
+        "accuracy": 1.0
+      },
+      "total": {
+        "evaluated": 3,
+        "correct": 3,
+        "accuracy": 1.0
+      },
+      "line_items": {
+        "evaluated": 3,
+        "correct": 3,
+        "accuracy": 1.0
+      }
+    },
+    "outcomes": {
+      "correct_confident": 30,
+      "correct_flagged": 0,
+      "wrong_flagged": 0,
+      "wrong_confident": 0
+    },
+    "review_rate": 0.0,
+    "document_review_rate": 0.0,
+    "false_confident_rate": 0.0,
+    "false_confident_rate_of_unflagged": 0.0,
+    "cost": {
+      "total_usd": "0.023204",
+      "mean_usd_per_document": "0.007735",
+      "documents_with_cost": 3
+    },
+    "latency_ms": {
+      "documents_with_latency": 3,
+      "mean": 6801.666666666667,
+      "p50": 4922,
+      "p95": 11124
+    }
+  },
+  "documents": [
+    {
+      "document_id": "po-001",
+      "filename": "po-001.pdf",
+      "model": "claude-haiku-4-5-20251001",
+      "prompt_version": "purchase_order/v1",
+      "input_tokens": 5893,
+      "output_tokens": 362,
+      "cost_usd": "0.007703",
+      "latency_ms": 11124,
+      "error": null,
+      "model_reply": "{\"purchase_order_number\": {\"value\": \"PO-2026-2001\", \"confidence\": 0.95, \"source_page\": 1}, \"order_date\": {\"value\": \"2026-02-03\", \"confidence\": 0.95, \"source_page\": 1}, \"delivery_date\": {\"value\": \"2026-02-17\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_name\": {\"value\": \"Acme Supplies BV\", \"confidence\": 0.95, \"source_page\": 1}, \"customer_name\": {\"value\": \"Beta Ltd\", \"confidence\": 0.95, \"source_page\": 1}, \"currency\": {\"value\": \"EUR\", \"confidence\": 0.95, \"source_page\": 2}, \"subtotal\": {\"value\": \"600.00\", \"confidence\": 0.95, \"source_page\": 2}, \"tax\": {\"value\": \"126.00\", \"confidence\": 0.95, \"source_page\": 2}, \"total\": {\"value\": \"726.00\", \"confidence\": 0.95, \"source_page\": 2}, \"line_items\": {\"value\": [{\"description\": \"Widget, blue\", \"quantity\": \"10\", \"unit_price\": \"40.00\", \"amount\": \"400.00\"}, {\"description\": \"Widget, red\", \"quantity\": \"5\", \"unit_price\": \"40.00\", \"amount\": \"200.00\"}], \"confidence\": 0.95, \"source_page\": 2}}",
+      "fields": {
+        "purchase_order_number": {
+          "expected": "PO-2026-2001",
+          "extracted": "PO-2026-2001",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "order_date": {
+          "expected": "2026-02-03",
+          "extracted": "2026-02-03",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "delivery_date": {
+          "expected": "2026-02-17",
+          "extracted": "2026-02-17",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_name": {
+          "expected": "Acme Supplies BV",
+          "extracted": "Acme Supplies BV",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "customer_name": {
+          "expected": "Beta Ltd",
+          "extracted": "Beta Ltd",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "currency": {
+          "expected": "EUR",
+          "extracted": "EUR",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "subtotal": {
+          "expected": "600.00",
+          "extracted": "600.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "tax": {
+          "expected": "126.00",
+          "extracted": "126.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "total": {
+          "expected": "726.00",
+          "extracted": "726.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "line_items": {
+          "expected": [
+            {
+              "description": "Widget, blue",
+              "quantity": "10",
+              "unit_price": "40.00",
+              "amount": "400.00"
+            },
+            {
+              "description": "Widget, red",
+              "quantity": "5",
+              "unit_price": "40.00",
+              "amount": "200.00"
+            }
+          ],
+          "extracted": [
+            {
+              "description": "Widget, blue",
+              "quantity": "10",
+              "unit_price": "40.00",
+              "amount": "400.00"
+            },
+            {
+              "description": "Widget, red",
+              "quantity": "5",
+              "unit_price": "40.00",
+              "amount": "200.00"
+            }
+          ],
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        }
+      }
+    },
+    {
+      "document_id": "po-002",
+      "filename": "po-002.pdf",
+      "model": "claude-haiku-4-5-20251001",
+      "prompt_version": "purchase_order/v1",
+      "input_tokens": 5893,
+      "output_tokens": 339,
+      "cost_usd": "0.007588",
+      "latency_ms": 4359,
+      "error": null,
+      "model_reply": "{\"purchase_order_number\": {\"value\": \"PO-2026-2002\", \"confidence\": 0.95, \"source_page\": 1}, \"order_date\": {\"value\": \"2026-03-11\", \"confidence\": 0.95, \"source_page\": 1}, \"delivery_date\": {\"value\": \"2026-03-25\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_name\": {\"value\": \"Northwind Trading Ltd\", \"confidence\": 0.95, \"source_page\": 1}, \"customer_name\": {\"value\": \"Corvus Studio\", \"confidence\": 0.95, \"source_page\": 1}, \"currency\": {\"value\": \"GBP\", \"confidence\": 0.95, \"source_page\": 2}, \"subtotal\": {\"value\": \"100.00\", \"confidence\": 0.95, \"source_page\": 2}, \"tax\": {\"value\": \"20.00\", \"confidence\": 0.95, \"source_page\": 2}, \"total\": {\"value\": \"120.00\", \"confidence\": 0.95, \"source_page\": 2}, \"line_items\": {\"value\": [{\"description\": \"Hex bolt M8 (box of 100)\", \"quantity\": \"8\", \"unit_price\": \"12.50\", \"amount\": \"100.00\"}], \"confidence\": 0.95, \"source_page\": 2}}",
+      "fields": {
+        "purchase_order_number": {
+          "expected": "PO-2026-2002",
+          "extracted": "PO-2026-2002",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "order_date": {
+          "expected": "2026-03-11",
+          "extracted": "2026-03-11",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "delivery_date": {
+          "expected": "2026-03-25",
+          "extracted": "2026-03-25",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_name": {
+          "expected": "Northwind Trading Ltd",
+          "extracted": "Northwind Trading Ltd",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "customer_name": {
+          "expected": "Corvus Studio",
+          "extracted": "Corvus Studio",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "currency": {
+          "expected": "GBP",
+          "extracted": "GBP",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "subtotal": {
+          "expected": "100.00",
+          "extracted": "100.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "tax": {
+          "expected": "20.00",
+          "extracted": "20.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "total": {
+          "expected": "120.00",
+          "extracted": "120.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "line_items": {
+          "expected": [
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "8",
+              "unit_price": "12.50",
+              "amount": "100.00"
+            }
+          ],
+          "extracted": [
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "8",
+              "unit_price": "12.50",
+              "amount": "100.00"
+            }
+          ],
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        }
+      }
+    },
+    {
+      "document_id": "po-003",
+      "filename": "po-003.pdf",
+      "model": "claude-haiku-4-5-20251001",
+      "prompt_version": "purchase_order/v1",
+      "input_tokens": 5893,
+      "output_tokens": 404,
+      "cost_usd": "0.007913",
+      "latency_ms": 4922,
+      "error": null,
+      "model_reply": "{\"purchase_order_number\": {\"value\": \"PO-2026-2003\", \"confidence\": 0.95, \"source_page\": 1}, \"order_date\": {\"value\": \"2026-04-06\", \"confidence\": 0.95, \"source_page\": 1}, \"delivery_date\": {\"value\": \"2026-04-20\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_name\": {\"value\": \"Bluegrass Hardware Inc\", \"confidence\": 0.95, \"source_page\": 1}, \"customer_name\": {\"value\": \"Tallow Works\", \"confidence\": 0.95, \"source_page\": 1}, \"currency\": {\"value\": \"USD\", \"confidence\": 0.95, \"source_page\": 2}, \"subtotal\": {\"value\": \"558.00\", \"confidence\": 0.95, \"source_page\": 2}, \"tax\": {\"value\": \"46.04\", \"confidence\": 0.95, \"source_page\": 2}, \"total\": {\"value\": \"604.04\", \"confidence\": 0.95, \"source_page\": 2}, \"line_items\": {\"value\": [{\"description\": \"Packing crate, large\", \"quantity\": \"12\", \"unit_price\": \"27.25\", \"amount\": \"327.00\"}, {\"description\": \"Courier delivery\", \"quantity\": \"2\", \"unit_price\": \"18.00\", \"amount\": \"36.00\"}, {\"description\": \"Laminated sign, A2\", \"quantity\": \"3\", \"unit_price\": \"65.00\", \"amount\": \"195.00\"}], \"confidence\": 0.95, \"source_page\": 2}}",
+      "fields": {
+        "purchase_order_number": {
+          "expected": "PO-2026-2003",
+          "extracted": "PO-2026-2003",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "order_date": {
+          "expected": "2026-04-06",
+          "extracted": "2026-04-06",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "delivery_date": {
+          "expected": "2026-04-20",
+          "extracted": "2026-04-20",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_name": {
+          "expected": "Bluegrass Hardware Inc",
+          "extracted": "Bluegrass Hardware Inc",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "customer_name": {
+          "expected": "Tallow Works",
+          "extracted": "Tallow Works",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "currency": {
+          "expected": "USD",
+          "extracted": "USD",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "subtotal": {
+          "expected": "558.00",
+          "extracted": "558.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "tax": {
+          "expected": "46.04",
+          "extracted": "46.04",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "total": {
+          "expected": "604.04",
+          "extracted": "604.04",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "line_items": {
+          "expected": [
+            {
+              "description": "Packing crate, large",
+              "quantity": "12",
+              "unit_price": "27.25",
+              "amount": "327.00"
+            },
+            {
+              "description": "Courier delivery",
+              "quantity": "2",
+              "unit_price": "18.00",
+              "amount": "36.00"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "3",
+              "unit_price": "65.00",
+              "amount": "195.00"
+            }
+          ],
+          "extracted": [
+            {
+              "description": "Packing crate, large",
+              "quantity": "12",
+              "unit_price": "27.25",
+              "amount": "327.00"
+            },
+            {
+              "description": "Courier delivery",
+              "quantity": "2",
+              "unit_price": "18.00",
+              "amount": "36.00"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "3",
+              "unit_price": "65.00",
+              "amount": "195.00"
+            }
+          ],
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        }
+      }
+    }
+  ]
+}

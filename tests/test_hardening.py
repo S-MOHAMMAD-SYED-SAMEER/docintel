@@ -355,7 +355,7 @@ def test_get_document_of_a_successful_extraction_carries_tokens_and_cost(
     assert latest["error"] is None
     assert latest["input_tokens"] == 4210 and latest["output_tokens"] == 388
     assert Decimal(str(latest["cost_usd"])) == Decimal("0.030650")
-    assert latest["prompt_version"] == "invoice/v1"
+    assert latest["prompt_version"] == "invoice/v2"
 
 
 def test_get_document_404s_for_an_unknown_id(api_client: TestClient) -> None:

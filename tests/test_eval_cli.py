@@ -91,7 +91,7 @@ def test_the_run_is_persisted(cli_env, migrated_engine: Engine, capsys) -> None:
 
     assert run.dataset_name == "invoices_v1"
     assert run.model_name == "stub-provider"
-    assert run.prompt_version == "invoice/v1"
+    assert run.prompt_version == "invoice/v2"
     assert run.document_count == 2
 
 

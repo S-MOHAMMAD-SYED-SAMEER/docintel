@@ -40,8 +40,16 @@ def test_v2_is_v1_plus_exactly_one_paragraph_about_identifiers() -> None:
     assert "zero-width space" in PROMPT_V2 and "vendor_tax_id" in PROMPT_V2
 
 
-def test_the_default_is_v1_until_the_decision_rule_says_otherwise(prompt_version) -> None:
+def test_the_default_is_v2_as_the_decision_rule_in_eval_md_decided(prompt_version) -> None:
     prompt_version(None)
+
+    extractor = get_extractor("invoice")
+
+    assert extractor.prompt_version == "invoice/v2" and extractor.prompt == PROMPT_V2
+
+
+def test_v1_is_still_selectable(prompt_version) -> None:
+    prompt_version("invoice/v1")
 
     extractor = get_extractor("invoice")
 
@@ -54,7 +62,7 @@ def test_the_setting_selects_v2_and_the_schema_is_the_same(prompt_version) -> No
     extractor = get_extractor("invoice")
 
     assert extractor.prompt_version == "invoice/v2" and extractor.prompt == PROMPT_V2
-    prompt_version(None)
+    prompt_version("invoice/v1")
     assert get_extractor("invoice").schema is extractor.schema
 
 

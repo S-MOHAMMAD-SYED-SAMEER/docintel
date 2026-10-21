@@ -77,7 +77,7 @@ def test_document_information_is_visible(
     assert "status needs_review" in html
     assert "2 page(s)" in html
     assert "fake-model-1" in html
-    assert "invoice/v1" in html
+    assert "invoice/v2" in html
 
 
 def test_field_names_and_values_are_visible(

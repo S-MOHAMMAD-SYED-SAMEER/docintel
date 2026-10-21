@@ -9,7 +9,7 @@ from pydantic import ValidationError
 
 from app.extractors import Invoice, InvoiceLineItem, get_extractor
 from app.extractors.base import ExtractedField
-from app.extractors.invoice import PROMPT_VERSION
+from app.extractors.invoice import PROMPT_V2_VERSION
 
 from .conftest import VALID_INVOICE_PAYLOAD
 
@@ -112,7 +112,7 @@ def test_extractor_exposes_schema_prompt_and_version() -> None:
 
     assert extractor.doc_type == "invoice"
     assert extractor.schema is Invoice
-    assert extractor.prompt_version == PROMPT_VERSION
+    assert extractor.prompt_version == PROMPT_V2_VERSION  # the default since the runs of 2026-10-21
     assert extractor.prompt.strip()
 
 

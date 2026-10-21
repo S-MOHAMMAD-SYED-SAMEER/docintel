@@ -1,0 +1,3299 @@
+{
+  "meta": {
+    "run": "2026-10-21-invoices_hard_v1-invoice-v1",
+    "date": "2026-10-21",
+    "dataset": "invoices_hard_v1",
+    "documents": 10,
+    "model_requested": "claude-haiku-4-5",
+    "model_resolved_by_the_api": "claude-haiku-4-5-20251001",
+    "prompt_version": "invoice/v1",
+    "adapter_retries": 0,
+    "temperature": "not set (the API default)",
+    "confidence_threshold": 0.85,
+    "confidence_weights": {
+      "model": 0.4,
+      "schema": 0.2,
+      "arithmetic": 0.2,
+      "text_layer": 0.2
+    },
+    "synthetic": true,
+    "labels": "by construction (the values the documents were rendered from)",
+    "provenance": "Written by Claude (generated; labels are the render inputs); reviewed by ChatGPT and Claude; final decisions by Sameer.",
+    "dataset_sha256": "db2962fdacc1b5c84577bb062076b47875103c73cd9b771b5409c3206149cc24"
+  },
+  "report": {
+    "dataset": "invoices_hard_v1",
+    "model_name": "claude-haiku-4-5-20251001",
+    "prompt_version": "invoice/v1",
+    "documents": 10,
+    "failed_documents": [],
+    "fields_evaluated": 130,
+    "overall_accuracy": 0.9769230769230769,
+    "field_accuracy": {
+      "invoice_number": {
+        "evaluated": 10,
+        "correct": 10,
+        "accuracy": 1.0
+      },
+      "invoice_date": {
+        "evaluated": 10,
+        "correct": 9,
+        "accuracy": 0.9
+      },
+      "due_date": {
+        "evaluated": 10,
+        "correct": 10,
+        "accuracy": 1.0
+      },
+      "vendor_name": {
+        "evaluated": 10,
+        "correct": 10,
+        "accuracy": 1.0
+      },
+      "vendor_address": {
+        "evaluated": 10,
+        "correct": 9,
+        "accuracy": 0.9
+      },
+      "vendor_tax_id": {
+        "evaluated": 10,
+        "correct": 9,
+        "accuracy": 0.9
+      },
+      "customer_name": {
+        "evaluated": 10,
+        "correct": 10,
+        "accuracy": 1.0
+      },
+      "purchase_order_number": {
+        "evaluated": 10,
+        "correct": 10,
+        "accuracy": 1.0
+      },
+      "currency": {
+        "evaluated": 10,
+        "correct": 10,
+        "accuracy": 1.0
+      },
+      "subtotal": {
+        "evaluated": 10,
+        "correct": 10,
+        "accuracy": 1.0
+      },
+      "tax": {
+        "evaluated": 10,
+        "correct": 10,
+        "accuracy": 1.0
+      },
+      "total": {
+        "evaluated": 10,
+        "correct": 10,
+        "accuracy": 1.0
+      },
+      "line_items": {
+        "evaluated": 10,
+        "correct": 10,
+        "accuracy": 1.0
+      }
+    },
+    "outcomes": {
+      "correct_confident": 126,
+      "correct_flagged": 1,
+      "wrong_flagged": 1,
+      "wrong_confident": 2
+    },
+    "review_rate": 0.015384615384615385,
+    "document_review_rate": 0.1,
+    "false_confident_rate": 0.015384615384615385,
+    "false_confident_rate_of_unflagged": 0.015625,
+    "cost": {
+      "total_usd": "0.069338",
+      "mean_usd_per_document": "0.006934",
+      "documents_with_cost": 10
+    },
+    "latency_ms": {
+      "documents_with_latency": 10,
+      "mean": 5989.2,
+      "p50": 5544,
+      "p95": 7014
+    }
+  },
+  "documents": [
+    {
+      "document_id": "hard-001",
+      "filename": "hard-001.png",
+      "model": "claude-haiku-4-5-20251001",
+      "prompt_version": "invoice/v1",
+      "input_tokens": 4263,
+      "output_tokens": 482,
+      "cost_usd": "0.006673",
+      "latency_ms": 6882,
+      "error": null,
+      "model_reply": "{\"invoice_number\": {\"value\": \"INV-2026-2201\", \"confidence\": 0.95, \"source_page\": 1}, \"invoice_date\": {\"value\": \"2026-02-09\", \"confidence\": 0.95, \"source_page\": 1}, \"due_date\": {\"value\": \"2026-02-23\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_name\": {\"value\": \"Kestrel Print & Sign\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_address\": {\"value\": \"88 Mill Lane, Leeds LS1 5QR\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_tax_id\": {\"value\": \"GB223344556\", \"confidence\": 0.95, \"source_page\": 1}, \"customer_name\": {\"value\": \"Riverbend Cafe\", \"confidence\": 0.95, \"source_page\": 1}, \"purchase_order_number\": {\"value\": \"PO-7781\", \"confidence\": 0.95, \"source_page\": 1}, \"currency\": {\"value\": \"GBP\", \"confidence\": 0.95, \"source_page\": 1}, \"subtotal\": {\"value\": \"205.00\", \"confidence\": 0.95, \"source_page\": 1}, \"tax\": {\"value\": \"41.00\", \"confidence\": 0.95, \"source_page\": 1}, \"total\": {\"value\": \"246.00\", \"confidence\": 0.95, \"source_page\": 1}, \"line_items\": {\"value\": [{\"description\": \"Hex bolt M8 (box of 100)\", \"quantity\": \"6\", \"unit_price\": \"12.50\", \"amount\": \"75.00\"}, {\"description\": \"Laminated sign, A2\", \"quantity\": \"2\", \"unit_price\": \"65.00\", \"amount\": \"130.00\"}], \"confidence\": 0.95, \"source_page\": 1}}",
+      "fields": {
+        "invoice_number": {
+          "expected": "INV-2026-2201",
+          "extracted": "INV-2026-2201",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "invoice_date": {
+          "expected": "2026-02-09",
+          "extracted": "2026-02-09",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "due_date": {
+          "expected": "2026-02-23",
+          "extracted": "2026-02-23",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_name": {
+          "expected": "Kestrel Print & Sign",
+          "extracted": "Kestrel Print & Sign",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_address": {
+          "expected": "88 Mill Lane, Leeds LS1 5QR",
+          "extracted": "88 Mill Lane, Leeds LS1 5QR",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_tax_id": {
+          "expected": "GB223344556",
+          "extracted": "GB223344556",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "customer_name": {
+          "expected": "Riverbend Cafe",
+          "extracted": "Riverbend Cafe",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "purchase_order_number": {
+          "expected": "PO-7781",
+          "extracted": "PO-7781",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "currency": {
+          "expected": "GBP",
+          "extracted": "GBP",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "subtotal": {
+          "expected": "205.00",
+          "extracted": "205.00",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "tax": {
+          "expected": "41.00",
+          "extracted": "41.00",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "total": {
+          "expected": "246.00",
+          "extracted": "246.00",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "line_items": {
+          "expected": [
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "6",
+              "unit_price": "12.50",
+              "amount": "75.00"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "2",
+              "unit_price": "65.00",
+              "amount": "130.00"
+            }
+          ],
+          "extracted": [
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "6",
+              "unit_price": "12.50",
+              "amount": "75.00"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "2",
+              "unit_price": "65.00",
+              "amount": "130.00"
+            }
+          ],
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        }
+      }
+    },
+    {
+      "document_id": "hard-002",
+      "filename": "hard-002.png",
+      "model": "claude-haiku-4-5-20251001",
+      "prompt_version": "invoice/v1",
+      "input_tokens": 4250,
+      "output_tokens": 474,
+      "cost_usd": "0.006620",
+      "latency_ms": 5201,
+      "error": null,
+      "model_reply": "{\"invoice_number\": {\"value\": \"RE-2026-0457\", \"confidence\": 0.95, \"source_page\": 1}, \"invoice_date\": {\"value\": \"2026-03-04\", \"confidence\": 0.95, \"source_page\": 1}, \"due_date\": {\"value\": \"2026-04-03\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_name\": {\"value\": \"Lindenhof Beratung GmbH\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_address\": {\"value\": \"Goethestrasse 14, 80336 München\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_tax_id\": {\"value\": \"DE811234567\", \"confidence\": 0.95, \"source_page\": 1}, \"customer_name\": {\"value\": \"Tallow Works\", \"confidence\": 0.95, \"source_page\": 1}, \"purchase_order_number\": {\"value\": null, \"confidence\": 0.9, \"source_page\": null}, \"currency\": {\"value\": \"EUR\", \"confidence\": 0.95, \"source_page\": 1}, \"subtotal\": {\"value\": \"1324.50\", \"confidence\": 0.95, \"source_page\": 1}, \"tax\": {\"value\": \"251.66\", \"confidence\": 0.95, \"source_page\": 1}, \"total\": {\"value\": \"1576.16\", \"confidence\": 0.95, \"source_page\": 1}, \"line_items\": {\"value\": [{\"description\": \"Beratung, Stunden\", \"quantity\": \"12\", \"unit_price\": \"95.00\", \"amount\": \"1140.00\"}, {\"description\": \"Reisekosten\", \"quantity\": \"1\", \"unit_price\": \"184.50\", \"amount\": \"184.50\"}], \"confidence\": 0.95, \"source_page\": 1}}",
+      "fields": {
+        "invoice_number": {
+          "expected": "RE-2026-0457",
+          "extracted": "RE-2026-0457",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "invoice_date": {
+          "expected": "2026-03-04",
+          "extracted": "2026-03-04",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "due_date": {
+          "expected": "2026-04-03",
+          "extracted": "2026-04-03",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_name": {
+          "expected": "Lindenhof Beratung GmbH",
+          "extracted": "Lindenhof Beratung GmbH",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_address": {
+          "expected": "Goethestrasse 14, 80336 Munchen",
+          "extracted": "Goethestrasse 14, 80336 München",
+          "correct": false,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_tax_id": {
+          "expected": "DE811234567",
+          "extracted": "DE811234567",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "customer_name": {
+          "expected": "Tallow Works",
+          "extracted": "Tallow Works",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "purchase_order_number": {
+          "expected": null,
+          "extracted": null,
+          "correct": true,
+          "confidence": 0.9,
+          "model_confidence": 0.9,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.9
+            }
+          ],
+          "failed_checks": [],
+          "source_page": null
+        },
+        "currency": {
+          "expected": "EUR",
+          "extracted": "EUR",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "subtotal": {
+          "expected": "1324.50",
+          "extracted": "1324.50",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "tax": {
+          "expected": "251.66",
+          "extracted": "251.66",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "total": {
+          "expected": "1576.16",
+          "extracted": "1576.16",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "line_items": {
+          "expected": [
+            {
+              "description": "Beratung, Stunden",
+              "quantity": "12",
+              "unit_price": "95.00",
+              "amount": "1140.00"
+            },
+            {
+              "description": "Reisekosten",
+              "quantity": "1",
+              "unit_price": "184.50",
+              "amount": "184.50"
+            }
+          ],
+          "extracted": [
+            {
+              "description": "Beratung, Stunden",
+              "quantity": "12",
+              "unit_price": "95.00",
+              "amount": "1140.00"
+            },
+            {
+              "description": "Reisekosten",
+              "quantity": "1",
+              "unit_price": "184.50",
+              "amount": "184.50"
+            }
+          ],
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        }
+      }
+    },
+    {
+      "document_id": "hard-003",
+      "filename": "hard-003.pdf",
+      "model": "claude-haiku-4-5-20251001",
+      "prompt_version": "invoice/v1",
+      "input_tokens": 4263,
+      "output_tokens": 465,
+      "cost_usd": "0.006588",
+      "latency_ms": 5207,
+      "error": null,
+      "model_reply": "{\"invoice_number\": {\"value\": \"INV-A-31207\", \"confidence\": 0.95, \"source_page\": 1}, \"invoice_date\": {\"value\": \"2026-04-03\", \"confidence\": 0.95, \"source_page\": 1}, \"due_date\": {\"value\": \"2026-03-18\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_name\": {\"value\": \"Meridian Logistics SA\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_address\": {\"value\": \"7 Rue Carnot, 69002 Lyon\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_tax_id\": {\"value\": \"FR40123456824\", \"confidence\": 0.95, \"source_page\": 1}, \"customer_name\": {\"value\": \"Corvus Studio\", \"confidence\": 0.95, \"source_page\": 1}, \"purchase_order_number\": {\"value\": \"PO-5519\", \"confidence\": 0.95, \"source_page\": 1}, \"currency\": {\"value\": \"EUR\", \"confidence\": 0.95, \"source_page\": 1}, \"subtotal\": {\"value\": \"378.00\", \"confidence\": 0.95, \"source_page\": 1}, \"tax\": {\"value\": \"79.38\", \"confidence\": 0.95, \"source_page\": 1}, \"total\": {\"value\": \"457.38\", \"confidence\": 0.95, \"source_page\": 1}, \"line_items\": {\"value\": [{\"description\": \"Widget, blue\", \"quantity\": \"9\", \"unit_price\": \"40.00\", \"amount\": \"360.00\"}, {\"description\": \"Courier delivery\", \"quantity\": \"1\", \"unit_price\": \"18.00\", \"amount\": \"18.00\"}], \"confidence\": 0.95, \"source_page\": 1}}",
+      "fields": {
+        "invoice_number": {
+          "expected": "INV-A-31207",
+          "extracted": "INV-A-31207",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "invoice_date": {
+          "expected": "2026-03-04",
+          "extracted": "2026-04-03",
+          "correct": false,
+          "confidence": 0.475,
+          "model_confidence": 0.95,
+          "needs_review": true,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 0.0
+            },
+            {
+              "name": "text_layer",
+              "score": 0.0
+            }
+          ],
+          "failed_checks": [
+            "dates.due_on_or_after_invoice"
+          ],
+          "source_page": 1
+        },
+        "due_date": {
+          "expected": "2026-03-18",
+          "extracted": "2026-03-18",
+          "correct": true,
+          "confidence": 0.475,
+          "model_confidence": 0.95,
+          "needs_review": true,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 0.0
+            },
+            {
+              "name": "text_layer",
+              "score": 0.0
+            }
+          ],
+          "failed_checks": [
+            "dates.due_on_or_after_invoice"
+          ],
+          "source_page": 1
+        },
+        "vendor_name": {
+          "expected": "Meridian Logistics SA",
+          "extracted": "Meridian Logistics SA",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_address": {
+          "expected": "7 Rue Carnot, 69002 Lyon",
+          "extracted": "7 Rue Carnot, 69002 Lyon",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_tax_id": {
+          "expected": "FR40123456824",
+          "extracted": "FR40123456824",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "customer_name": {
+          "expected": "Corvus Studio",
+          "extracted": "Corvus Studio",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "purchase_order_number": {
+          "expected": "PO-5519",
+          "extracted": "PO-5519",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "currency": {
+          "expected": "EUR",
+          "extracted": "EUR",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "subtotal": {
+          "expected": "378.00",
+          "extracted": "378.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "tax": {
+          "expected": "79.38",
+          "extracted": "79.38",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "total": {
+          "expected": "457.38",
+          "extracted": "457.38",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "line_items": {
+          "expected": [
+            {
+              "description": "Widget, blue",
+              "quantity": "9",
+              "unit_price": "40.00",
+              "amount": "360.00"
+            },
+            {
+              "description": "Courier delivery",
+              "quantity": "1",
+              "unit_price": "18.00",
+              "amount": "18.00"
+            }
+          ],
+          "extracted": [
+            {
+              "description": "Widget, blue",
+              "quantity": "9",
+              "unit_price": "40.00",
+              "amount": "360.00"
+            },
+            {
+              "description": "Courier delivery",
+              "quantity": "1",
+              "unit_price": "18.00",
+              "amount": "18.00"
+            }
+          ],
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        }
+      }
+    },
+    {
+      "document_id": "hard-004",
+      "filename": "hard-004.pdf",
+      "model": "claude-haiku-4-5-20251001",
+      "prompt_version": "invoice/v1",
+      "input_tokens": 4263,
+      "output_tokens": 467,
+      "cost_usd": "0.006598",
+      "latency_ms": 5544,
+      "error": null,
+      "model_reply": "{\"invoice_number\": {\"value\": \"CN-2026-0098\", \"confidence\": 0.95, \"source_page\": 1}, \"invoice_date\": {\"value\": \"2026-01-27\", \"confidence\": 0.95, \"source_page\": 1}, \"due_date\": {\"value\": \"2026-02-10\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_name\": {\"value\": \"Northwind Trading Ltd\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_address\": {\"value\": \"4 Dock Road, Bristol BS1 4RN\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_tax_id\": {\"value\": \"GB987654321\", \"confidence\": 0.95, \"source_page\": 1}, \"customer_name\": {\"value\": \"Beta Ltd\", \"confidence\": 0.95, \"source_page\": 1}, \"purchase_order_number\": {\"value\": \"PO-6120\", \"confidence\": 0.95, \"source_page\": 1}, \"currency\": {\"value\": \"GBP\", \"confidence\": 0.95, \"source_page\": 1}, \"subtotal\": {\"value\": \"-185.00\", \"confidence\": 0.95, \"source_page\": 1}, \"tax\": {\"value\": \"-37.00\", \"confidence\": 0.95, \"source_page\": 1}, \"total\": {\"value\": \"-222.00\", \"confidence\": 0.95, \"source_page\": 1}, \"line_items\": {\"value\": [{\"description\": \"Widget, red\", \"quantity\": \"-3\", \"unit_price\": \"40.00\", \"amount\": \"-120.00\"}, {\"description\": \"Laminated sign, A2\", \"quantity\": \"-1\", \"unit_price\": \"65.00\", \"amount\": \"-65.00\"}], \"confidence\": 0.95, \"source_page\": 1}}",
+      "fields": {
+        "invoice_number": {
+          "expected": "CN-2026-0098",
+          "extracted": "CN-2026-0098",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "invoice_date": {
+          "expected": "2026-01-27",
+          "extracted": "2026-01-27",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "due_date": {
+          "expected": "2026-02-10",
+          "extracted": "2026-02-10",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_name": {
+          "expected": "Northwind Trading Ltd",
+          "extracted": "Northwind Trading Ltd",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_address": {
+          "expected": "4 Dock Road, Bristol BS1 4RN",
+          "extracted": "4 Dock Road, Bristol BS1 4RN",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_tax_id": {
+          "expected": "GB987654321",
+          "extracted": "GB987654321",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "customer_name": {
+          "expected": "Beta Ltd",
+          "extracted": "Beta Ltd",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "purchase_order_number": {
+          "expected": "PO-6120",
+          "extracted": "PO-6120",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "currency": {
+          "expected": "GBP",
+          "extracted": "GBP",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "subtotal": {
+          "expected": "-185.00",
+          "extracted": "-185.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "tax": {
+          "expected": "-37.00",
+          "extracted": "-37.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "total": {
+          "expected": "-222.00",
+          "extracted": "-222.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "line_items": {
+          "expected": [
+            {
+              "description": "Widget, red",
+              "quantity": "-3",
+              "unit_price": "40.00",
+              "amount": "-120.00"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "-1",
+              "unit_price": "65.00",
+              "amount": "-65.00"
+            }
+          ],
+          "extracted": [
+            {
+              "description": "Widget, red",
+              "quantity": "-3",
+              "unit_price": "40.00",
+              "amount": "-120.00"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "-1",
+              "unit_price": "65.00",
+              "amount": "-65.00"
+            }
+          ],
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        }
+      }
+    },
+    {
+      "document_id": "hard-005",
+      "filename": "hard-005.jpg",
+      "model": "claude-haiku-4-5-20251001",
+      "prompt_version": "invoice/v1",
+      "input_tokens": 4263,
+      "output_tokens": 513,
+      "cost_usd": "0.006828",
+      "latency_ms": 5947,
+      "error": null,
+      "model_reply": "{\"invoice_number\": {\"value\": \"INV-2026-3340\", \"confidence\": 0.95, \"source_page\": 1}, \"invoice_date\": {\"value\": \"2026-05-18\", \"confidence\": 0.95, \"source_page\": 1}, \"due_date\": {\"value\": \"2026-06-01\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_name\": {\"value\": \"Bluegrass Hardware Inc\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_address\": {\"value\": \"900 Sycamore St, Austin TX 78701\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_tax_id\": {\"value\": \"US45-6789012\", \"confidence\": 0.95, \"source_page\": 1}, \"customer_name\": {\"value\": \"Hollis & Dane LLP\", \"confidence\": 0.95, \"source_page\": 1}, \"purchase_order_number\": {\"value\": \"PO-9902\", \"confidence\": 0.95, \"source_page\": 1}, \"currency\": {\"value\": \"USD\", \"confidence\": 0.95, \"source_page\": 1}, \"subtotal\": {\"value\": \"215.50\", \"confidence\": 0.95, \"source_page\": 1}, \"tax\": {\"value\": \"17.24\", \"confidence\": 0.95, \"source_page\": 1}, \"total\": {\"value\": \"232.74\", \"confidence\": 0.95, \"source_page\": 1}, \"line_items\": {\"value\": [{\"description\": \"Widget, blue\", \"quantity\": \"4\", \"unit_price\": \"40.00\", \"amount\": \"160.00\"}, {\"description\": \"Hex bolt M8 (box of 100)\", \"quantity\": \"3\", \"unit_price\": \"12.50\", \"amount\": \"37.50\"}, {\"description\": \"Courier delivery\", \"quantity\": \"1\", \"unit_price\": \"18.00\", \"amount\": \"18.00\"}], \"confidence\": 0.95, \"source_page\": 1}}",
+      "fields": {
+        "invoice_number": {
+          "expected": "INV-2026-3340",
+          "extracted": "INV-2026-3340",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "invoice_date": {
+          "expected": "2026-05-18",
+          "extracted": "2026-05-18",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "due_date": {
+          "expected": "2026-06-01",
+          "extracted": "2026-06-01",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_name": {
+          "expected": "Bluegrass Hardware Inc",
+          "extracted": "Bluegrass Hardware Inc",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_address": {
+          "expected": "900 Sycamore St, Austin TX 78701",
+          "extracted": "900 Sycamore St, Austin TX 78701",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_tax_id": {
+          "expected": "US45-6789012",
+          "extracted": "US45-6789012",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "customer_name": {
+          "expected": "Hollis & Dane LLP",
+          "extracted": "Hollis & Dane LLP",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "purchase_order_number": {
+          "expected": "PO-9902",
+          "extracted": "PO-9902",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "currency": {
+          "expected": "USD",
+          "extracted": "USD",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "subtotal": {
+          "expected": "215.50",
+          "extracted": "215.50",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "tax": {
+          "expected": "17.24",
+          "extracted": "17.24",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "total": {
+          "expected": "232.74",
+          "extracted": "232.74",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "line_items": {
+          "expected": [
+            {
+              "description": "Widget, blue",
+              "quantity": "4",
+              "unit_price": "40.00",
+              "amount": "160.00"
+            },
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "3",
+              "unit_price": "12.50",
+              "amount": "37.50"
+            },
+            {
+              "description": "Courier delivery",
+              "quantity": "1",
+              "unit_price": "18.00",
+              "amount": "18.00"
+            }
+          ],
+          "extracted": [
+            {
+              "description": "Widget, blue",
+              "quantity": "4",
+              "unit_price": "40.00",
+              "amount": "160.00"
+            },
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "3",
+              "unit_price": "12.50",
+              "amount": "37.50"
+            },
+            {
+              "description": "Courier delivery",
+              "quantity": "1",
+              "unit_price": "18.00",
+              "amount": "18.00"
+            }
+          ],
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        }
+      }
+    },
+    {
+      "document_id": "hard-006",
+      "filename": "hard-006.pdf",
+      "model": "claude-haiku-4-5-20251001",
+      "prompt_version": "invoice/v1",
+      "input_tokens": 5830,
+      "output_tokens": 692,
+      "cost_usd": "0.009290",
+      "latency_ms": 7014,
+      "error": null,
+      "model_reply": "{\"invoice_number\": {\"value\": \"INV-2026-4412\", \"confidence\": 0.95, \"source_page\": 1}, \"invoice_date\": {\"value\": \"2026-06-30\", \"confidence\": 0.95, \"source_page\": 1}, \"due_date\": {\"value\": \"2026-07-30\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_name\": {\"value\": \"Acme Supplies BV\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_address\": {\"value\": \"12 Kade, 1011 AB Amsterdam\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_tax_id\": {\"value\": \"NL123456789B01\", \"confidence\": 0.95, \"source_page\": 1}, \"customer_name\": {\"value\": \"Corvus Studio\", \"confidence\": 0.95, \"source_page\": 1}, \"purchase_order_number\": {\"value\": \"PO-8873\", \"confidence\": 0.95, \"source_page\": 1}, \"currency\": {\"value\": \"EUR\", \"confidence\": 0.95, \"source_page\": 2}, \"subtotal\": {\"value\": \"1563.50\", \"confidence\": 0.95, \"source_page\": 2}, \"tax\": {\"value\": \"328.34\", \"confidence\": 0.95, \"source_page\": 2}, \"total\": {\"value\": \"1891.84\", \"confidence\": 0.95, \"source_page\": 2}, \"line_items\": {\"value\": [{\"description\": \"Widget, blue\", \"quantity\": \"10\", \"unit_price\": \"40.00\", \"amount\": \"400.00\"}, {\"description\": \"Widget, red\", \"quantity\": \"5\", \"unit_price\": \"40.00\", \"amount\": \"200.00\"}, {\"description\": \"Hex bolt M8 (box of 100)\", \"quantity\": \"20\", \"unit_price\": \"12.50\", \"amount\": \"250.00\"}, {\"description\": \"Courier delivery\", \"quantity\": \"2\", \"unit_price\": \"18.00\", \"amount\": \"36.00\"}, {\"description\": \"Laminated sign, A2\", \"quantity\": \"3\", \"unit_price\": \"65.00\", \"amount\": \"195.00\"}, {\"description\": \"Widget, blue\", \"quantity\": \"7\", \"unit_price\": \"40.00\", \"amount\": \"280.00\"}, {\"description\": \"Hex bolt M8 (box of 100)\", \"quantity\": \"11\", \"unit_price\": \"12.50\", \"amount\": \"137.50\"}, {\"description\": \"Laminated sign, A2\", \"quantity\": \"1\", \"unit_price\": \"65.00\", \"amount\": \"65.00\"}], \"confidence\": 0.95, \"source_page\": 2}}",
+      "fields": {
+        "invoice_number": {
+          "expected": "INV-2026-4412",
+          "extracted": "INV-2026-4412",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "invoice_date": {
+          "expected": "2026-06-30",
+          "extracted": "2026-06-30",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "due_date": {
+          "expected": "2026-07-30",
+          "extracted": "2026-07-30",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_name": {
+          "expected": "Acme Supplies BV",
+          "extracted": "Acme Supplies BV",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_address": {
+          "expected": "12 Kade, 1011 AB Amsterdam",
+          "extracted": "12 Kade, 1011 AB Amsterdam",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_tax_id": {
+          "expected": "NL123456789B01",
+          "extracted": "NL123456789B01",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "customer_name": {
+          "expected": "Corvus Studio",
+          "extracted": "Corvus Studio",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "purchase_order_number": {
+          "expected": "PO-8873",
+          "extracted": "PO-8873",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "currency": {
+          "expected": "EUR",
+          "extracted": "EUR",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "subtotal": {
+          "expected": "1563.50",
+          "extracted": "1563.50",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "tax": {
+          "expected": "328.34",
+          "extracted": "328.34",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "total": {
+          "expected": "1891.84",
+          "extracted": "1891.84",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        },
+        "line_items": {
+          "expected": [
+            {
+              "description": "Widget, blue",
+              "quantity": "10",
+              "unit_price": "40.00",
+              "amount": "400.00"
+            },
+            {
+              "description": "Widget, red",
+              "quantity": "5",
+              "unit_price": "40.00",
+              "amount": "200.00"
+            },
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "20",
+              "unit_price": "12.50",
+              "amount": "250.00"
+            },
+            {
+              "description": "Courier delivery",
+              "quantity": "2",
+              "unit_price": "18.00",
+              "amount": "36.00"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "3",
+              "unit_price": "65.00",
+              "amount": "195.00"
+            },
+            {
+              "description": "Widget, blue",
+              "quantity": "7",
+              "unit_price": "40.00",
+              "amount": "280.00"
+            },
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "11",
+              "unit_price": "12.50",
+              "amount": "137.50"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "1",
+              "unit_price": "65.00",
+              "amount": "65.00"
+            }
+          ],
+          "extracted": [
+            {
+              "description": "Widget, blue",
+              "quantity": "10",
+              "unit_price": "40.00",
+              "amount": "400.00"
+            },
+            {
+              "description": "Widget, red",
+              "quantity": "5",
+              "unit_price": "40.00",
+              "amount": "200.00"
+            },
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "20",
+              "unit_price": "12.50",
+              "amount": "250.00"
+            },
+            {
+              "description": "Courier delivery",
+              "quantity": "2",
+              "unit_price": "18.00",
+              "amount": "36.00"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "3",
+              "unit_price": "65.00",
+              "amount": "195.00"
+            },
+            {
+              "description": "Widget, blue",
+              "quantity": "7",
+              "unit_price": "40.00",
+              "amount": "280.00"
+            },
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "11",
+              "unit_price": "12.50",
+              "amount": "137.50"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "1",
+              "unit_price": "65.00",
+              "amount": "65.00"
+            }
+          ],
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 2
+        }
+      }
+    },
+    {
+      "document_id": "hard-007",
+      "filename": "hard-007.pdf",
+      "model": "claude-haiku-4-5-20251001",
+      "prompt_version": "invoice/v1",
+      "input_tokens": 4263,
+      "output_tokens": 505,
+      "cost_usd": "0.006788",
+      "latency_ms": 6548,
+      "error": null,
+      "model_reply": "{\"invoice_number\": {\"value\": \"INV-77-0192\", \"confidence\": 0.99, \"source_page\": 1}, \"invoice_date\": {\"value\": \"2026-07-14\", \"confidence\": 0.99, \"source_page\": 1}, \"due_date\": {\"value\": \"2026-08-13\", \"confidence\": 0.99, \"source_page\": 1}, \"vendor_name\": {\"value\": \"Kestrel Print & Sign\", \"confidence\": 0.99, \"source_page\": 1}, \"vendor_address\": {\"value\": \"88 Mill Lane, Leeds LS1 5QR\", \"confidence\": 0.99, \"source_page\": 1}, \"vendor_tax_id\": {\"value\": \"GB223344556\", \"confidence\": 0.99, \"source_page\": 1}, \"customer_name\": {\"value\": \"Tallow Works\", \"confidence\": 0.99, \"source_page\": 1}, \"purchase_order_number\": {\"value\": \"PO-3358\", \"confidence\": 0.99, \"source_page\": 1}, \"currency\": {\"value\": \"GBP\", \"confidence\": 0.99, \"source_page\": 1}, \"subtotal\": {\"value\": \"652.00\", \"confidence\": 0.99, \"source_page\": 1}, \"tax\": {\"value\": \"130.40\", \"confidence\": 0.99, \"source_page\": 1}, \"total\": {\"value\": \"782.40\", \"confidence\": 0.99, \"source_page\": 1}, \"line_items\": {\"value\": [{\"description\": \"Widget, red\", \"quantity\": \"12\", \"unit_price\": \"40.00\", \"amount\": \"480.00\"}, {\"description\": \"Laminated sign, A2\", \"quantity\": \"2\", \"unit_price\": \"65.00\", \"amount\": \"130.00\"}, {\"description\": \"Freight and handling\", \"quantity\": \"1\", \"unit_price\": \"42.00\", \"amount\": \"42.00\"}], \"confidence\": 0.99, \"source_page\": 1}}",
+      "fields": {
+        "invoice_number": {
+          "expected": "INV-77-0192",
+          "extracted": "INV-77-0192",
+          "correct": true,
+          "confidence": 0.995,
+          "model_confidence": 0.99,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.99
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "invoice_date": {
+          "expected": "2026-07-14",
+          "extracted": "2026-07-14",
+          "correct": true,
+          "confidence": 0.995,
+          "model_confidence": 0.99,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.99
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "due_date": {
+          "expected": "2026-08-13",
+          "extracted": "2026-08-13",
+          "correct": true,
+          "confidence": 0.995,
+          "model_confidence": 0.99,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.99
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_name": {
+          "expected": "Kestrel Print & Sign",
+          "extracted": "Kestrel Print & Sign",
+          "correct": true,
+          "confidence": 0.995,
+          "model_confidence": 0.99,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.99
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_address": {
+          "expected": "88 Mill Lane, Leeds LS1 5QR",
+          "extracted": "88 Mill Lane, Leeds LS1 5QR",
+          "correct": true,
+          "confidence": 0.9933333333333333,
+          "model_confidence": 0.99,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.99
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_tax_id": {
+          "expected": "GB223344556",
+          "extracted": "GB223344556",
+          "correct": true,
+          "confidence": 0.9933333333333333,
+          "model_confidence": 0.99,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.99
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "customer_name": {
+          "expected": "Tallow Works",
+          "extracted": "Tallow Works",
+          "correct": true,
+          "confidence": 0.9933333333333333,
+          "model_confidence": 0.99,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.99
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "purchase_order_number": {
+          "expected": "PO-3358",
+          "extracted": "PO-3358",
+          "correct": true,
+          "confidence": 0.9933333333333333,
+          "model_confidence": 0.99,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.99
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "currency": {
+          "expected": "GBP",
+          "extracted": "GBP",
+          "correct": true,
+          "confidence": 0.995,
+          "model_confidence": 0.99,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.99
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "subtotal": {
+          "expected": "652.00",
+          "extracted": "652.00",
+          "correct": true,
+          "confidence": 0.995,
+          "model_confidence": 0.99,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.99
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "tax": {
+          "expected": "130.40",
+          "extracted": "130.40",
+          "correct": true,
+          "confidence": 0.995,
+          "model_confidence": 0.99,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.99
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "total": {
+          "expected": "782.40",
+          "extracted": "782.40",
+          "correct": true,
+          "confidence": 0.995,
+          "model_confidence": 0.99,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.99
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "line_items": {
+          "expected": [
+            {
+              "description": "Widget, red",
+              "quantity": "12",
+              "unit_price": "40.00",
+              "amount": "480.00"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "2",
+              "unit_price": "65.00",
+              "amount": "130.00"
+            },
+            {
+              "description": "Freight and handling",
+              "quantity": "1",
+              "unit_price": "42.00",
+              "amount": "42.00"
+            }
+          ],
+          "extracted": [
+            {
+              "description": "Widget, red",
+              "quantity": "12",
+              "unit_price": "40.00",
+              "amount": "480.00"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "2",
+              "unit_price": "65.00",
+              "amount": "130.00"
+            },
+            {
+              "description": "Freight and handling",
+              "quantity": "1",
+              "unit_price": "42.00",
+              "amount": "42.00"
+            }
+          ],
+          "correct": true,
+          "confidence": 0.9933333333333333,
+          "model_confidence": 0.99,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.99
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        }
+      }
+    },
+    {
+      "document_id": "hard-008",
+      "filename": "hard-008.png",
+      "model": "claude-haiku-4-5-20251001",
+      "prompt_version": "invoice/v1",
+      "input_tokens": 4250,
+      "output_tokens": 474,
+      "cost_usd": "0.006620",
+      "latency_ms": 5488,
+      "error": null,
+      "model_reply": "{\"invoice_number\": {\"value\": \"9-208841\", \"confidence\": 0.95, \"source_page\": 1}, \"invoice_date\": {\"value\": \"2026-08-21\", \"confidence\": 0.95, \"source_page\": 1}, \"due_date\": {\"value\": \"2026-09-20\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_name\": {\"value\": \"Meridian Logistics SA\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_address\": {\"value\": \"7 Rue Carnot, 69002 Lyon\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_tax_id\": {\"value\": \"FR4012345682 4\", \"confidence\": 0.85, \"source_page\": 1}, \"customer_name\": {\"value\": \"Riverbend Cafe\", \"confidence\": 0.95, \"source_page\": 1}, \"purchase_order_number\": {\"value\": \"PO-1042\", \"confidence\": 0.95, \"source_page\": 1}, \"currency\": {\"value\": \"EUR\", \"confidence\": 0.95, \"source_page\": 1}, \"subtotal\": {\"value\": \"387.50\", \"confidence\": 0.95, \"source_page\": 1}, \"tax\": {\"value\": \"38.75\", \"confidence\": 0.95, \"source_page\": 1}, \"total\": {\"value\": \"426.25\", \"confidence\": 0.95, \"source_page\": 1}, \"line_items\": {\"value\": [{\"description\": \"Hex bolt M8 (box of 100)\", \"quantity\": \"15\", \"unit_price\": \"12.50\", \"amount\": \"187.50\"}, {\"description\": \"Widget, blue\", \"quantity\": \"5\", \"unit_price\": \"40.00\", \"amount\": \"200.00\"}], \"confidence\": 0.95, \"source_page\": 1}}",
+      "fields": {
+        "invoice_number": {
+          "expected": "9-208841",
+          "extracted": "9-208841",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "invoice_date": {
+          "expected": "2026-08-21",
+          "extracted": "2026-08-21",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "due_date": {
+          "expected": "2026-09-20",
+          "extracted": "2026-09-20",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_name": {
+          "expected": "Meridian Logistics SA",
+          "extracted": "Meridian Logistics SA",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_address": {
+          "expected": "7 Rue Carnot, 69002 Lyon",
+          "extracted": "7 Rue Carnot, 69002 Lyon",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_tax_id": {
+          "expected": "FR40123456824",
+          "extracted": "FR4012345682 4",
+          "correct": false,
+          "confidence": 0.85,
+          "model_confidence": 0.85,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.85
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "customer_name": {
+          "expected": "Riverbend Cafe",
+          "extracted": "Riverbend Cafe",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "purchase_order_number": {
+          "expected": "PO-1042",
+          "extracted": "PO-1042",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "currency": {
+          "expected": "EUR",
+          "extracted": "EUR",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "subtotal": {
+          "expected": "387.50",
+          "extracted": "387.50",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "tax": {
+          "expected": "38.75",
+          "extracted": "38.75",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "total": {
+          "expected": "426.25",
+          "extracted": "426.25",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "line_items": {
+          "expected": [
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "15",
+              "unit_price": "12.50",
+              "amount": "187.50"
+            },
+            {
+              "description": "Widget, blue",
+              "quantity": "5",
+              "unit_price": "40.00",
+              "amount": "200.00"
+            }
+          ],
+          "extracted": [
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "15",
+              "unit_price": "12.50",
+              "amount": "187.50"
+            },
+            {
+              "description": "Widget, blue",
+              "quantity": "5",
+              "unit_price": "40.00",
+              "amount": "200.00"
+            }
+          ],
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        }
+      }
+    },
+    {
+      "document_id": "hard-009",
+      "filename": "hard-009.pdf",
+      "model": "claude-haiku-4-5-20251001",
+      "prompt_version": "invoice/v1",
+      "input_tokens": 4263,
+      "output_tokens": 453,
+      "cost_usd": "0.006528",
+      "latency_ms": 5348,
+      "error": null,
+      "model_reply": "{\"invoice_number\": {\"value\": \"INV-2026-5005\", \"confidence\": 0.95, \"source_page\": 1}, \"invoice_date\": {\"value\": \"2026-09-02\", \"confidence\": 0.95, \"source_page\": 1}, \"due_date\": {\"value\": null, \"confidence\": 0.9, \"source_page\": 1}, \"vendor_name\": {\"value\": \"Northwind Trading Ltd\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_address\": {\"value\": \"4 Dock Road, Bristol BS1 4RN\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_tax_id\": {\"value\": null, \"confidence\": 0.85, \"source_page\": null}, \"customer_name\": {\"value\": \"Hollis & Dane LLP\", \"confidence\": 0.95, \"source_page\": 1}, \"purchase_order_number\": {\"value\": null, \"confidence\": 0.85, \"source_page\": null}, \"currency\": {\"value\": \"GBP\", \"confidence\": 0.95, \"source_page\": 1}, \"subtotal\": {\"value\": \"258.00\", \"confidence\": 0.95, \"source_page\": 1}, \"tax\": {\"value\": \"0.00\", \"confidence\": 0.95, \"source_page\": 1}, \"total\": {\"value\": \"258.00\", \"confidence\": 0.95, \"source_page\": 1}, \"line_items\": {\"value\": [{\"description\": \"Widget, blue\", \"quantity\": \"6\", \"unit_price\": \"40.00\", \"amount\": \"240.00\"}, {\"description\": \"Courier delivery\", \"quantity\": \"1\", \"unit_price\": \"18.00\", \"amount\": \"18.00\"}], \"confidence\": 0.95, \"source_page\": 1}}",
+      "fields": {
+        "invoice_number": {
+          "expected": "INV-2026-5005",
+          "extracted": "INV-2026-5005",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "invoice_date": {
+          "expected": "2026-09-02",
+          "extracted": "2026-09-02",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "due_date": {
+          "expected": null,
+          "extracted": null,
+          "correct": true,
+          "confidence": 0.9,
+          "model_confidence": 0.9,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.9
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_name": {
+          "expected": "Northwind Trading Ltd",
+          "extracted": "Northwind Trading Ltd",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_address": {
+          "expected": "4 Dock Road, Bristol BS1 4RN",
+          "extracted": "4 Dock Road, Bristol BS1 4RN",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_tax_id": {
+          "expected": null,
+          "extracted": null,
+          "correct": true,
+          "confidence": 0.85,
+          "model_confidence": 0.85,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.85
+            }
+          ],
+          "failed_checks": [],
+          "source_page": null
+        },
+        "customer_name": {
+          "expected": "Hollis & Dane LLP",
+          "extracted": "Hollis & Dane LLP",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "purchase_order_number": {
+          "expected": null,
+          "extracted": null,
+          "correct": true,
+          "confidence": 0.85,
+          "model_confidence": 0.85,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.85
+            }
+          ],
+          "failed_checks": [],
+          "source_page": null
+        },
+        "currency": {
+          "expected": "GBP",
+          "extracted": "GBP",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "subtotal": {
+          "expected": "258.00",
+          "extracted": "258.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "tax": {
+          "expected": "0.00",
+          "extracted": "0.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "total": {
+          "expected": "258.00",
+          "extracted": "258.00",
+          "correct": true,
+          "confidence": 0.975,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            },
+            {
+              "name": "text_layer",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "line_items": {
+          "expected": [
+            {
+              "description": "Widget, blue",
+              "quantity": "6",
+              "unit_price": "40.00",
+              "amount": "240.00"
+            },
+            {
+              "description": "Courier delivery",
+              "quantity": "1",
+              "unit_price": "18.00",
+              "amount": "18.00"
+            }
+          ],
+          "extracted": [
+            {
+              "description": "Widget, blue",
+              "quantity": "6",
+              "unit_price": "40.00",
+              "amount": "240.00"
+            },
+            {
+              "description": "Courier delivery",
+              "quantity": "1",
+              "unit_price": "18.00",
+              "amount": "18.00"
+            }
+          ],
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        }
+      }
+    },
+    {
+      "document_id": "hard-010",
+      "filename": "hard-010.png",
+      "model": "claude-haiku-4-5-20251001",
+      "prompt_version": "invoice/v1",
+      "input_tokens": 4250,
+      "output_tokens": 511,
+      "cost_usd": "0.006805",
+      "latency_ms": 6713,
+      "error": null,
+      "model_reply": "{\"invoice_number\": {\"value\": \"INV-2026-6120\", \"confidence\": 0.95, \"source_page\": 1}, \"invoice_date\": {\"value\": \"2026-10-05\", \"confidence\": 0.95, \"source_page\": 1}, \"due_date\": {\"value\": \"2026-11-04\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_name\": {\"value\": \"Acme Supplies BV\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_address\": {\"value\": \"12 Kade, 1011 AB Amsterdam\", \"confidence\": 0.95, \"source_page\": 1}, \"vendor_tax_id\": {\"value\": \"NL123456789B01\", \"confidence\": 0.95, \"source_page\": 1}, \"customer_name\": {\"value\": \"Beta Ltd\", \"confidence\": 0.95, \"source_page\": 1}, \"purchase_order_number\": {\"value\": \"PO-2210\", \"confidence\": 0.95, \"source_page\": 1}, \"currency\": {\"value\": \"EUR\", \"confidence\": 0.95, \"source_page\": 1}, \"subtotal\": {\"value\": \"435.00\", \"confidence\": 0.95, \"source_page\": 1}, \"tax\": {\"value\": \"91.35\", \"confidence\": 0.95, \"source_page\": 1}, \"total\": {\"value\": \"526.35\", \"confidence\": 0.95, \"source_page\": 1}, \"line_items\": {\"value\": [{\"description\": \"Widget, red\", \"quantity\": \"8\", \"unit_price\": \"40.00\", \"amount\": \"320.00\"}, {\"description\": \"Hex bolt M8 (box of 100)\", \"quantity\": \"4\", \"unit_price\": \"12.50\", \"amount\": \"50.00\"}, {\"description\": \"Laminated sign, A2\", \"quantity\": \"1\", \"unit_price\": \"65.00\", \"amount\": \"65.00\"}], \"confidence\": 0.95, \"source_page\": 1}}",
+      "fields": {
+        "invoice_number": {
+          "expected": "INV-2026-6120",
+          "extracted": "INV-2026-6120",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "invoice_date": {
+          "expected": "2026-10-05",
+          "extracted": "2026-10-05",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "due_date": {
+          "expected": "2026-11-04",
+          "extracted": "2026-11-04",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_name": {
+          "expected": "Acme Supplies BV",
+          "extracted": "Acme Supplies BV",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_address": {
+          "expected": "12 Kade, 1011 AB Amsterdam",
+          "extracted": "12 Kade, 1011 AB Amsterdam",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "vendor_tax_id": {
+          "expected": "NL123456789B01",
+          "extracted": "NL123456789B01",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "customer_name": {
+          "expected": "Beta Ltd",
+          "extracted": "Beta Ltd",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "purchase_order_number": {
+          "expected": "PO-2210",
+          "extracted": "PO-2210",
+          "correct": true,
+          "confidence": 0.95,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "currency": {
+          "expected": "EUR",
+          "extracted": "EUR",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "schema",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "subtotal": {
+          "expected": "435.00",
+          "extracted": "435.00",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "tax": {
+          "expected": "91.35",
+          "extracted": "91.35",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "total": {
+          "expected": "526.35",
+          "extracted": "526.35",
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        },
+        "line_items": {
+          "expected": [
+            {
+              "description": "Widget, red",
+              "quantity": "8",
+              "unit_price": "40.00",
+              "amount": "320.00"
+            },
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "4",
+              "unit_price": "12.50",
+              "amount": "50.00"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "1",
+              "unit_price": "65.00",
+              "amount": "65.00"
+            }
+          ],
+          "extracted": [
+            {
+              "description": "Widget, red",
+              "quantity": "8",
+              "unit_price": "40.00",
+              "amount": "320.00"
+            },
+            {
+              "description": "Hex bolt M8 (box of 100)",
+              "quantity": "4",
+              "unit_price": "12.50",
+              "amount": "50.00"
+            },
+            {
+              "description": "Laminated sign, A2",
+              "quantity": "1",
+              "unit_price": "65.00",
+              "amount": "65.00"
+            }
+          ],
+          "correct": true,
+          "confidence": 0.9666666666666667,
+          "model_confidence": 0.95,
+          "needs_review": false,
+          "signals": [
+            {
+              "name": "model",
+              "score": 0.95
+            },
+            {
+              "name": "arithmetic",
+              "score": 1.0
+            }
+          ],
+          "failed_checks": [],
+          "source_page": 1
+        }
+      }
+    }
+  ]
+}

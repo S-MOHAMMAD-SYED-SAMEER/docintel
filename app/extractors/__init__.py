@@ -24,7 +24,7 @@ _EXTRACTORS: dict[str, Extractor] = {
 }
 
 
-# The invoice prompt versions, chosen by `DOCINTEL_INVOICE_PROMPT_VERSION` (default invoice/v1).
+# The invoice prompt versions, chosen by `DOCINTEL_INVOICE_PROMPT_VERSION` (default invoice/v2).
 _INVOICE_PROMPTS: dict[str, Extractor] = {
     extractor.prompt_version: extractor for extractor in (InvoiceExtractor(), InvoiceExtractorV2())
 }

@@ -1,0 +1,520 @@
+{
+  "request_cap": 80,
+  "cost_cap_usd": "2.00",
+  "requests_used": 64,
+  "cost_usd_total": "0.505365",
+  "entries": [
+    {
+      "at": "2026-10-21T07:36:04+00:00",
+      "label": "evals",
+      "cost_usd": "0.008160",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 466
+    },
+    {
+      "at": "2026-10-21T08:04:33+00:00",
+      "label": "evals",
+      "cost_usd": "0.008160",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 466
+    },
+    {
+      "at": "2026-10-21T08:04:39+00:00",
+      "label": "evals",
+      "cost_usd": "0.008365",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 507
+    },
+    {
+      "at": "2026-10-21T08:04:45+00:00",
+      "label": "evals",
+      "cost_usd": "0.008200",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 474
+    },
+    {
+      "at": "2026-10-21T08:04:50+00:00",
+      "label": "evals",
+      "cost_usd": "0.008380",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 510
+    },
+    {
+      "at": "2026-10-21T08:04:56+00:00",
+      "label": "evals",
+      "cost_usd": "0.008195",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 473
+    },
+    {
+      "at": "2026-10-21T08:05:02+00:00",
+      "label": "evals",
+      "cost_usd": "0.008335",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 501
+    },
+    {
+      "at": "2026-10-21T08:05:07+00:00",
+      "label": "evals",
+      "cost_usd": "0.008180",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 470
+    },
+    {
+      "at": "2026-10-21T08:05:13+00:00",
+      "label": "evals",
+      "cost_usd": "0.008395",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 513
+    },
+    {
+      "at": "2026-10-21T08:05:19+00:00",
+      "label": "evals",
+      "cost_usd": "0.008190",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 472
+    },
+    {
+      "at": "2026-10-21T08:05:24+00:00",
+      "label": "evals",
+      "cost_usd": "0.008385",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 511
+    },
+    {
+      "at": "2026-10-21T08:05:30+00:00",
+      "label": "evals",
+      "cost_usd": "0.008180",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 470
+    },
+    {
+      "at": "2026-10-21T08:05:36+00:00",
+      "label": "evals",
+      "cost_usd": "0.008345",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 503
+    },
+    {
+      "at": "2026-10-21T08:05:42+00:00",
+      "label": "evals",
+      "cost_usd": "0.008220",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 478
+    },
+    {
+      "at": "2026-10-21T08:05:47+00:00",
+      "label": "evals",
+      "cost_usd": "0.008365",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 507
+    },
+    {
+      "at": "2026-10-21T08:05:53+00:00",
+      "label": "evals",
+      "cost_usd": "0.008140",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 462
+    },
+    {
+      "at": "2026-10-21T08:05:59+00:00",
+      "label": "evals",
+      "cost_usd": "0.008365",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 507
+    },
+    {
+      "at": "2026-10-21T08:06:05+00:00",
+      "label": "evals",
+      "cost_usd": "0.008200",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 474
+    },
+    {
+      "at": "2026-10-21T08:06:10+00:00",
+      "label": "evals",
+      "cost_usd": "0.008355",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 505
+    },
+    {
+      "at": "2026-10-21T08:06:16+00:00",
+      "label": "evals",
+      "cost_usd": "0.008210",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 476
+    },
+    {
+      "at": "2026-10-21T08:06:22+00:00",
+      "label": "evals",
+      "cost_usd": "0.008355",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 505
+    },
+    {
+      "at": "2026-10-21T08:06:45+00:00",
+      "label": "evals",
+      "cost_usd": "0.006673",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4263,
+      "output_tokens": 482
+    },
+    {
+      "at": "2026-10-21T08:06:52+00:00",
+      "label": "evals",
+      "cost_usd": "0.006620",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4250,
+      "output_tokens": 474
+    },
+    {
+      "at": "2026-10-21T08:06:57+00:00",
+      "label": "evals",
+      "cost_usd": "0.006588",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4263,
+      "output_tokens": 465
+    },
+    {
+      "at": "2026-10-21T08:07:03+00:00",
+      "label": "evals",
+      "cost_usd": "0.006598",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4263,
+      "output_tokens": 467
+    },
+    {
+      "at": "2026-10-21T08:07:08+00:00",
+      "label": "evals",
+      "cost_usd": "0.006828",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4263,
+      "output_tokens": 513
+    },
+    {
+      "at": "2026-10-21T08:07:15+00:00",
+      "label": "evals",
+      "cost_usd": "0.009290",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5830,
+      "output_tokens": 692
+    },
+    {
+      "at": "2026-10-21T08:07:22+00:00",
+      "label": "evals",
+      "cost_usd": "0.006788",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4263,
+      "output_tokens": 505
+    },
+    {
+      "at": "2026-10-21T08:07:28+00:00",
+      "label": "evals",
+      "cost_usd": "0.006620",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4250,
+      "output_tokens": 474
+    },
+    {
+      "at": "2026-10-21T08:07:34+00:00",
+      "label": "evals",
+      "cost_usd": "0.006528",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4263,
+      "output_tokens": 453
+    },
+    {
+      "at": "2026-10-21T08:07:40+00:00",
+      "label": "evals",
+      "cost_usd": "0.006805",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4250,
+      "output_tokens": 511
+    },
+    {
+      "at": "2026-10-21T08:19:41+00:00",
+      "label": "evals",
+      "cost_usd": "0.008303",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 466
+    },
+    {
+      "at": "2026-10-21T08:19:47+00:00",
+      "label": "evals",
+      "cost_usd": "0.008508",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 507
+    },
+    {
+      "at": "2026-10-21T08:19:53+00:00",
+      "label": "evals",
+      "cost_usd": "0.008343",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 474
+    },
+    {
+      "at": "2026-10-21T08:19:58+00:00",
+      "label": "evals",
+      "cost_usd": "0.008523",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 510
+    },
+    {
+      "at": "2026-10-21T08:20:04+00:00",
+      "label": "evals",
+      "cost_usd": "0.008338",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 473
+    },
+    {
+      "at": "2026-10-21T08:20:10+00:00",
+      "label": "evals",
+      "cost_usd": "0.008478",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 501
+    },
+    {
+      "at": "2026-10-21T08:20:15+00:00",
+      "label": "evals",
+      "cost_usd": "0.008323",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 470
+    },
+    {
+      "at": "2026-10-21T08:20:21+00:00",
+      "label": "evals",
+      "cost_usd": "0.008538",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 513
+    },
+    {
+      "at": "2026-10-21T08:20:27+00:00",
+      "label": "evals",
+      "cost_usd": "0.008333",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 472
+    },
+    {
+      "at": "2026-10-21T08:20:33+00:00",
+      "label": "evals",
+      "cost_usd": "0.008528",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 511
+    },
+    {
+      "at": "2026-10-21T08:20:38+00:00",
+      "label": "evals",
+      "cost_usd": "0.008323",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 470
+    },
+    {
+      "at": "2026-10-21T08:20:44+00:00",
+      "label": "evals",
+      "cost_usd": "0.008488",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 503
+    },
+    {
+      "at": "2026-10-21T08:20:50+00:00",
+      "label": "evals",
+      "cost_usd": "0.008363",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 478
+    },
+    {
+      "at": "2026-10-21T08:20:56+00:00",
+      "label": "evals",
+      "cost_usd": "0.008508",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 507
+    },
+    {
+      "at": "2026-10-21T08:21:01+00:00",
+      "label": "evals",
+      "cost_usd": "0.008273",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 460
+    },
+    {
+      "at": "2026-10-21T08:21:07+00:00",
+      "label": "evals",
+      "cost_usd": "0.008508",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 507
+    },
+    {
+      "at": "2026-10-21T08:21:12+00:00",
+      "label": "evals",
+      "cost_usd": "0.008343",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 474
+    },
+    {
+      "at": "2026-10-21T08:21:18+00:00",
+      "label": "evals",
+      "cost_usd": "0.008498",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 505
+    },
+    {
+      "at": "2026-10-21T08:21:24+00:00",
+      "label": "evals",
+      "cost_usd": "0.008353",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 476
+    },
+    {
+      "at": "2026-10-21T08:21:29+00:00",
+      "label": "evals",
+      "cost_usd": "0.008498",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 505
+    },
+    {
+      "at": "2026-10-21T08:21:43+00:00",
+      "label": "evals",
+      "cost_usd": "0.006816",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4406,
+      "output_tokens": 482
+    },
+    {
+      "at": "2026-10-21T08:21:50+00:00",
+      "label": "evals",
+      "cost_usd": "0.006768",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4393,
+      "output_tokens": 475
+    },
+    {
+      "at": "2026-10-21T08:21:55+00:00",
+      "label": "evals",
+      "cost_usd": "0.006731",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4406,
+      "output_tokens": 465
+    },
+    {
+      "at": "2026-10-21T08:22:01+00:00",
+      "label": "evals",
+      "cost_usd": "0.006741",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4406,
+      "output_tokens": 467
+    },
+    {
+      "at": "2026-10-21T08:22:06+00:00",
+      "label": "evals",
+      "cost_usd": "0.006971",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4406,
+      "output_tokens": 513
+    },
+    {
+      "at": "2026-10-21T08:22:12+00:00",
+      "label": "evals",
+      "cost_usd": "0.009433",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5973,
+      "output_tokens": 692
+    },
+    {
+      "at": "2026-10-21T08:22:19+00:00",
+      "label": "evals",
+      "cost_usd": "0.006931",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4406,
+      "output_tokens": 505
+    },
+    {
+      "at": "2026-10-21T08:22:25+00:00",
+      "label": "evals",
+      "cost_usd": "0.006753",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4393,
+      "output_tokens": 472
+    },
+    {
+      "at": "2026-10-21T08:22:31+00:00",
+      "label": "evals",
+      "cost_usd": "0.006681",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4406,
+      "output_tokens": 455
+    },
+    {
+      "at": "2026-10-21T08:22:36+00:00",
+      "label": "evals",
+      "cost_usd": "0.006948",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 4393,
+      "output_tokens": 511
+    },
+    {
+      "at": "2026-10-21T08:22:52+00:00",
+      "label": "evals",
+      "cost_usd": "0.007703",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5893,
+      "output_tokens": 362
+    },
+    {
+      "at": "2026-10-21T08:23:03+00:00",
+      "label": "evals",
+      "cost_usd": "0.007588",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5893,
+      "output_tokens": 339
+    },
+    {
+      "at": "2026-10-21T08:23:08+00:00",
+      "label": "evals",
+      "cost_usd": "0.007913",
+      "model": "claude-haiku-4-5-20251001",
+      "input_tokens": 5893,
+      "output_tokens": 404
+    }
+  ]
+}

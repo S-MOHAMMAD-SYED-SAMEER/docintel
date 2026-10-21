@@ -6,8 +6,8 @@ edit**: `tests/test_prompts.py` pins `invoice/v1` byte for byte.
 
 | Version | Written | Status |
 |---|---|---|
-| `invoice/v1` | the original | the default (`DOCINTEL_INVOICE_PROMPT_VERSION=invoice/v1`) |
-| `invoice/v2` | 2026-10-21, from the first real run's failures on `invoices_v1`, **committed before any run that uses it** | selected with `DOCINTEL_INVOICE_PROMPT_VERSION=invoice/v2`; becomes the default only by the rule in `docs/EVAL.md` |
+| `invoice/v1` | the original | still selectable (`DOCINTEL_INVOICE_PROMPT_VERSION=invoice/v1`) |
+| `invoice/v2` | 2026-10-21, from the first real run's failures on `invoices_v1`, **committed before any run that uses it** | **the default**, because it met every condition of the rule in `docs/EVAL.md` on the runs of 2026-10-21 (below); one run each, so read the caveats |
 | `purchase_order/v1` | the original | the only purchase-order prompt |
 
 ## invoice/v2: what the evidence was, and what changed
@@ -54,3 +54,17 @@ It does not touch the schema, the checker, the scoring or the review threshold.
      with a zero-width space inside, still counts as "on the page". Two of the three misses were therefore not flagged. This is
      a defect of the scorer, reported in the results and to be fixed after the study.
   2. The model's self-reported confidence (0.90) was the same on the right and the wrong copies.
+
+## What happened when v2 was run (2026-10-21; full record in `docs/results/2026-10-21-real-runs.md`)
+
+| Over the same 30 documents (390 fields) | v1 | v2 |
+|---|---|---|
+| Wrong fields | 6 | 3 |
+| Wrong and not flagged (false-confident) | 4 | 2 |
+| `invoices_v1` alone (20 documents, 260 fields) | 257 correct | 260 correct |
+| `invoices_hard_v1` alone (10 documents, 130 fields) | 127 correct | 127 correct |
+
+By the rule written beforehand, v2 is the default. **All of the difference is on `invoices_v1`, the set v2 was written from.** On
+the hard set, where v2 was not tuned, v1 and v2 each missed the same three fields. One run each at default sampling, so the
+`invoices_v1` difference is as consistent with chance as with the prompt. The scorer weaknesses listed above were not fixed
+for these runs and remain open.

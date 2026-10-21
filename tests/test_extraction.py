@@ -69,7 +69,7 @@ def test_extraction_row_records_the_call_metadata(
 
     extraction = _load(migrated_engine, extraction_id)["extraction"]
     assert extraction.model_name == "fake-model-1"
-    assert extraction.prompt_version == "invoice/v1"
+    assert extraction.prompt_version == "invoice/v2"
     assert extraction.document_id == rendered_document.id
     assert extraction.created_at is not None
     assert extraction.error is None
