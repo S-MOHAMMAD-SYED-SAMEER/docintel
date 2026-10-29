@@ -70,14 +70,14 @@ asking a language model whether it added up correctly.
 | **Strict schemas** | Pydantic v2 with `extra="forbid"`; the model cannot invent a field. Money is `Decimal` carried as decimal strings — a JSON number would arrive as a float and `1234.56` would stop being exact. |
 | **Structured model output** | The extractor's JSON Schema is sent as `output_config.format`, tightened so every object is closed and every property required. |
 | **Deterministic validation** | Row `quantity × unit_price`, rows summing to subtotal, `subtotal + tax = total`, ISO 4217 codes, date parsing and ordering — all in `app/validation/`, none of it in the prompt. |
-| **Field-level confidence** | Four weighted signals combined per field, renormalised over the signals that actually apply. The model's own number gets under half the say. |
+| **Field-level confidence** | Four weighted signals combined per field, renormalised over the signals that actually apply. With all four signals present the model's own number gets 0.40 of the weight; where fewer apply the rest is renormalised and its share rises (with only the model, as on an image-only document, it has all of it). |
 | **Human-in-the-loop** | A field below threshold, or one that failed a deterministic check, goes to a review queue with the reason attached. |
 | **Correction audit trail** | A correction records what the field said before it. Repeated corrections chain back to the model's original; nothing is overwritten. |
 | **Provider abstraction** | One interface, `extract(images, schema, prompt) -> RawExtraction`. Exactly one module imports the Anthropic SDK. |
 | **Document-type registries** | Invoice and purchase order share one pipeline with zero branching on document type — asserted by a test. |
 | **Reproducible evaluation** | A committed, deterministic, labelled dataset and a CLI that measures accuracy, review rate, false-confident rate, cost and latency. |
 | **Cost and latency tracking** | Recorded per extraction from provider usage; never invented when the provider reports none. |
-| **PostgreSQL + Alembic** | Seven migrations, each verified to upgrade, downgrade and re-upgrade on a fresh database. |
+| **PostgreSQL + Alembic** | Seven migrations; a test takes the whole chain up, down to `base` and up again on a fresh database (not each migration on its own). |
 | **Test coverage** | 658 tests across 38 files, including a hard guard that no test can reach the real API. |
 
 ---
@@ -124,8 +124,9 @@ asking a language model whether it added up correctly.
 
 Invoice and purchase order run through **the same pipeline**. `app/extraction.py`,
 `app/confidence.py`, `app/review.py`, `app/corrections.py` and `app/export.py`
-contain no branch on document type at all — there is a test that reads their
-source and asserts it.
+contain no branch on document type that I could find. A test reads their source and
+fails on the text `doc_type == "` or the word `purchase_order`; a branch written
+another way (`!=`, `in`) would not be caught by it.
 
 What differs per type is resolved through two registries keyed by `doc_type`:
 
@@ -379,8 +380,8 @@ runs at a time (a second `POST .../extract` gets 409).
 **The schema sent to the API** is the extractor's Pydantic schema with every keyword the structured-outputs endpoint
 does not accept (`minimum`, `maximum`, `default` and the other numeric and string constraints) removed. Those limits
 are still enforced on the way back in: Pydantic validates every answer, so a confidence of 1.4 or a page 0 fails the
-extraction. Whether the live endpoint accepts the remaining schema has not been checked yet: the first real request
-will be that check.
+extraction. The live endpoint accepts the remaining schema: 64 requests were made with it on 2026-10-21 and all of them
+extracted.
 
 `raw_response` is kept verbatim and never discarded — it is what you read when
 an extraction is wrong, and what future eval runs re-score.
@@ -420,8 +421,11 @@ confidence = Σ(weightᵢ × scoreᵢ) / Σ(weightᵢ)   over applicable signals
 
 Weights need not sum to 1 — inapplicable signals drop out and the rest are
 renormalised, so a field is never marked down for a check that could not run.
-The defaults give the model under half the say, so the deterministic signals
-together outweigh it wherever they apply. All five values are configurable;
+With all four signals present the defaults give the model 0.40 of the weight, so the
+deterministic signals together outweigh it there. Where fewer apply the weights are
+renormalised and the model's share is larger: the model plus one 0.20 signal gives it
+two thirds, and on a field with no check at all (an image-only document) it has all of
+it (`hard-002`'s address: model 0.95, final 0.95). All five values are configurable;
 none is hard-coded in the scoring logic.
 
 `needs_review` is set when **the score is below the threshold (default 0.85),
@@ -435,7 +439,12 @@ score but never forces review on its own.
 embedded in the source PDF. A scan, a photo, or an image upload has none, and
 that returns an empty text layer — meaning "this signal does not apply", never
 "the value is wrong". Matching ignores case, spacing, currency symbols and
-thousands separators, so `1,210.00` on the page corroborates `1210.00`.
+thousands separators, so `1,210.00` on the page corroborates `1210.00`. It does **not**
+corroborate a date the page prints in a non-ISO form: an extracted date is turned into
+ISO text (`2026-03-18`, which reduces to `20260318`) and compared as a whole token with the
+page's `18/03/2026` (`18032026`), so a correct date scores 0.0 on this signal (the saved
+`hard-003` `due_date`). How many documents this affects has not been measured; see the
+limits.
 
 `field_values` carries three numbers: `model_confidence` (verbatim, never
 overwritten), `confidence` (the final score), and `validation` (the
@@ -599,6 +608,9 @@ second type runs against the real model, nothing more. Cost: about USD 0.008 a t
   "As run" and "with the fixed check" are published side by side because the second was chosen after seeing the first; the new
   check was specified from three known cases, not tuned on the other results. It still accepts a truncation at a word boundary
   of a multi-word value (`Acme Supplies` for `Acme Supplies BV`).
+- **A correct date printed in a non-ISO form gets no text-layer corroboration.** The signal reads 0.0 for it, so it
+  scores lower than it should (the saved `hard-003` `due_date` is correct with a text-layer signal of 0.0). How many
+  documents are affected has not been measured. A v1.1 candidate: compare dates in the form the page prints them.
 - **On image-only documents the model's own confidence is the only signal** (there is no text layer), so a wrong value the model
   is sure of is not flagged. Both wrong values still unflagged with the fixed check are of this kind (an address, and a VAT number
   copied wrongly at 0.92).
@@ -693,7 +705,7 @@ Environment-only, prefix `DOCINTEL_`. See `.env.example`; never commit a real
 | --- | --- | --- |
 | `DOCINTEL_DATABASE_URL` | local dev URL | **Override in production.** The default carries a development credential and points at localhost. |
 | `DOCINTEL_ANTHROPIC_API_KEY` | empty | The credential. `ANTHROPIC_API_KEY` (the SDK's own name) in the environment or in `.env` works too; `DOCINTEL_ANTHROPIC_API_KEY` wins if both are set. With none, an extraction fails with a clear "no credential" error. |
-| `DOCINTEL_EXTRACTION_MODEL` | `claude-haiku-4-5` | The model ID sent to the API. Not yet verified against the live API. |
+| `DOCINTEL_EXTRACTION_MODEL` | `claude-haiku-4-5` | The model ID sent to the API. Verified: the 2026-10-21 runs used it, and the API resolved it to `claude-haiku-4-5-20251001`. |
 | `DOCINTEL_EXTRACTION_TIMEOUT_SECONDS` | `120` | A request is cut off after this long. |
 | `DOCINTEL_INVOICE_PROMPT_VERSION` | `invoice/v2` | The invoice prompt: `invoice/v2` (the default, chosen by the rule in `docs/EVAL.md`) or `invoice/v1`. Stored with every extraction. |
 | `DOCINTEL_EXTRACTION_MAX_RETRIES` | `2` | SDK retries of transient failures; `0` = never (required for a counted evaluation run). |
@@ -798,16 +810,11 @@ pytest                     # 658 tests
 pytest -q tests/test_purchase_order.py
 ```
 
-With PostgreSQL running: 658 tests collected, 658 pass. A previous count
-(478 collected, 477 pass) reported one failure,
-`tests/test_eval_cli.py::test_json_output_is_machine_readable`, as a
-known, environment-specific artifact — SQLAlchemy log output occasionally
-interleaves with the CLI's captured JSON stdout in some environments — not
-a defect in the application. That specific failure did not reproduce in
-the environment this count was most recently verified in; it is recorded
-here rather than silently dropped, since nothing has changed about the
-underlying mechanism that could cause it, only the environment happened
-not to trigger it this time.
+With PostgreSQL running: 658 tests collected, 658 pass (the CI run on the `v1.0` tag). An
+earlier count (478 collected, 477 pass) recorded one environment-specific failure,
+`tests/test_eval_cli.py::test_json_output_is_machine_readable` (SQLAlchemy log output
+interleaving with the CLI's captured JSON). It has not been seen in the later runs; the
+mechanism was not changed, so it could return.
 
 Tests that need PostgreSQL are skipped when no server answers, so `pytest`
 runs without a database at 391 pass, 267 skip (658 collected either way).

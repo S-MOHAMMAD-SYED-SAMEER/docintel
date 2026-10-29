@@ -25,7 +25,7 @@ The schema is built by running the **real Alembic migrations**, not a shortcut. 
 
 ## What is covered
 
-About 34 test files, in groups:
+38 test files, in groups:
 
 | Group | What it checks |
 |---|---|
@@ -57,8 +57,8 @@ invoice through the demo and checks the record) and **`audit`** (`pip-audit`).
 
 Passing tests show the code does what the tests say. They do not show that the extraction is accurate: no model is called in
 the suite (every provider is a fake), so a change in the model's behaviour, a wrong model ID, or an API that rejects the
-schema cannot turn a test red. That is what the evaluation runs are for, and the first of them (a single smoke extraction)
-is also the first check that the live endpoint accepts the schema. See [EVAL.md](EVAL.md) for the plan.
+schema cannot turn a test red. That is what the evaluation runs are for, and the first of them (a single smoke extraction) was also the first check that the live endpoint
+accepts the schema (it did: the 2026-10-21 runs made 64 requests with it). See [EVAL.md](EVAL.md) for the plan.
 
 ## Adding a test
 
