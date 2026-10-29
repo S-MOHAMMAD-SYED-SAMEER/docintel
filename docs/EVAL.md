@@ -10,8 +10,8 @@ what caps, in what order, and how the one prompt revision will be decided.**
 ## Model and settings
 
 - Model: `claude-haiku-4-5` (the default in `app/config.py`). Its price (USD 1 per million input tokens, 5 per million output
-  tokens) was checked against Anthropic's pricing page on 2026-10-20 (`app/providers/pricing.py`). The model ID itself is
-  **not yet verified against the live API**: the first request is that check.
+  tokens) was checked against Anthropic's pricing page on 2026-10-20 (`app/providers/pricing.py`). The model ID itself was
+  **not yet verified against the live API** when this plan was written; the 2026-10-21 runs verified it (the API resolved it to `claude-haiku-4-5-20251001`).
 - Adapter retries **off** (`DOCINTEL_EXTRACTION_MAX_RETRIES=0`), timeout 120 s, `max_tokens` 16,000, the default prompts
   `invoice/v1` and `purchase_order/v1`, the default confidence weights (0.40 / 0.20 / 0.20 / 0.20) and the default threshold
   (0.85). **None of the weights or the threshold is tuned on the evaluation data.** If an offline analysis shows what other
